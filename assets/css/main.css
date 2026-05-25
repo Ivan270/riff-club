@@ -1,4 +1,5 @@
-:root {
+:root,
+[data-theme="dark"] {
   --ink: #101010;
   --black: #050505;
   --paper: #fff7e8;
@@ -12,12 +13,28 @@
   --muted-ink: #5e574c;
   --max: 1120px;
   --font-display:
-    Impact, Haettenschweiler, 'Arial Black', 'Franklin Gothic Heavy', sans-serif;
-  --font-body: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+    Impact, Haettenschweiler, 'Franklin Gothic Heavy', 'Arial Black', sans-serif;
+  --font-body: Charter, 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
   --font-mono:
-    'Courier New', Courier, ui-monospace, SFMono-Regular, Menlo, monospace;
+    'IBM Plex Mono', 'Courier New', Courier, monospace;
   --shadow-hard: 7px 7px 0 var(--black);
-  color-scheme: dark light;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --ink: #241f1a;
+  --black: #101010;
+  --paper: #fff8e9;
+  --paper-aged: #e8dcc4;
+  --acid: #c5f000;
+  --red: #e93227;
+  --purple: #8f45dd;
+  --tape: #e9c769;
+  --gray: #f0e5d0;
+  --muted: #3f382f;
+  --muted-ink: #6a5d4e;
+  --shadow-hard: 7px 7px 0 rgba(16, 16, 16, .82);
+  color-scheme: light;
 }
 
 * {
@@ -26,6 +43,7 @@
 html {
   scroll-behavior: smooth;
   background: var(--ink);
+  overflow-x: clip;
 }
 
 body {
@@ -54,6 +72,12 @@ body {
   font-size: 18px;
   line-height: 1.55;
   text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+:target,
+:focus {
+  scroll-margin-top: 96px;
 }
 
 body::before {

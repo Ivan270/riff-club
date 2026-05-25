@@ -7,7 +7,8 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "generate": "nuxt generate",
-    "preview": "nuxt preview"
+    "preview": "nuxt preview",
+    "test:frontend": "node scripts/frontend-regression-check.mjs"
   },
   "dependencies": {
     "nuxt": "3.17.0",

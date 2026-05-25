@@ -1,20 +1,30 @@
 <script setup lang="ts">
 const route = useRoute()
 const isActive = (path: string) => route.path === path
+
+const navItems = [
+  { label: 'Eléctrica', to: '/clases-guitarra-electrica' },
+  { label: 'Acústica', to: '/clases-guitarra-acustica' },
+  { label: 'Bajo', to: '/clases-bajo' },
+  { label: 'Método', to: '/sobre-mi' },
+  { label: 'Contacto', to: '/contacto', cta: true }
+]
 </script>
 
 <template>
   <header class="site-header tape">
     <NuxtLink class="brand" to="/" aria-label="Ir al inicio">Riff Club Local</NuxtLink>
     <nav aria-label="Navegación principal">
-      <NuxtLink v-if="route.path !== '/'" class="nav-link" :class="{ active: isActive('/') }" to="/">Inicio</NuxtLink>
-      <NuxtLink class="nav-link" :class="{ active: isActive('/clases-guitarra-electrica') }"
-        to="/clases-guitarra-electrica">Eléctrica</NuxtLink>
-      <NuxtLink class="nav-link" :class="{ active: isActive('/clases-guitarra-acustica') }"
-        to="/clases-guitarra-acustica">Acústica</NuxtLink>
-      <NuxtLink class="nav-link" :class="{ active: isActive('/clases-bajo') }" to="/clases-bajo">Bajo</NuxtLink>
-      <NuxtLink class="nav-link" :class="{ active: isActive('/sobre-mi') }" to="/sobre-mi">Método</NuxtLink>
-      <NuxtLink class="nav-link nav-cta" :class="{ active: isActive('/contacto') }" to="/contacto">Contacto</NuxtLink>
+      <NuxtLink v-if="route.path !== '/'" class="nav-link" :class="{ active: isActive('/') }" to="/" :aria-current="isActive('/') ? 'page' : undefined">Inicio</NuxtLink>
+      <NuxtLink
+        v-for="item in navItems"
+        :key="item.to"
+        class="nav-link"
+        :class="{ active: isActive(item.to), 'nav-cta': item.cta }"
+        :to="item.to"
+        :aria-current="isActive(item.to) ? 'page' : undefined"
+      >{{ item.label }}</NuxtLink>
+      <ThemeToggle />
     </nav>
   </header>
 </template>
@@ -60,6 +70,10 @@ nav {
 
 .nav-link {
   position: relative;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
   padding: 7px 9px;
   color: var(--paper);
   white-space: nowrap;
