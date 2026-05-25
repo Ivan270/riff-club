@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Nuxt build output
+.nuxt/
+.output/
+dist
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local tooling state
+.agents/
+.superpowers/
+skills-lock.json
+
+# OS and editor files
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
