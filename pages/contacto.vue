@@ -58,7 +58,8 @@ useHead({
 
 <style scoped>
 .contact { display: grid; grid-template-columns: 1fr 420px; gap: 36px; align-items: start; }
-.contact p, details p { color: var(--muted); }
+.contact p { color: var(--muted); }
+details p { color: var(--muted-on-dark); }
 form { display: grid; gap: 14px; padding: 22px; background: var(--paper); color: var(--ink); box-shadow: 8px 8px 0 var(--red); }
 .contact-form-card { position: relative; box-sizing: border-box; max-width: calc(100% - 12px); border: 2px solid var(--ink); transform: rotate(1deg); }
 .contact-form-card::before { content: ''; position: absolute; top: -12px; left: 28px; width: 86px; height: 22px; background: color-mix(in srgb, var(--acid) 72%, white); border: 1px solid var(--ink); transform: rotate(-4deg); }

@@ -19,7 +19,7 @@
 .footer::after { inset: auto 6% 20px auto; width: min(420px, 62vw); background: var(--purple); transform: rotate(2deg); }
 .footer-grid { position: relative; z-index: 1; display: grid; gap: 24px; grid-template-columns: 1.3fr 1fr auto; align-items: center; padding: clamp(24px, 4vw, 34px); background: rgba(5, 5, 5, .9); border: 2px dashed var(--paper); box-shadow: 9px 9px 0 var(--acid); }
 h2 { margin: 0; font-family: var(--font-display); font-size: clamp(2rem, 6vw, 4.5rem); line-height: .9; letter-spacing: -.06em; text-transform: uppercase; }
-p { color: var(--muted); }
+p { color: var(--muted-on-dark); }
 .footer-stamp { display: inline-block; margin: 16px 0 0; padding: 8px 10px; color: var(--ink); background: var(--paper); border: 2px solid var(--red); font: 900 .78rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; box-shadow: 4px 4px 0 var(--red); transform: rotate(-1deg); }
 @media (max-width: 820px) { .footer-grid { grid-template-columns: 1fr; } }
 </style>

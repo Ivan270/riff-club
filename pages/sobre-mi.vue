@@ -19,7 +19,8 @@ useSeoMeta({ title: 'Profesor de guitarra y bajo en La Reina', description: 'Con
 </template>
 
 <style scoped>
-.lead, .setlist-steps p { color: var(--muted); max-width: 760px; }
+.lead { color: var(--muted); max-width: 760px; }
+.setlist-steps p { color: var(--muted-ink); max-width: 760px; }
 .setlist-steps { display: grid; gap: 22px; grid-template-columns: repeat(3, 1fr); counter-reset: setlist; }
 article { position: relative; box-sizing: border-box; max-width: calc(100% - 12px); padding: 52px 24px 24px; background: var(--paper); color: var(--ink); border: 2px solid var(--ink); box-shadow: 8px 8px 0 #000; transform: rotate(-1.5deg); }
 article:nth-child(2) { transform: rotate(1deg); }

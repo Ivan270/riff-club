@@ -120,7 +120,7 @@ p {
 }
 
 .panel p {
-  color: var(--muted);
+  color: var(--muted-on-dark);
 }
 
 .area-panel p {
