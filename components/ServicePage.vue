@@ -72,8 +72,9 @@ defineProps<{
 .panel {
   box-sizing: border-box;
   padding: 28px;
-  border: 2px solid var(--paper);
-  background: #151515;
+  border: 2px solid var(--section-border);
+  background: var(--section-bg);
+  color: var(--section-text);
 }
 
 .main-panel {
@@ -83,7 +84,7 @@ defineProps<{
 .flyer-panel {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #181818, #0b0b0b);
+  background: linear-gradient(180deg, var(--section-bg-start), var(--section-bg-end));
   border-style: dashed;
 }
 
@@ -92,7 +93,7 @@ defineProps<{
   position: absolute;
   inset: auto -16px -18px -16px;
   height: 34px;
-  background: repeating-linear-gradient(90deg, transparent 0 16px, var(--paper) 16px 19px);
+  background: repeating-linear-gradient(90deg, transparent 0 16px, var(--section-border) 16px 19px);
   opacity: .28;
 }
 
@@ -120,7 +121,7 @@ p {
 }
 
 .panel p {
-  color: var(--muted-on-dark);
+  color: var(--section-muted);
 }
 
 .area-panel p {

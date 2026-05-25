@@ -59,14 +59,14 @@ useHead({
 <style scoped>
 .contact { display: grid; grid-template-columns: 1fr 420px; gap: 36px; align-items: start; }
 .contact p { color: var(--muted); }
-details p { color: var(--muted-on-dark); }
+details p { color: var(--section-muted); }
 form { display: grid; gap: 14px; padding: 22px; background: var(--paper); color: var(--ink); box-shadow: 8px 8px 0 var(--red); }
 .contact-form-card { position: relative; box-sizing: border-box; max-width: calc(100% - 12px); border: 2px solid var(--ink); transform: rotate(1deg); }
 .contact-form-card::before { content: ''; position: absolute; top: -12px; left: 28px; width: 86px; height: 22px; background: color-mix(in srgb, var(--acid) 72%, white); border: 1px solid var(--ink); transform: rotate(-4deg); }
 label { display: grid; gap: 6px; font-weight: 900; }
 input, textarea { box-sizing: border-box; width: 100%; padding: 12px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); font: inherit; }
 h2 { font-size: clamp(2.5rem, 8vw, 5rem); line-height: .82; text-transform: uppercase; letter-spacing: -.08em; }
-.faq-row { position: relative; box-sizing: border-box; max-width: calc(100% - 12px); margin-bottom: 14px; padding: 18px 20px; border: 2px solid var(--paper); background: #111; box-shadow: 6px 6px 0 #000; }
+.faq-row { position: relative; box-sizing: border-box; max-width: calc(100% - 12px); margin-bottom: 14px; padding: 18px 20px; border: 2px solid var(--section-border); background: var(--section-bg); color: var(--section-text); box-shadow: 6px 6px 0 #000; }
 .faq-row::before { content: ''; position: absolute; top: -8px; right: 26px; width: 18px; height: 18px; border: 2px solid var(--paper); border-radius: 50%; background: var(--red); }
 .faq-row:nth-child(even) { transform: rotate(.5deg); }
 .faq-row:nth-child(odd) { transform: rotate(-.5deg); }

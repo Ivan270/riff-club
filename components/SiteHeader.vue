@@ -39,8 +39,8 @@ const navItems = [
   align-items: center;
   justify-content: space-between;
   padding: 14px 18px 16px;
-  background: rgba(16, 16, 16, .94);
-  border-bottom: 3px solid var(--paper);
+  background: var(--header-bg);
+  border-bottom: 3px solid var(--section-border);
   clip-path: polygon(0 0, 100% 0, 99% 100%, 91% 92%, 83% 100%, 72% 94%, 64% 100%, 55% 93%, 46% 100%, 36% 94%, 27% 100%, 18% 93%, 8% 100%, 0 96%);
   backdrop-filter: blur(10px);
   box-shadow: 0 10px 0 rgba(0, 0, 0, .3);
@@ -75,7 +75,7 @@ nav {
   align-items: center;
   justify-content: center;
   padding: 7px 9px;
-  color: var(--paper);
+  color: var(--page-text);
   white-space: nowrap;
   text-decoration: none;
   font: 900 .86rem/1 var(--font-mono);
@@ -102,7 +102,7 @@ nav {
 }
 
 .nav-link.active {
-  color: var(--acid);
+  color: var(--red);
 }
 
 .nav-cta {

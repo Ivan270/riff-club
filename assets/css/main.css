@@ -22,6 +22,14 @@
   --grid-line: rgba(255, 247, 232, 0.06);
   --grain-light: rgba(255, 255, 255, 0.55);
   --grain-dark: rgba(0, 0, 0, 0.7);
+  --section-bg: #050505;
+  --section-bg-start: #181818;
+  --section-bg-end: #0b0b0b;
+  --section-text: #fff7e8;
+  --section-muted: #d8d0bf;
+  --section-border: #fff7e8;
+  --section-overlay: rgba(5, 5, 5, .9);
+  --header-bg: rgba(16, 16, 16, .94);
   --max: 1120px;
   --font-display:
     Impact, Haettenschweiler, 'Franklin Gothic Heavy', 'Arial Black', sans-serif;
@@ -55,6 +63,14 @@
   --grid-line: rgba(36, 31, 26, 0.08);
   --grain-light: rgba(255, 255, 255, 0.82);
   --grain-dark: rgba(36, 31, 26, 0.24);
+  --section-bg: #fff2d2;
+  --section-bg-start: #fffaf0;
+  --section-bg-end: #ffe5ad;
+  --section-text: #241f1a;
+  --section-muted: #574b3c;
+  --section-border: #241f1a;
+  --section-overlay: rgba(255, 248, 233, .92);
+  --header-bg: rgba(255, 246, 223, .94);
   --shadow-hard: 7px 7px 0 rgba(16, 16, 16, .82);
   color-scheme: light;
 }

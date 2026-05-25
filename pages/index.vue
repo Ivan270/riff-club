@@ -70,9 +70,9 @@ h2 { font-size: clamp(2.6rem, 8vw, 6rem); line-height: .82; letter-spacing: -.08
 .note::before { content: ''; position: absolute; top: -11px; left: 24px; width: 72px; height: 20px; background: color-mix(in srgb, var(--acid) 78%, white); border: 1px solid var(--ink); transform: rotate(-3deg); }
 .note h3 { color: var(--ink); font-size: 1.4rem; text-transform: uppercase; }
 .note p { color: #272727; }
-.method p { color: var(--muted-on-dark); }
-.method { background: #050505; padding-inline: 24px; border-left: 8px solid var(--red); }
-.setlist-panel { position: relative; box-sizing: border-box; max-width: calc(100% - 12px); border: 2px solid var(--paper); box-shadow: 12px 12px 0 var(--red); background: linear-gradient(135deg, #050505 0 78%, rgba(218, 255, 0, .16) 78% 100%); }
-.setlist-panel::after { content: 'setlist'; position: absolute; right: 18px; top: 18px; padding: 5px 10px; border: 1px solid var(--paper); color: var(--paper); font-size: .78rem; font-weight: 950; letter-spacing: .18em; text-transform: uppercase; transform: rotate(4deg); }
+.method p { color: var(--section-muted); }
+.method { background: var(--section-bg); color: var(--section-text); padding-inline: 24px; border-left: 8px solid var(--red); }
+.setlist-panel { position: relative; box-sizing: border-box; max-width: calc(100% - 12px); border: 2px solid var(--section-border); box-shadow: 12px 12px 0 var(--red); background: linear-gradient(135deg, var(--section-bg) 0 78%, color-mix(in srgb, var(--acid) 16%, transparent) 78% 100%); }
+.setlist-panel::after { content: 'setlist'; position: absolute; right: 18px; top: 18px; padding: 5px 10px; border: 1px solid var(--section-border); color: var(--section-text); font-size: .78rem; font-weight: 950; letter-spacing: .18em; text-transform: uppercase; transform: rotate(4deg); }
 @media (max-width: 860px) { .note-grid, .service-grid { grid-template-columns: 1fr; } .note, .note:nth-child(2), .note:nth-child(3) { transform: none; box-shadow: 4px 6px 0 #000; } .setlist-panel { box-shadow: 4px 6px 0 var(--red); } .setlist-panel::after { position: static; display: inline-block; margin-top: 18px; } }
 </style>
