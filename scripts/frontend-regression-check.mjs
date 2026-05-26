@@ -1,6 +1,13 @@
 import { readFileSync } from 'node:fs'
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
+const readOptional = (path) => {
+  try {
+    return read(path)
+  } catch {
+    return ''
+  }
+}
 const failures = []
 
 const assert = (condition, message) => {
@@ -44,6 +51,28 @@ assert(css.includes('color: var(--page-text);'), 'body text must use page text v
 assert(css.includes('--bg-end: #fff0cf'), 'Light theme must use a visibly light final background stop')
 assert(css.includes('overflow-x: clip'), 'Global CSS must clip horizontal overflow')
 assert(!css.includes('color-scheme: dark light'), 'Global CSS must not advertise both schemes globally')
+
+const pkg = JSON.parse(read('package.json'))
+const motion = readOptional('composables/useGsapMotion.ts')
+const animatedFiles = [
+  'components/HeroZine.vue',
+  'components/ServicePage.vue',
+  'components/ContactCta.vue',
+  'components/SiteFooter.vue'
+].map((path) => [path, read(path)])
+
+assert(pkg.dependencies?.gsap, 'GSAP must be installed as a runtime dependency')
+assert(motion.includes("import('gsap')"), 'GSAP must be dynamically imported inside the motion composable')
+assert(motion.includes("import('gsap/ScrollTrigger')"), 'ScrollTrigger must be dynamically imported inside the motion composable')
+assert(motion.includes('prefers-reduced-motion: reduce'), 'Motion composable must respect reduced motion')
+assert(motion.includes('gsap.context'), 'Motion composable must use gsap.context for cleanup')
+assert(!motion.includes('scrollerProxy'), 'Motion composable must not use scroll-jacking APIs')
+
+for (const [path, source] of animatedFiles) {
+  assert(source.includes('useGsapMotion'), `${path} must use the shared GSAP motion composable`)
+  assert(source.includes('onMounted'), `${path} must initialize animation from a client lifecycle hook`)
+  assert(!source.includes('repeat: -1'), `${path} must not include infinite GSAP loops`)
+}
 
 for (const [path, source] of servicePages) {
   assert(source.includes('<ServicePage'), `${path} must use shared ServicePage component`)

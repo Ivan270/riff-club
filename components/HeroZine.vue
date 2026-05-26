@@ -1,9 +1,35 @@
 <script setup lang="ts">
 const whatsappHref = 'https://wa.me/56995296324?text=Hola%2C%20quiero%20consultar%20por%20clases%20presenciales%20de%20guitarra%2Fbajo%20en%20La%20Reina.%20%C2%BFTienes%20horarios%20disponibles%3F'
+
+const heroRef = useTemplateRef<HTMLElement>('heroRef')
+const { bindPressFeedback, runWhenMotionAllowed } = useGsapMotion()
+let cleanupTimeline: (() => void) | undefined
+let cleanupButtons: (() => void) | undefined
+
+onMounted(async () => {
+  cleanupTimeline = await runWhenMotionAllowed(heroRef, ({ gsap }) => {
+    const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+    timeline
+      .from('.hero-copy > *', { y: 22, opacity: 0, duration: 0.45, stagger: 0.08 })
+      .from('.poster', { y: 34, opacity: 0, rotate: -3, scale: 0.97, duration: 0.58, ease: 'back.out(1.5)' }, '-=0.28')
+      .from('.poster-tape', { y: -18, opacity: 0, rotate: -14, duration: 0.28, stagger: 0.08 }, '-=0.2')
+      .from('.poster-type span', { x: -24, opacity: 0, rotate: -8, scale: 0.9, duration: 0.32, stagger: 0.08, ease: 'back.out(2)' }, '-=0.14')
+      .from('.string-lines span', { scaleX: 0, transformOrigin: 'left center', duration: 0.32, stagger: 0.045 }, '-=0.28')
+      .from('.poster-local, .poster-note, .poster b', { opacity: 0, scale: 0.92, rotate: -4, duration: 0.28, stagger: 0.06 }, '-=0.2')
+  })
+
+  cleanupButtons = await bindPressFeedback(Array.from(heroRef.value?.querySelectorAll('.button') ?? []))
+})
+
+onBeforeUnmount(() => {
+  cleanupTimeline?.()
+  cleanupButtons?.()
+})
 </script>
 
 <template>
-  <section class="hero container" aria-labelledby="home-title">
+  <section ref="heroRef" class="hero container" aria-labelledby="home-title">
     <div class="hero-copy">
       <span class="sticker">Clases presenciales / La Reina</span>
       <h1 id="home-title" class="display">Clases de guitarra en La Reina</h1>
@@ -59,7 +85,6 @@ const whatsappHref = 'https://wa.me/56995296324?text=Hola%2C%20quiero%20consulta
   box-shadow: 14px 14px 0 var(--red);
   overflow: hidden;
   transform: rotate(1deg);
-  animation: poster-drop .7s cubic-bezier(.2, .8, .15, 1) both;
 }
 
 .poster::before {
@@ -197,18 +222,6 @@ const whatsappHref = 'https://wa.me/56995296324?text=Hola%2C%20quiero%20consulta
   font-size: 7rem;
   line-height: 1;
   letter-spacing: -.12em;
-}
-
-@keyframes poster-drop {
-  from {
-    opacity: 0;
-    transform: translateY(22px) rotate(-2deg) scale(.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) rotate(1deg) scale(1);
-  }
 }
 
 @media (max-width: 860px) {

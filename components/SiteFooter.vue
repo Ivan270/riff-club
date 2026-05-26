@@ -1,5 +1,36 @@
+<script setup lang="ts">
+const footerRef = useTemplateRef<HTMLElement>('footerRef')
+const { bindPressFeedback, runWhenMotionAllowed } = useGsapMotion()
+let cleanupTimeline: (() => void) | undefined
+let cleanupButtons: (() => void) | undefined
+
+onMounted(async () => {
+  cleanupTimeline = await runWhenMotionAllowed(footerRef, ({ gsap }) => {
+    gsap.from('.footer-grid', {
+      y: 30,
+      opacity: 0,
+      rotate: -1.5,
+      duration: 0.48,
+      ease: 'back.out(1.4)',
+      scrollTrigger: {
+        trigger: footerRef.value,
+        start: 'top 86%',
+        once: true
+      }
+    })
+  })
+
+  cleanupButtons = await bindPressFeedback(Array.from(footerRef.value?.querySelectorAll('.button') ?? []))
+})
+
+onBeforeUnmount(() => {
+  cleanupTimeline?.()
+  cleanupButtons?.()
+})
+</script>
+
 <template>
-  <footer class="footer">
+  <footer ref="footerRef" class="footer">
     <div class="container footer-grid">
       <div>
         <p class="eyebrow">Clases presenciales</p>

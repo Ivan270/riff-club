@@ -1,6 +1,42 @@
 <script setup lang="ts">
 type Accent = 'red' | 'acid' | 'purple'
 
+const servicePageRef = useTemplateRef<HTMLElement>('servicePageRef')
+const { bindPressFeedback, runWhenMotionAllowed } = useGsapMotion()
+let cleanupTimeline: (() => void) | undefined
+let cleanupButtons: (() => void) | undefined
+
+onMounted(async () => {
+  cleanupTimeline = await runWhenMotionAllowed(servicePageRef, ({ gsap, ScrollTrigger }) => {
+    const page = servicePageRef.value
+    const animatedElements = page ? Array.from(page.querySelectorAll<HTMLElement>('.service-motion-target')) : []
+
+    animatedElements.forEach((element, index) => {
+      gsap.from(element, {
+        y: 28,
+        opacity: 0,
+        rotate: index % 2 === 0 ? -2 : 2,
+        duration: 0.48,
+        ease: 'back.out(1.4)',
+        scrollTrigger: {
+          trigger: element,
+          start: 'top 82%',
+          once: true
+        }
+      })
+    })
+
+    ScrollTrigger.refresh()
+  })
+
+  cleanupButtons = await bindPressFeedback(Array.from(servicePageRef.value?.querySelectorAll('.related-links a') ?? []))
+})
+
+onBeforeUnmount(() => {
+  cleanupTimeline?.()
+  cleanupButtons?.()
+})
+
 defineProps<{
   eyebrow: string
   title: string
@@ -15,7 +51,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="service-page" :class="`service-page--${accent}`">
+  <div ref="servicePageRef" class="service-page" :class="`service-page--${accent}`">
     <section class="service-hero container" aria-labelledby="page-title">
       <p class="eyebrow">{{ eyebrow }}</p>
       <h1 id="page-title" class="display">{{ title }}</h1>
@@ -23,12 +59,12 @@ defineProps<{
     </section>
 
     <section class="section container content-grid" aria-labelledby="approach-title">
-      <article class="panel main-panel flyer-panel">
+      <article class="panel main-panel flyer-panel service-motion-target">
         <span class="sticker">{{ sticker }}</span>
         <h2 id="approach-title">{{ approachTitle }}</h2>
         <p v-for="paragraph in body" :key="paragraph">{{ paragraph }}</p>
       </article>
-      <aside class="panel area-panel venue-note" aria-labelledby="area-title">
+      <aside class="panel area-panel venue-note service-motion-target" aria-labelledby="area-title">
         <h2 id="area-title">Zona de clases</h2>
         <p>{{ area }}</p>
       </aside>
@@ -38,7 +74,7 @@ defineProps<{
       <p class="eyebrow">También puedes revisar</p>
       <h2 id="related-title">Otros instrumentos</h2>
       <div class="related-links">
-        <NuxtLink v-for="link in related" :key="link.to" :to="link.to">{{ link.label }}</NuxtLink>
+        <NuxtLink v-for="link in related" :key="link.to" class="service-motion-target" :to="link.to">{{ link.label }}</NuxtLink>
       </div>
     </section>
 

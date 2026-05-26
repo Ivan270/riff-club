@@ -1,9 +1,38 @@
 <script setup lang="ts">
 const whatsappHref = 'https://wa.me/56995296324?text=Hola%2C%20quiero%20consultar%20por%20clases%20presenciales%20de%20guitarra%2Fbajo%20en%20La%20Reina.%20%C2%BFTienes%20horarios%20disponibles%3F'
+
+const ctaRef = useTemplateRef<HTMLElement>('ctaRef')
+const { bindPressFeedback, runWhenMotionAllowed } = useGsapMotion()
+let cleanupTimeline: (() => void) | undefined
+let cleanupButtons: (() => void) | undefined
+
+onMounted(async () => {
+  cleanupTimeline = await runWhenMotionAllowed(ctaRef, ({ gsap }) => {
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: ctaRef.value,
+        start: 'top 82%',
+        once: true
+      }
+    })
+
+    timeline
+      .from('.cta-paper', { y: 30, opacity: 0, rotate: -3, duration: 0.48, ease: 'back.out(1.4)' })
+      .from('.stamp', { scale: 0.86, opacity: 0, rotate: -8, duration: 0.24, ease: 'back.out(2)' }, '-=0.2')
+      .from('.tear-offs span', { y: 14, opacity: 0, duration: 0.22, stagger: 0.04 }, '-=0.12')
+  })
+
+  cleanupButtons = await bindPressFeedback(Array.from(ctaRef.value?.querySelectorAll('.button') ?? []))
+})
+
+onBeforeUnmount(() => {
+  cleanupTimeline?.()
+  cleanupButtons?.()
+})
 </script>
 
 <template>
-  <section class="cta" aria-labelledby="cta-title">
+  <section ref="ctaRef" class="cta" aria-labelledby="cta-title">
     <div class="cta-paper tear-edge">
       <p class="stamp">Cupos presenciales</p>
       <h2 id="cta-title">¿Listo para tocar con dirección?</h2>
