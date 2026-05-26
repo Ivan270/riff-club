@@ -3,11 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "npx --yes hyperframes@0.6.43 preview",
-    "preview": "hyperframes preview",
-    "check": "npx --yes hyperframes@0.6.43 lint && npx --yes hyperframes@0.6.43 validate && npx --yes hyperframes@0.6.43 inspect",
-    "render": "hyperframes render",
-    "publish": "npx --yes hyperframes@0.6.43 publish",
+    "dev": "pnpm dlx hyperframes preview",
+    "preview": "pnpm dlx hyperframes preview",
+    "check": "pnpm test:composition && pnpm dlx hyperframes lint && pnpm dlx hyperframes validate && pnpm dlx hyperframes inspect",
+    "render": "pnpm dlx hyperframes render",
+    "publish": "pnpm dlx hyperframes publish",
     "test:composition": "node scripts/check-composition.mjs"
   }
 }
