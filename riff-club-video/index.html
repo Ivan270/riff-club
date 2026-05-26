@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=1920, height=1080" />
+    <meta name="viewport" content="width=1080, height=1920" />
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
     <style>
       * {
@@ -10,42 +10,654 @@
         padding: 0;
         box-sizing: border-box;
       }
+
       html,
       body {
-        margin: 0;
-        width: 1920px;
-        height: 1080px;
+        width: 1080px;
+        height: 1920px;
         overflow: hidden;
-        background: #000;
+        background: #050505;
+        color: #fff7e8;
+        font-family: "Archivo Black", "Arial Black", Impact, sans-serif;
+      }
+
+      [data-composition-id="riff-club-promo"] {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #050505;
+        isolation: isolate;
+      }
+
+      .scene,
+      .transition-layer {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        background: #050505;
+      }
+
+      .scene-content {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        padding: 96px 78px;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+      }
+
+      .grain {
+        position: absolute;
+        inset: -40px;
+        z-index: 1;
+        opacity: 0.18;
+        background-image:
+          radial-gradient(circle at 18% 24%, rgba(216, 255, 0, 0.22) 0 2px, rgba(216, 255, 0, 0) 3px),
+          radial-gradient(circle at 74% 34%, rgba(255, 59, 48, 0.2) 0 1px, rgba(255, 59, 48, 0) 3px),
+          radial-gradient(circle at 40% 82%, rgba(168, 85, 247, 0.18) 0 2px, rgba(168, 85, 247, 0) 4px),
+          linear-gradient(135deg, rgba(255, 247, 232, 0.09) 25%, rgba(255, 247, 232, 0) 25% 50%, rgba(255, 247, 232, 0.08) 50% 75%, rgba(255, 247, 232, 0) 75%);
+        background-size: 94px 94px, 67px 67px, 123px 123px, 18px 18px;
+        mix-blend-mode: screen;
+        pointer-events: none;
+      }
+
+      .mega-ghost {
+        position: absolute;
+        z-index: 1;
+        color: #101010;
+        font-size: 250px;
+        line-height: 0.82;
+        letter-spacing: -0.08em;
+        text-transform: uppercase;
+        transform: rotate(-90deg);
+        transform-origin: center;
+        pointer-events: none;
+        -webkit-text-stroke: 3px rgba(255, 247, 232, 0.1);
+      }
+
+      .eyebrow,
+      .micro,
+      .chip,
+      .meta {
+        font-family: "IBM Plex Mono", "Courier New", monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        width: fit-content;
+        padding: 16px 22px;
+        border: 4px solid #fff7e8;
+        background: #101010;
+        color: #d8ff00;
+        font-size: 24px;
+        line-height: 1;
+      }
+
+      .title-scene .scene-content {
+        justify-content: space-between;
+        gap: 44px;
+      }
+
+      .title-grid {
+        display: grid;
+        grid-template-columns: 1fr 230px;
+        gap: 28px;
+        align-items: end;
+      }
+
+      .brand-title {
+        max-width: 760px;
+        font-size: 176px;
+        line-height: 0.78;
+        letter-spacing: -0.08em;
+        text-transform: uppercase;
+      }
+
+      .red-block {
+        min-height: 530px;
+        padding: 26px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        background: #ff3b30;
+        border: 5px solid #fff7e8;
+        color: #050505;
+        font-size: 92px;
+        line-height: 0.78;
+        letter-spacing: -0.07em;
+        text-transform: uppercase;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+      }
+
+      .title-copy {
+        display: grid;
+        gap: 24px;
+      }
+
+      .title-copy h2 {
+        max-width: 780px;
+        font-size: 68px;
+        line-height: 0.92;
+        letter-spacing: -0.05em;
+      }
+
+      .acid-rule {
+        width: 100%;
+        height: 28px;
+        background: #d8ff00;
+        border: 4px solid #050505;
+        box-shadow: 14px 14px 0 #a855f7;
+      }
+
+      .meta-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .meta {
+        color: #fff7e8;
+        font-size: 26px;
+      }
+
+      .hero-scene .scene-content {
+        justify-content: space-between;
+        gap: 50px;
+      }
+
+      .hero-top {
+        display: grid;
+        grid-template-columns: 1fr 284px;
+        gap: 28px;
+        align-items: start;
+      }
+
+      .hero-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+
+      .hero-copy h1,
+      .section-title {
+        font-size: 106px;
+        line-height: 0.9;
+        letter-spacing: -0.07em;
+        text-transform: uppercase;
+      }
+
+      .hero-copy p {
+        max-width: 640px;
+        color: #fff7e8;
+        font-family: "IBM Plex Mono", "Courier New", monospace;
+        font-size: 34px;
+        line-height: 1.12;
+      }
+
+      .cta-box {
+        padding: 24px 22px;
+        border: 5px solid #050505;
+        background: #d8ff00;
+        color: #050505;
+        font-size: 36px;
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        box-shadow: 10px 10px 0 #ff3b30;
+      }
+
+      .poster-card {
+        position: relative;
+        min-height: 820px;
+        padding: 46px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 6px solid #fff7e8;
+        background: #101010;
+        box-shadow: 22px 22px 0 #a855f7;
+      }
+
+      .poster-card h2 {
+        max-width: 540px;
+        color: #d8ff00;
+        font-size: 120px;
+        line-height: 0.78;
+        letter-spacing: -0.08em;
+        text-transform: uppercase;
+      }
+
+      .string-stack {
+        display: grid;
+        gap: 24px;
+      }
+
+      .poster-string {
+        height: 10px;
+        background: #fff7e8;
+        border: 2px solid #050505;
+      }
+
+      .poster-string:nth-child(2n) {
+        background: #ff3b30;
+      }
+
+      .poster-string:nth-child(3n) {
+        background: #d8ff00;
+      }
+
+      .instrument-strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+
+      .chip {
+        padding: 18px 14px;
+        border: 3px solid #fff7e8;
+        background: #050505;
+        color: #fff7e8;
+        font-size: 21px;
+        text-align: center;
+      }
+
+      .strings-scene .scene-content {
+        justify-content: center;
+        gap: 70px;
+      }
+
+      .strings-header {
+        display: grid;
+        gap: 24px;
+      }
+
+      .strings-header h2 {
+        max-width: 880px;
+        font-size: 132px;
+        line-height: 0.86;
+        letter-spacing: -0.08em;
+        text-transform: uppercase;
+      }
+
+      .impact-board {
+        display: grid;
+        gap: 34px;
+        padding: 48px 34px;
+        border: 6px solid #fff7e8;
+        background: #101010;
+        box-shadow: -18px 18px 0 #ff3b30;
+      }
+
+      .impact-line {
+        display: grid;
+        grid-template-columns: 170px 1fr;
+        gap: 28px;
+        align-items: center;
+      }
+
+      .impact-label {
+        color: #d8ff00;
+        font-family: "IBM Plex Mono", "Courier New", monospace;
+        font-size: 28px;
+        text-transform: uppercase;
+      }
+
+      .impact-string {
+        height: 26px;
+        background: #fff7e8;
+        border: 4px solid #050505;
+        box-shadow: 8px 8px 0 #a855f7;
+      }
+
+      .impact-line:nth-child(2) .impact-string,
+      .impact-line:nth-child(5) .impact-string {
+        background: #ff3b30;
+      }
+
+      .impact-line:nth-child(3) .impact-string,
+      .impact-line:nth-child(6) .impact-string {
+        background: #d8ff00;
+      }
+
+      .services-scene .scene-content {
+        justify-content: space-between;
+        gap: 46px;
+      }
+
+      .service-cards {
+        display: grid;
+        gap: 28px;
+      }
+
+      .service-card {
+        min-height: 338px;
+        padding: 36px;
+        display: grid;
+        grid-template-columns: 1fr 128px;
+        gap: 24px;
+        border: 5px solid #fff7e8;
+        background: #101010;
+      }
+
+      .service-card:nth-child(1) {
+        box-shadow: 14px 14px 0 #ff3b30;
+      }
+
+      .service-card:nth-child(2) {
+        box-shadow: 14px 14px 0 #d8ff00;
+      }
+
+      .service-card:nth-child(3) {
+        box-shadow: 14px 14px 0 #a855f7;
+      }
+
+      .service-card h3 {
+        font-size: 70px;
+        line-height: 0.9;
+        letter-spacing: -0.06em;
+        text-transform: uppercase;
+      }
+
+      .service-card p {
+        margin-top: 24px;
+        max-width: 600px;
+        font-family: "IBM Plex Mono", "Courier New", monospace;
+        font-size: 31px;
+        line-height: 1.12;
+      }
+
+      .service-number {
+        color: #d8ff00;
+        font-size: 94px;
+        line-height: 0.8;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .final-scene .scene-content {
+        justify-content: space-between;
+        gap: 58px;
+      }
+
+      .final-title {
+        font-size: 188px;
+        line-height: 0.78;
+        letter-spacing: -0.085em;
+        text-transform: uppercase;
+      }
+
+      .final-cta {
+        padding: 46px 42px;
+        border: 6px solid #050505;
+        background: #d8ff00;
+        color: #050505;
+        box-shadow: 18px 18px 0 #ff3b30;
+      }
+
+      .final-cta h2 {
+        font-size: 104px;
+        line-height: 0.86;
+        letter-spacing: -0.07em;
+        text-transform: uppercase;
+      }
+
+      .final-location {
+        display: grid;
+        gap: 22px;
+        padding: 34px;
+        border: 5px solid #fff7e8;
+        background: #101010;
+      }
+
+      .final-location p {
+        font-family: "IBM Plex Mono", "Courier New", monospace;
+        font-size: 35px;
+        line-height: 1.08;
+        text-transform: uppercase;
+      }
+
+      .accent-panel {
+        position: absolute;
+        z-index: 1;
+        border: 5px solid #fff7e8;
+        pointer-events: none;
+      }
+
+      .accent-panel.red {
+        background: #ff3b30;
+      }
+
+      .accent-panel.acid {
+        background: #d8ff00;
+      }
+
+      .accent-panel.purple {
+        background: #a855f7;
+      }
+
+      .title-scene .mega-ghost {
+        right: -310px;
+        top: 660px;
+      }
+
+      .hero-scene .mega-ghost {
+        left: -360px;
+        top: 720px;
+      }
+
+      .strings-scene .mega-ghost {
+        right: -330px;
+        top: 620px;
+      }
+
+      .services-scene .mega-ghost {
+        left: -390px;
+        top: 700px;
+      }
+
+      .final-scene .mega-ghost {
+        right: -340px;
+        top: 720px;
+      }
+
+      .transition-layer {
+        z-index: 20;
+        pointer-events: none;
+        background: rgba(5, 5, 5, 0);
+      }
+
+      .transition-a::before,
+      .transition-b::before,
+      .transition-c::before,
+      .transition-d::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-top: 42px solid #d8ff00;
+        border-bottom: 42px solid #ff3b30;
+        background: linear-gradient(115deg, rgba(216, 255, 0, 0) 0 34%, #d8ff00 34% 44%, #050505 44% 58%, #ff3b30 58% 68%, rgba(255, 59, 48, 0) 68% 100%);
+      }
+
+      .transition-b::before {
+        border-top-color: #a855f7;
+        background: linear-gradient(65deg, rgba(168, 85, 247, 0) 0 30%, #a855f7 30% 42%, #050505 42% 57%, #d8ff00 57% 70%, rgba(216, 255, 0, 0) 70% 100%);
+      }
+
+      .transition-c::before {
+        border-bottom-color: #a855f7;
+      }
+
+      .transition-d::before {
+        border-top-color: #fff7e8;
+        border-bottom-color: #d8ff00;
       }
     </style>
   </head>
   <body>
     <div
       id="root"
-      data-composition-id="main"
+      data-composition-id="riff-club-promo"
       data-start="0"
-      data-duration="10"
-      data-width="1920"
-      data-height="1080"
+      data-duration="20"
+      data-width="1080"
+      data-height="1920"
     >
-      
-      
-
-      <!--
-        Add your clips here. Example:
-        <div id="title" class="clip" data-start="0" data-duration="5" data-track-index="1"
-             style="font-size: 64px; color: #fff; padding: 40px">
-          Hello World
+      <section id="title-scene" class="clip scene title-scene" data-start="0" data-duration="4" data-track-index="1">
+        <div class="grain" data-layout-ignore></div>
+        <div class="mega-ghost" data-layout-ignore>riff</div>
+        <div class="accent-panel purple" data-layout-ignore style="right: 76px; top: 92px; width: 172px; height: 172px"></div>
+        <div class="scene-content">
+          <div class="meta-row">
+            <span class="eyebrow">20s teaser</span>
+            <span class="meta">Santiago Oriente</span>
+          </div>
+          <div class="title-grid">
+            <h1 class="brand-title">RIFF CLUB</h1>
+            <div class="red-block">Riff</div>
+          </div>
+          <div class="title-copy">
+            <h2>Clases presenciales en La Reina</h2>
+            <div class="acid-rule" aria-hidden="true"></div>
+          </div>
         </div>
-      -->
+      </section>
+
+      <section id="hero-scene" class="clip scene hero-scene" data-start="4" data-duration="4" data-track-index="1">
+        <div class="grain" data-layout-ignore></div>
+        <div class="mega-ghost" data-layout-ignore>club</div>
+        <div class="accent-panel red" data-layout-ignore style="right: -36px; bottom: 176px; width: 250px; height: 420px"></div>
+        <div class="scene-content">
+          <div class="hero-top">
+            <div class="hero-copy">
+              <span class="eyebrow">Metodo, canciones reales y ruta clara</span>
+              <h1>Clases de guitarra en La Reina</h1>
+              <p>Guitarra electrica / acustica / bajo</p>
+            </div>
+            <div class="cta-box">Agendar por WhatsApp</div>
+          </div>
+          <div class="poster-card">
+            <h2>Riff Club</h2>
+            <div class="string-stack" aria-label="six strings">
+              <div class="poster-string"></div>
+              <div class="poster-string"></div>
+              <div class="poster-string"></div>
+              <div class="poster-string"></div>
+              <div class="poster-string"></div>
+              <div class="poster-string"></div>
+            </div>
+            <div class="instrument-strip">
+              <span class="chip">Guitarra electrica</span>
+              <span class="chip">Acustica</span>
+              <span class="chip">Bajo</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="strings-scene" class="clip scene strings-scene" data-start="8" data-duration="4" data-track-index="1">
+        <div class="grain" data-layout-ignore></div>
+        <div class="mega-ghost" data-layout-ignore>focus</div>
+        <div class="accent-panel acid" data-layout-ignore style="left: 74px; bottom: 78px; width: 302px; height: 104px"></div>
+        <div class="scene-content">
+          <div class="strings-header">
+            <span class="eyebrow">Practica con foco</span>
+            <h2>Seis cuerdas. Un golpe claro.</h2>
+          </div>
+          <div class="impact-board">
+            <div class="impact-line">
+              <span class="impact-label">Tecnica</span>
+              <span class="impact-string"></span>
+            </div>
+            <div class="impact-line">
+              <span class="impact-label">Ritmo</span>
+              <span class="impact-string"></span>
+            </div>
+            <div class="impact-line">
+              <span class="impact-label">Sonido</span>
+              <span class="impact-string"></span>
+            </div>
+            <div class="impact-line">
+              <span class="impact-label">Groove</span>
+              <span class="impact-string"></span>
+            </div>
+            <div class="impact-line">
+              <span class="impact-label">Ataque</span>
+              <span class="impact-string"></span>
+            </div>
+            <div class="impact-line">
+              <span class="impact-label">Pulso</span>
+              <span class="impact-string"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="services-scene" class="clip scene services-scene" data-start="12" data-duration="4" data-track-index="1">
+        <div class="grain" data-layout-ignore></div>
+        <div class="mega-ghost" data-layout-ignore>gear</div>
+        <div class="scene-content">
+          <span class="eyebrow">Elige tu instrumento</span>
+          <h2 class="section-title">Ruta practica para tocar mejor</h2>
+          <div class="service-cards">
+            <article class="service-card">
+              <div>
+                <h3>Electrica</h3>
+                <p>Riffs, solos y tecnica aplicada a canciones que quieres tocar.</p>
+              </div>
+              <span class="service-number">01</span>
+            </article>
+            <article class="service-card">
+              <div>
+                <h3>Acustica</h3>
+                <p>Acordes, rasgueos y repertorio para sonar completo desde casa.</p>
+              </div>
+              <span class="service-number">02</span>
+            </article>
+            <article class="service-card">
+              <div>
+                <h3>Bajo</h3>
+                <p>Groove, pulso y lineas que sostienen una banda real.</p>
+              </div>
+              <span class="service-number">03</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="final-scene" class="clip scene final-scene" data-start="16" data-duration="4" data-track-index="1">
+        <div class="grain" data-layout-ignore></div>
+        <div class="mega-ghost" data-layout-ignore>play</div>
+        <div class="accent-panel purple" data-layout-ignore style="left: -42px; top: 520px; width: 236px; height: 540px"></div>
+        <div class="scene-content">
+          <span class="eyebrow">La Reina / Santiago Oriente</span>
+          <h1 class="final-title">RIFF CLUB</h1>
+          <div class="final-cta">
+            <h2>Agenda tu clase</h2>
+          </div>
+          <div class="final-location">
+            <p>Guitarra electrica &middot; Acustica &middot; Bajo</p>
+            <p>Clases presenciales para avanzar con foco.</p>
+          </div>
+        </div>
+      </section>
+
+      <div id="transition-a" class="clip transition-layer transition-a" data-start="3.65" data-duration="0.35" data-track-index="2" data-layout-ignore></div>
+      <div id="transition-b" class="clip transition-layer transition-b" data-start="7.65" data-duration="0.35" data-track-index="3" data-layout-ignore></div>
+      <div id="transition-c" class="clip transition-layer transition-c" data-start="11.65" data-duration="0.35" data-track-index="4" data-layout-ignore></div>
+      <div id="transition-d" class="clip transition-layer transition-d" data-start="15.65" data-duration="0.35" data-track-index="5" data-layout-ignore></div>
     </div>
 
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
-      // Example: tl.from("#title", { opacity: 0, y: -50, duration: 1 }, 0);
-      window.__timelines["main"] = tl;
+      window.__timelines["riff-club-promo"] = tl;
     </script>
   </body>
 </html>
