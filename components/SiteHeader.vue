@@ -1,21 +1,30 @@
 <script setup lang="ts">
-const route = useRoute()
-const isActive = (path: string) => route.path === path
+const route = useRoute();
+const isActive = (path: string) => route.path === path;
 
 const navItems = [
-  { label: 'Eléctrica', to: '/clases-guitarra-electrica' },
-  { label: 'Acústica', to: '/clases-guitarra-acustica' },
-  { label: 'Bajo', to: '/clases-bajo' },
-  { label: 'Método', to: '/sobre-mi' },
-  { label: 'Contacto', to: '/contacto', cta: true }
-]
+  { label: "Eléctrica", to: "/clases-guitarra-electrica" },
+  { label: "Acústica", to: "/clases-guitarra-acustica" },
+  { label: "Bajo", to: "/clases-bajo" },
+  { label: "Método", to: "/sobre-mi" },
+  { label: "Contacto", to: "/contacto", cta: true },
+];
 </script>
 
 <template>
   <header class="site-header tape">
-    <NuxtLink class="brand" to="/" aria-label="Ir al inicio">Riff Club Local</NuxtLink>
+    <NuxtLink class="brand" to="/" aria-label="Ir al inicio"
+      >Riff Club</NuxtLink
+    >
     <nav aria-label="Navegación principal">
-      <NuxtLink v-if="route.path !== '/'" class="nav-link" :class="{ active: isActive('/') }" to="/" :aria-current="isActive('/') ? 'page' : undefined">Inicio</NuxtLink>
+      <NuxtLink
+        v-if="route.path !== '/'"
+        class="nav-link"
+        :class="{ active: isActive('/') }"
+        to="/"
+        :aria-current="isActive('/') ? 'page' : undefined"
+        >Inicio</NuxtLink
+      >
       <NuxtLink
         v-for="item in navItems"
         :key="item.to"
@@ -23,7 +32,8 @@ const navItems = [
         :class="{ active: isActive(item.to), 'nav-cta': item.cta }"
         :to="item.to"
         :aria-current="isActive(item.to) ? 'page' : undefined"
-      >{{ item.label }}</NuxtLink>
+        >{{ item.label }}</NuxtLink
+      >
       <ThemeToggle />
     </nav>
   </header>
@@ -41,9 +51,24 @@ const navItems = [
   padding: 14px 18px 16px;
   background: var(--header-bg);
   border-bottom: 3px solid var(--section-border);
-  clip-path: polygon(0 0, 100% 0, 99% 100%, 91% 92%, 83% 100%, 72% 94%, 64% 100%, 55% 93%, 46% 100%, 36% 94%, 27% 100%, 18% 93%, 8% 100%, 0 96%);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    99% 100%,
+    91% 92%,
+    83% 100%,
+    72% 94%,
+    64% 100%,
+    55% 93%,
+    46% 100%,
+    36% 94%,
+    27% 100%,
+    18% 93%,
+    8% 100%,
+    0 96%
+  );
   backdrop-filter: blur(10px);
-  box-shadow: 0 10px 0 rgba(0, 0, 0, .3);
+  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.3);
 }
 
 .brand {
@@ -51,10 +76,10 @@ const navItems = [
   font-family: var(--font-display);
   font-size: clamp(1.2rem, 3vw, 1.8rem);
   font-weight: 950;
-  line-height: .86;
+  line-height: 0.86;
   text-transform: uppercase;
   text-decoration: none;
-  letter-spacing: -.05em;
+  letter-spacing: -0.05em;
   text-shadow: 2px 2px 0 var(--red);
 }
 
@@ -65,7 +90,7 @@ nav {
   align-items: center;
   justify-content: flex-end;
   overflow: visible;
-  font-size: .86rem;
+  font-size: 0.86rem;
 }
 
 .nav-link {
@@ -78,8 +103,8 @@ nav {
   color: var(--page-text);
   white-space: nowrap;
   text-decoration: none;
-  font: 900 .86rem/1 var(--font-mono);
-  letter-spacing: .03em;
+  font: 900 0.86rem/1 var(--font-mono);
+  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 
@@ -93,7 +118,7 @@ nav {
   background: var(--acid);
   transform: scaleX(0) rotate(-1deg);
   transform-origin: left;
-  transition: transform .16s ease;
+  transition: transform 0.16s ease;
 }
 
 .nav-link:hover::after,

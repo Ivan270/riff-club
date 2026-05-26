@@ -1,31 +1,79 @@
 <script setup lang="ts">
-const whatsappHref = 'https://wa.me/56995296324?text=Hola%2C%20quiero%20consultar%20por%20clases%20presenciales%20de%20guitarra%2Fbajo%20en%20La%20Reina.%20%C2%BFTienes%20horarios%20disponibles%3F'
+const whatsappHref =
+  "https://wa.me/56995296324?text=Hola%2C%20quiero%20consultar%20por%20clases%20presenciales%20de%20guitarra%2Fbajo%20en%20La%20Reina.%20%C2%BFTienes%20horarios%20disponibles%3F";
 
-const heroRef = useTemplateRef<HTMLElement>('heroRef')
-const { bindPressFeedback, runWhenMotionAllowed } = useGsapMotion()
-let cleanupTimeline: (() => void) | undefined
-let cleanupButtons: (() => void) | undefined
+const heroRef = useTemplateRef<HTMLElement>("heroRef");
+const { bindPressFeedback, runWhenMotionAllowed } = useGsapMotion();
+let cleanupTimeline: (() => void) | undefined;
+let cleanupButtons: (() => void) | undefined;
 
 onMounted(async () => {
   cleanupTimeline = await runWhenMotionAllowed(heroRef, ({ gsap }) => {
-    const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } })
+    const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
 
     timeline
-      .from('.hero-copy > *', { y: 22, opacity: 0, duration: 0.45, stagger: 0.08 })
-      .from('.poster', { y: 34, opacity: 0, rotate: -3, scale: 0.97, duration: 0.58, ease: 'back.out(1.5)' }, '-=0.28')
-      .from('.poster-tape', { y: -18, opacity: 0, rotate: -14, duration: 0.28, stagger: 0.08 }, '-=0.2')
-      .from('.poster-type span', { x: -24, opacity: 0, rotate: -8, scale: 0.9, duration: 0.32, stagger: 0.08, ease: 'back.out(2)' }, '-=0.14')
-      .from('.string-lines span', { scaleX: 0, transformOrigin: 'left center', duration: 0.32, stagger: 0.045 }, '-=0.28')
-      .from('.poster-local, .poster-note, .poster b', { opacity: 0, scale: 0.92, rotate: -4, duration: 0.28, stagger: 0.06 }, '-=0.2')
-  })
+      .from(".hero-copy > *", {
+        y: 22,
+        opacity: 0,
+        duration: 0.45,
+        stagger: 0.08,
+      })
+      .from(
+        ".poster",
+        {
+          y: 34,
+          opacity: 0,
+          rotate: -3,
+          scale: 0.97,
+          duration: 0.58,
+          ease: "back.out(1.5)",
+        },
+        "-=0.28",
+      )
+      .from(
+        ".poster-tape",
+        { y: -18, opacity: 0, rotate: -14, duration: 0.28, stagger: 0.08 },
+        "-=0.2",
+      )
+      .from(
+        ".poster-type span",
+        {
+          x: -24,
+          opacity: 0,
+          rotate: -8,
+          scale: 0.9,
+          duration: 0.32,
+          stagger: 0.08,
+          ease: "back.out(2)",
+        },
+        "-=0.14",
+      )
+      .from(
+        ".string-lines span",
+        {
+          scaleX: 0,
+          transformOrigin: "left center",
+          duration: 0.32,
+          stagger: 0.045,
+        },
+        "-=0.28",
+      )
+      .from(
+        ".poster-local, .poster-note, .poster b",
+        { opacity: 0, scale: 0.92, rotate: -4, duration: 0.28, stagger: 0.06 },
+        "-=0.2",
+      );
+  });
 
-  cleanupButtons = await bindPressFeedback(Array.from(heroRef.value?.querySelectorAll('.button') ?? []))
-})
+  cleanupButtons = await bindPressFeedback(
+    Array.from(heroRef.value?.querySelectorAll(".button") ?? []),
+  );
+});
 
 onBeforeUnmount(() => {
-  cleanupTimeline?.()
-  cleanupButtons?.()
-})
+  cleanupTimeline?.();
+  cleanupButtons?.();
+});
 </script>
 
 <template>
@@ -33,19 +81,32 @@ onBeforeUnmount(() => {
     <div class="hero-copy">
       <span class="sticker">Clases presenciales / La Reina</span>
       <h1 id="home-title" class="display">Clases de guitarra en La Reina</h1>
-      <p class="lead">Aprende guitarra eléctrica, acústica o bajo con método, canciones reales y una ruta clara para
-        dejar de practicar a ciegas.</p>
+      <p class="lead">
+        Aprende guitarra eléctrica, acústica o bajo con método, canciones reales
+        y una ruta clara para dejar de practicar a ciegas.
+      </p>
       <div class="actions">
-        <a class="button button-primary" :href="whatsappHref" target="_blank" rel="noopener">Agendar por WhatsApp</a>
-        <NuxtLink class="button button-secondary" to="/contacto">Enviar formulario</NuxtLink>
+        <a
+          class="button button-primary"
+          :href="whatsappHref"
+          target="_blank"
+          rel="noopener"
+          >Agendar por WhatsApp</a
+        >
+        <NuxtLink class="button button-secondary" to="/contacto"
+          >Enviar formulario</NuxtLink
+        >
       </div>
     </div>
     <div class="poster" aria-hidden="true">
       <i class="poster-tape tape-a"></i>
       <i class="poster-tape tape-b"></i>
       <div class="poster-local">La Reina / Santiago Oriente</div>
-      <div class="string-lines"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-      <div class="poster-type"><span>Riff</span><span>Club</span><span>Local</span></div>
+      <div class="string-lines">
+        <span></span><span></span><span></span><span></span><span></span
+        ><span></span>
+      </div>
+      <div class="poster-type"><span>Riff</span><span>Club</span></div>
       <div class="poster-note">Guitarra electrica / acustica / bajo</div>
       <b>01</b>
     </div>
@@ -55,7 +116,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .hero {
   display: grid;
-  grid-template-columns: 1.1fr .9fr;
+  grid-template-columns: 1.1fr 0.9fr;
   gap: 36px;
   align-items: center;
   min-height: 82vh;
@@ -92,8 +153,12 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: 0;
   z-index: 0;
-  opacity: .22;
-  background-image: radial-gradient(circle, var(--ink) 0 1px, transparent 1.5px);
+  opacity: 0.22;
+  background-image: radial-gradient(
+    circle,
+    var(--ink) 0 1px,
+    transparent 1.5px
+  );
   background-size: 7px 7px;
   mix-blend-mode: multiply;
 }
@@ -117,8 +182,8 @@ onBeforeUnmount(() => {
   width: 118px;
   height: 30px;
   background: color-mix(in srgb, var(--tape) 78%, transparent);
-  border: 1px solid rgba(16, 16, 16, .16);
-  box-shadow: 0 2px 0 rgba(16, 16, 16, .12);
+  border: 1px solid rgba(16, 16, 16, 0.16);
+  box-shadow: 0 2px 0 rgba(16, 16, 16, 0.12);
 }
 
 .tape-a {
@@ -140,8 +205,8 @@ onBeforeUnmount(() => {
   padding: 8px 10px;
   border: 2px solid var(--ink);
   background: var(--acid);
-  font: 900 .78rem/1 var(--font-mono);
-  letter-spacing: .08em;
+  font: 900 0.78rem/1 var(--font-mono);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   transform: rotate(-2deg);
 }
@@ -161,7 +226,7 @@ onBeforeUnmount(() => {
   display: block;
   height: 3px;
   background: var(--ink);
-  box-shadow: 0 10px 0 rgba(16, 16, 16, .12);
+  box-shadow: 0 10px 0 rgba(16, 16, 16, 0.12);
 }
 
 .poster-type {
@@ -180,9 +245,9 @@ onBeforeUnmount(() => {
   font-family: var(--font-display);
   font-size: clamp(3rem, 8vw, 6rem);
   font-weight: 950;
-  line-height: .76;
+  line-height: 0.76;
   text-transform: uppercase;
-  letter-spacing: .01em;
+  letter-spacing: 0.01em;
   box-shadow: 6px 6px 0 var(--ink);
   transform: rotate(-3deg);
 }
@@ -208,8 +273,8 @@ onBeforeUnmount(() => {
   padding: 8px 10px;
   background: var(--ink);
   color: var(--paper);
-  font: 900 .8rem/1 var(--font-mono);
-  letter-spacing: .06em;
+  font: 900 0.8rem/1 var(--font-mono);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -221,7 +286,7 @@ onBeforeUnmount(() => {
   color: var(--acid);
   font-size: 7rem;
   line-height: 1;
-  letter-spacing: -.12em;
+  letter-spacing: -0.12em;
 }
 
 @media (max-width: 860px) {

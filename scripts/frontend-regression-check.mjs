@@ -17,6 +17,7 @@ const assert = (condition, message) => {
 }
 
 const hero = read('components/HeroZine.vue')
+const footer = read('components/SiteFooter.vue')
 const header = read('components/SiteHeader.vue')
 const css = read('assets/css/main.css')
 const themedSurfaceFiles = [
@@ -34,6 +35,9 @@ const servicePages = [
 
 assert(hero.includes('56995296324'), 'Hero WhatsApp CTA must use 56995296324')
 assert(!hero.includes('56912345678'), 'Hero WhatsApp CTA must not use placeholder number')
+assert(footer.includes('Sitio desarrollado por'), 'SiteFooter must include a small developer credit')
+assert(footer.includes('https://github.com/ivan270'), 'SiteFooter developer credit must link to GitHub')
+assert(footer.includes('rel="noopener noreferrer nofollow"'), 'SiteFooter developer credit must use safe nofollow external link attributes')
 assert(header.includes('aria-current'), 'SiteHeader must expose active page with aria-current')
 assert(header.includes('ThemeToggle'), 'SiteHeader must render ThemeToggle')
 assert(css.includes('[data-theme="light"]'), 'Global CSS must define light theme variables')
