@@ -17,6 +17,12 @@ pnpm preview
 ## Validate
 
 ```bash
+pnpm check
+```
+
+Or run the checks individually:
+
+```bash
 pnpm lint
 pnpm validate
 pnpm inspect

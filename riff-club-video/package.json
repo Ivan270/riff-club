@@ -3,13 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "hyperframes": "pnpm dlx hyperframes",
-    "lint": "pnpm dlx hyperframes lint",
-    "validate": "pnpm dlx hyperframes validate",
-    "inspect": "pnpm dlx hyperframes inspect",
-    "preview": "pnpm dlx hyperframes preview",
-    "render": "pnpm dlx hyperframes render --output renders/riff-club-promo.mp4 --fps 30 --quality standard",
+    "hyperframes": "hyperframes",
+    "dev": "pnpm preview",
+    "lint": "hyperframes lint",
+    "validate": "hyperframes validate",
+    "inspect": "hyperframes inspect",
+    "preview": "hyperframes preview",
+    "render": "hyperframes render --output renders/riff-club-promo.mp4 --fps 30 --quality standard",
     "check": "pnpm test:composition && pnpm lint && pnpm validate && pnpm inspect",
     "test:composition": "node scripts/check-composition.mjs"
+  },
+  "devDependencies": {
+    "hyperframes": "0.6.43"
   }
 }
