@@ -28,14 +28,16 @@
   --section-text: #fff7e8;
   --section-muted: #d8d0bf;
   --section-border: #fff7e8;
-  --section-overlay: rgba(5, 5, 5, .9);
-  --header-bg: rgba(16, 16, 16, .94);
+  --section-overlay: rgba(5, 5, 5, 0.9);
+  --header-bg: rgba(16, 16, 16, 0.94);
   --max: 1120px;
   --font-display:
-    Impact, Haettenschweiler, 'Franklin Gothic Heavy', 'Arial Black', sans-serif;
-  --font-body: Charter, 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --font-mono:
-    'IBM Plex Mono', 'Courier New', Courier, monospace;
+    Impact, Haettenschweiler, "Franklin Gothic Heavy", "Arial Black", sans-serif;
+  /*--font-body: Charter, 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;*/
+  --font-body:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  --font-mono: "IBM Plex Mono", "Courier New", Courier, monospace;
   --shadow-hard: 7px 7px 0 var(--black);
   color-scheme: dark;
 }
@@ -69,9 +71,9 @@
   --section-text: #241f1a;
   --section-muted: #574b3c;
   --section-border: #241f1a;
-  --section-overlay: rgba(255, 248, 233, .92);
-  --header-bg: rgba(255, 246, 223, .94);
-  --shadow-hard: 7px 7px 0 rgba(16, 16, 16, .82);
+  --section-overlay: rgba(255, 248, 233, 0.92);
+  --header-bg: rgba(255, 246, 223, 0.94);
+  --shadow-hard: 7px 7px 0 rgba(16, 16, 16, 0.82);
   color-scheme: light;
 }
 
@@ -99,12 +101,13 @@ body {
       var(--red-glow) 0 9rem,
       transparent 9.2rem
     ),
+    linear-gradient(135deg, var(--grid-line) 0 1px, transparent 1px 22px),
     linear-gradient(
-      135deg,
-      var(--grid-line) 0 1px,
-      transparent 1px 22px
-    ),
-    linear-gradient(180deg, var(--bg-start) 0%, var(--bg-mid) 48%, var(--bg-end) 100%);
+      180deg,
+      var(--bg-start) 0%,
+      var(--bg-mid) 48%,
+      var(--bg-end) 100%
+    );
   color: var(--page-text);
   font-family: var(--font-body);
   font-size: 18px;
@@ -119,7 +122,7 @@ body {
 }
 
 body::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
@@ -265,7 +268,7 @@ button:focus-visible,
 }
 
 .tape::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -14px;
   left: 50%;

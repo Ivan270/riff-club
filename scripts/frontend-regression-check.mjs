@@ -17,6 +17,7 @@ const assert = (condition, message) => {
 }
 
 const hero = read('components/HeroZine.vue')
+const home = read('pages/index.vue')
 const footer = read('components/SiteFooter.vue')
 const header = read('components/SiteHeader.vue')
 const css = read('assets/css/main.css')
@@ -71,6 +72,20 @@ assert(motion.includes("import('gsap/ScrollTrigger')"), 'ScrollTrigger must be d
 assert(motion.includes('prefers-reduced-motion: reduce'), 'Motion composable must respect reduced motion')
 assert(motion.includes('gsap.context'), 'Motion composable must use gsap.context for cleanup')
 assert(!motion.includes('scrollerProxy'), 'Motion composable must not use scroll-jacking APIs')
+assert(home.includes('class="pain-flyer"'), 'Homepage pain section must use the pinned flyer scene class')
+assert(home.includes('pin: true'), 'Homepage pain flyer animation must pin the section')
+assert(home.includes("trigger: flyer"), 'Homepage pain flyer animation must be triggered by the flyer section')
+assert(home.includes('class="section container services-stage"'), 'Homepage services section must use the animated services stage class')
+assert(home.includes("trigger: services"), 'Homepage services animation must be triggered by the services section')
+assert(home.includes('pin: services'), 'Homepage services headline animation must pin the services section')
+assert(home.includes("x: '50vw'"), 'Homepage services headline must move toward viewport center during takeover')
+assert(home.includes("y: '50vh'"), 'Homepage services headline must move toward vertical viewport center during takeover')
+assert(home.includes('xPercent: -50'), 'Homepage services headline must center itself while zooming')
+assert(home.includes('yPercent: -50'), 'Homepage services headline must vertically center itself while zooming')
+assert(home.includes('scale: 2.8'), 'Homepage services headline must zoom large enough to occupy the screen')
+assert(home.includes("xPercent: 0, yPercent: 0, scale: 1, transformOrigin: 'center center'"), 'Homepage services headline must zoom out from its centered origin')
+assert(home.includes("set('#servicios-title', { transformOrigin: 'left center' })"), 'Homepage services headline must restore its normal origin after zoom-out')
+assert(home.includes('ScrollTrigger.refresh()'), 'Homepage scroll animation must refresh ScrollTrigger after setup')
 
 for (const [path, source] of animatedFiles) {
   assert(source.includes('useGsapMotion'), `${path} must use the shared GSAP motion composable`)
