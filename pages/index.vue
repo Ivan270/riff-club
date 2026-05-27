@@ -292,7 +292,7 @@ onBeforeUnmount(() => {
 h2 {
   font-size: clamp(2.6rem, 8vw, 6rem);
   line-height: 0.82;
-  letter-spacing: 0.08em;
+  letter-spacing: -0.06em;
   text-transform: uppercase;
   margin: 12px 0 28px;
 }
