@@ -169,9 +169,9 @@ onMounted(async () => {
           y: "50vh",
           xPercent: -50,
           yPercent: -50,
-          scale: 2.8,
+          scale: 6.8,
           transformOrigin: "center center",
-          duration: 0.42,
+          duration: 1.42,
           ease: "power2.inOut",
         })
         .to("#servicios-title", {
@@ -244,7 +244,7 @@ onBeforeUnmount(() => {
       class="section container services-stage"
       aria-labelledby="servicios-title"
     >
-      <p class="eyebrow">Elige tu instrumento</p>
+      <p class="eyebrow" id="servicios-eyebrow">Elige tu instrumento</p>
       <h2 id="servicios-title">
         Clases presenciales cerca de Santiago Oriente.
       </h2>
