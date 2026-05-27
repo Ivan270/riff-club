@@ -1,10 +1,10 @@
 {
   "name": "music-teacher-site",
   "private": true,
-  "packageManager": "npm@11.12.1",
+  "packageManager": "pnpm@11.0.6",
   "type": "module",
   "scripts": {
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --no-fork",
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
