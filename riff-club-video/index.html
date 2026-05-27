@@ -518,7 +518,7 @@
       data-width="1080"
       data-height="1920"
     >
-      <section id="title-scene" class="clip scene title-scene" data-start="0" data-duration="4" data-track-index="1">
+      <section id="title-scene" class="clip scene title-scene" data-start="0" data-duration="2" data-track-index="1">
         <div class="grain" data-layout-ignore></div>
         <div class="mega-ghost" data-layout-ignore>riff</div>
         <div class="accent-panel purple" data-layout-ignore style="right: 76px; top: 92px; width: 172px; height: 172px"></div>
@@ -538,7 +538,7 @@
         </div>
       </section>
 
-      <section id="hero-scene" class="clip scene hero-scene" data-start="4" data-duration="4" data-track-index="1">
+      <section id="hero-scene" class="clip scene hero-scene" data-start="2" data-duration="7" data-track-index="1">
         <div class="grain" data-layout-ignore></div>
         <div class="mega-ghost" data-layout-ignore>club</div>
         <div class="accent-panel red" data-layout-ignore style="right: -36px; bottom: 176px; width: 250px; height: 420px"></div>
@@ -570,7 +570,7 @@
         </div>
       </section>
 
-      <section id="strings-scene" class="clip scene strings-scene" data-start="8" data-duration="4" data-track-index="1">
+      <section id="strings-scene" class="clip scene strings-scene" data-start="9" data-duration="4" data-track-index="1">
         <div class="grain" data-layout-ignore></div>
         <div class="mega-ghost" data-layout-ignore>focus</div>
         <div class="accent-panel acid" data-layout-ignore style="left: 74px; bottom: 78px; width: 302px; height: 104px"></div>
@@ -608,7 +608,7 @@
         </div>
       </section>
 
-      <section id="services-scene" class="clip scene services-scene" data-start="12" data-duration="4" data-track-index="1">
+      <section id="services-scene" class="clip scene services-scene" data-start="13" data-duration="4" data-track-index="1">
         <div class="grain" data-layout-ignore></div>
         <div class="mega-ghost" data-layout-ignore>gear</div>
         <div class="scene-content">
@@ -640,7 +640,7 @@
         </div>
       </section>
 
-      <section id="final-scene" class="clip scene final-scene" data-start="16" data-duration="4" data-track-index="1">
+      <section id="final-scene" class="clip scene final-scene" data-start="17" data-duration="3" data-track-index="1">
         <div class="grain" data-layout-ignore></div>
         <div class="mega-ghost" data-layout-ignore>play</div>
         <div class="accent-panel purple" data-layout-ignore style="left: -42px; top: 520px; width: 236px; height: 540px"></div>
@@ -657,27 +657,28 @@
         </div>
       </section>
 
-      <div id="transition-a" class="clip transition-layer transition-a" data-start="3.65" data-duration="0.7" data-track-index="2" data-layout-ignore></div>
-      <div id="transition-b" class="clip transition-layer transition-b" data-start="7.65" data-duration="0.7" data-track-index="3" data-layout-ignore></div>
-      <div id="transition-c" class="clip transition-layer transition-c" data-start="11.65" data-duration="0.7" data-track-index="4" data-layout-ignore></div>
-      <div id="transition-d" class="clip transition-layer transition-d" data-start="15.65" data-duration="0.7" data-track-index="5" data-layout-ignore></div>
+      <div id="transition-a" class="clip transition-layer transition-a" data-start="1.72" data-duration="0.4" data-track-index="2" data-layout-ignore></div>
+      <div id="transition-b" class="clip transition-layer transition-b" data-start="8.72" data-duration="0.33" data-track-index="3" data-layout-ignore></div>
+      <div id="transition-c" class="clip transition-layer transition-c" data-start="12.72" data-duration="0.33" data-track-index="4" data-layout-ignore></div>
+      <div id="transition-d" class="clip transition-layer transition-d" data-start="16.72" data-duration="0.33" data-track-index="5" data-layout-ignore></div>
     </div>
 
     <script>
       window.__timelines = window.__timelines || {};
-      const tl = gsap.timeline({ paused: true });
+      const tl = gsap.timeline({ paused: true, defaults: { overwrite: "auto" } });
 
       const easeSnap = "steps(5)";
-      const wipe = (selector, at) => {
-        tl.fromTo(selector, { xPercent: -115 }, { xPercent: 0, duration: 0.35, ease: "power4.in" }, at);
-        tl.to(selector, { xPercent: 115, duration: 0.35, ease: "power4.out" }, at + 0.35);
+      const wipe = (selector, at, coverAt, endAt) => {
+        tl.fromTo(selector, { xPercent: -115 }, { xPercent: 0, duration: coverAt - at, ease: "power4.in" }, at);
+        tl.to(selector, { xPercent: 115, duration: endAt - coverAt, ease: "power4.out" }, coverAt);
       };
 
+      tl.set(".scene", { opacity: 0 }, 0);
       tl.set("#title-scene", { opacity: 1 }, 0);
-      tl.set("#hero-scene", { opacity: 1 }, 4);
-      tl.set("#strings-scene", { opacity: 1 }, 8);
-      tl.set("#services-scene", { opacity: 1 }, 12);
-      tl.set("#final-scene", { opacity: 1 }, 16);
+      tl.set("#hero-scene", { opacity: 1 }, 2);
+      tl.set("#strings-scene", { opacity: 1 }, 9);
+      tl.set("#services-scene", { opacity: 1 }, 13);
+      tl.set("#final-scene", { opacity: 1 }, 17);
 
       tl.fromTo(".title-scene .meta-row", { y: -46, opacity: 0 }, { y: 0, opacity: 1, duration: 0.48, ease: "power3.out" }, 0.15);
       tl.fromTo(".title-scene .brand-title", { x: -92, opacity: 0, skewX: -7 }, { x: 0, opacity: 1, skewX: 0, duration: 0.62, ease: "expo.out" }, 0.32);
@@ -686,41 +687,41 @@
       tl.fromTo(".title-scene .acid-rule", { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: 0.36, ease: easeSnap }, 1.06);
       tl.fromTo(".title-scene .mega-ghost", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.65, ease: "power1.out" }, 0.42);
 
-      wipe(".transition-a", 3.65);
+      wipe(".transition-a", 1.72, 2, 2.12);
 
-      tl.fromTo(".hero-scene .hero-copy .eyebrow", { x: -54, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power2.out" }, 4.16);
-      tl.fromTo(".hero-scene .hero-copy h1", { y: 74, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.62, ease: "expo.out" }, 4.26);
-      tl.fromTo(".hero-scene .hero-copy p", { x: -36, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 4.58);
-      tl.fromTo(".hero-scene .cta-box", { x: 76, y: -28, rotation: 4, opacity: 0 }, { x: 0, y: 0, rotation: 0, opacity: 1, duration: 0.56, ease: "back.out(1.45)" }, 4.42);
-      tl.fromTo(".hero-scene .poster-card", { y: 92, rotation: -2.5, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 0.66, ease: "power4.out" }, 4.78);
-      tl.fromTo(".hero-scene .poster-card h2", { x: -58, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power2.out" }, 5.08);
-      tl.fromTo(".hero-scene .poster-string", { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: 0.34, stagger: 0.055, ease: "power1.out" }, 5.22);
-      tl.fromTo(".hero-scene .chip", { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.36, stagger: 0.07, ease: "back.out(1.7)" }, 5.48);
+      tl.fromTo(".hero-scene .hero-copy .eyebrow", { x: -54, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power2.out" }, 2.16);
+      tl.fromTo(".hero-scene .hero-copy h1", { y: 74, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.62, ease: "expo.out" }, 2.26);
+      tl.fromTo(".hero-scene .hero-copy p", { x: -36, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 2.58);
+      tl.fromTo(".hero-scene .cta-box", { x: 76, y: -28, rotation: 4, opacity: 0 }, { x: 0, y: 0, rotation: 0, opacity: 1, duration: 0.56, ease: "back.out(1.45)" }, 2.42);
+      tl.fromTo(".hero-scene .poster-card", { y: 92, rotation: -2.5, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 0.66, ease: "power4.out" }, 2.78);
+      tl.fromTo(".hero-scene .poster-card h2", { x: -58, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power2.out" }, 3.08);
+      tl.fromTo(".hero-scene .poster-string", { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: 0.34, stagger: 0.055, ease: "power1.out" }, 3.22);
+      tl.fromTo(".hero-scene .chip", { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.36, stagger: 0.07, ease: "back.out(1.7)" }, 3.48);
 
-      wipe(".transition-b", 7.65);
+      wipe(".transition-b", 8.72, 9, 9.05);
 
-      tl.fromTo(".strings-scene .eyebrow", { x: -52, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 8.16);
-      tl.fromTo(".strings-scene .strings-header h2", { y: 68, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "expo.out" }, 8.28);
-      tl.fromTo(".strings-scene .impact-board", { scale: 0.94, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.46, ease: "back.out(1.25)" }, 8.7);
-      tl.fromTo(".strings-scene .impact-label", { x: -42, opacity: 0 }, { x: 0, opacity: 1, duration: 0.28, stagger: 0.08, ease: "power2.out" }, 8.88);
-      tl.fromTo(".strings-scene .impact-line:nth-child(odd) .impact-string", { x: -90, scaleX: 0, transformOrigin: "left center", opacity: 0 }, { x: 0, scaleX: 1, opacity: 1, duration: 0.38, stagger: 0.12, ease: "power4.out" }, 8.96);
-      tl.fromTo(".strings-scene .impact-line:nth-child(even) .impact-string", { x: 90, scaleX: 0, transformOrigin: "right center", opacity: 0 }, { x: 0, scaleX: 1, opacity: 1, duration: 0.38, stagger: 0.12, ease: "power4.out" }, 9.02);
+      tl.fromTo(".strings-scene .eyebrow", { x: -52, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 9.16);
+      tl.fromTo(".strings-scene .strings-header h2", { y: 68, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "expo.out" }, 9.28);
+      tl.fromTo(".strings-scene .impact-board", { scale: 0.94, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.46, ease: "back.out(1.25)" }, 9.7);
+      tl.fromTo(".strings-scene .impact-label", { x: -42, opacity: 0 }, { x: 0, opacity: 1, duration: 0.28, stagger: 0.08, ease: "power2.out" }, 9.88);
+      tl.fromTo(".strings-scene .impact-line:nth-child(odd) .impact-string", { x: -90, scaleX: 0, transformOrigin: "left center", opacity: 0 }, { x: 0, scaleX: 1, opacity: 1, duration: 0.38, stagger: 0.12, ease: "power4.out" }, 9.96);
+      tl.fromTo(".strings-scene .impact-line:nth-child(even) .impact-string", { x: 90, scaleX: 0, transformOrigin: "right center", opacity: 0 }, { x: 0, scaleX: 1, opacity: 1, duration: 0.38, stagger: 0.12, ease: "power4.out" }, 10.02);
 
-      wipe(".transition-c", 11.65);
+      wipe(".transition-c", 12.72, 13, 13.05);
 
-      tl.fromTo(".services-scene .eyebrow", { y: -38, opacity: 0 }, { y: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 12.16);
-      tl.fromTo(".services-scene .section-title", { x: -72, opacity: 0 }, { x: 0, opacity: 1, duration: 0.58, ease: "expo.out" }, 12.3);
-      tl.fromTo(".services-scene .service-card:nth-child(1)", { x: -96, rotation: -3, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.2)" }, 12.7);
-      tl.fromTo(".services-scene .service-card:nth-child(2)", { x: 96, rotation: 2.5, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "power4.out" }, 12.92);
-      tl.fromTo(".services-scene .service-card:nth-child(3)", { y: 90, rotation: -1.8, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.35)" }, 13.14);
-      tl.fromTo(".services-scene .service-number", { scale: 0.72, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.36, stagger: 0.11, ease: "power2.out" }, 13.02);
+      tl.fromTo(".services-scene .eyebrow", { y: -38, opacity: 0 }, { y: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 13.16);
+      tl.fromTo(".services-scene .section-title", { x: -72, opacity: 0 }, { x: 0, opacity: 1, duration: 0.58, ease: "expo.out" }, 13.3);
+      tl.fromTo(".services-scene .service-card:nth-child(1)", { x: -96, rotation: -3, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.2)" }, 13.7);
+      tl.fromTo(".services-scene .service-card:nth-child(2)", { x: 96, rotation: 2.5, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "power4.out" }, 13.92);
+      tl.fromTo(".services-scene .service-card:nth-child(3)", { y: 90, rotation: -1.8, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.35)" }, 14.14);
+      tl.fromTo(".services-scene .service-number", { scale: 0.72, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.36, stagger: 0.11, ease: "power2.out" }, 14.02);
 
-      wipe(".transition-d", 15.65);
+      wipe(".transition-d", 16.72, 17, 17.05);
 
-      tl.fromTo(".final-scene .eyebrow", { x: -54, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 16.16);
-      tl.fromTo(".final-scene .final-title", { y: 82, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.64, ease: "expo.out" }, 16.3);
-      tl.fromTo(".final-scene .final-cta", { x: 78, rotation: 3.5, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.58, ease: "back.out(1.4)" }, 16.74);
-      tl.fromTo(".final-scene .final-location", { y: 58, opacity: 0 }, { y: 0, opacity: 1, duration: 0.46, ease: "power2.out" }, 17.08);
+      tl.fromTo(".final-scene .eyebrow", { x: -54, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 17.16);
+      tl.fromTo(".final-scene .final-title", { y: 82, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.64, ease: "expo.out" }, 17.3);
+      tl.fromTo(".final-scene .final-cta", { x: 78, rotation: 3.5, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.58, ease: "back.out(1.4)" }, 17.74);
+      tl.fromTo(".final-scene .final-location", { y: 58, opacity: 0 }, { y: 0, opacity: 1, duration: 0.46, ease: "power2.out" }, 18.08);
       tl.to(".final-scene .scene-content", { y: 18, opacity: 0.92, duration: 0.6, ease: "power1.inOut" }, 19.25);
 
       window.__timelines["riff-club-promo"] = tl;
