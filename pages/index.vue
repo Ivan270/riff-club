@@ -386,7 +386,8 @@ h2 {
 .note h3 {
   color: var(--ink);
   font-size: 1.4rem;
-  text-transform: uppercase;
+  font-weight: 500;
+  /*text-transform: uppercase;*/
 }
 .note p {
   color: #272727;

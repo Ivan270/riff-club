@@ -84,7 +84,8 @@ article p {
   color: #272727;
 }
 h2 {
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
+  font-weight: 500;
 }
 @media (max-width: 860px) {
   .setlist-steps {
