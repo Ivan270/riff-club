@@ -39,4 +39,4 @@ This writes `renders/riff-club-promo.mp4`.
 
 ## Optional Music Bed
 
-Place a royalty-free music file at `assets/music.mp3`. The composition is designed to work without audio if that file is absent during preview or render.
+To render with music, place a royalty-free file at `assets/music.mp3`, then uncomment the `music-bed` audio element in `index.html`.
