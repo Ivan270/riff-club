@@ -18,7 +18,7 @@
         overflow: hidden;
         background: #050505;
         color: #fff7e8;
-        font-family: "Archivo Black", "Arial Black", Impact, sans-serif;
+        font-family: "Archivo Black", "Arial Black", sans-serif;
       }
 
       [data-composition-id="riff-club-promo"] {
@@ -306,8 +306,8 @@
 
       .impact-line {
         display: grid;
-        grid-template-columns: 170px 1fr;
-        gap: 28px;
+        grid-template-columns: 192px 1fr;
+        gap: 24px;
         align-items: center;
       }
 
@@ -404,9 +404,9 @@
 
       .final-cta {
         padding: 46px 42px;
-        border: 6px solid #050505;
-        background: #d8ff00;
-        color: #050505;
+        border: 6px solid #d8ff00;
+        background: #101010;
+        color: #fff7e8;
         box-shadow: 18px 18px 0 #ff3b30;
       }
 
@@ -520,7 +520,7 @@
     >
       <section id="title-scene" class="clip scene title-scene" data-start="0" data-duration="2" data-track-index="1">
         <div class="grain" data-layout-ignore></div>
-        <div class="mega-ghost" data-layout-ignore>riff</div>
+        <div class="mega-ghost" data-layout-ignore aria-hidden="true"></div>
         <div class="accent-panel purple" data-layout-ignore style="right: 76px; top: 92px; width: 172px; height: 172px"></div>
         <div class="scene-content">
           <div class="meta-row">
@@ -540,7 +540,7 @@
 
       <section id="hero-scene" class="clip scene hero-scene" data-start="2" data-duration="7" data-track-index="1">
         <div class="grain" data-layout-ignore></div>
-        <div class="mega-ghost" data-layout-ignore>club</div>
+        <div class="mega-ghost" data-layout-ignore aria-hidden="true"></div>
         <div class="accent-panel red" data-layout-ignore style="right: -36px; bottom: 176px; width: 250px; height: 420px"></div>
         <div class="scene-content">
           <div class="hero-top">
@@ -572,14 +572,14 @@
 
       <section id="strings-scene" class="clip scene strings-scene" data-start="9" data-duration="4" data-track-index="1">
         <div class="grain" data-layout-ignore></div>
-        <div class="mega-ghost" data-layout-ignore>focus</div>
+        <div class="mega-ghost" data-layout-ignore aria-hidden="true"></div>
         <div class="accent-panel acid" data-layout-ignore style="left: 74px; bottom: 78px; width: 302px; height: 104px"></div>
         <div class="scene-content">
           <div class="strings-header">
             <span class="eyebrow">Practica con foco</span>
             <h2>Seis cuerdas. Un golpe claro.</h2>
           </div>
-          <div class="impact-board">
+          <div class="impact-board" data-layout-allow-overflow>
             <div class="impact-line">
               <span class="impact-label">Tecnica</span>
               <span class="impact-string"></span>
@@ -610,7 +610,7 @@
 
       <section id="services-scene" class="clip scene services-scene" data-start="13" data-duration="4" data-track-index="1">
         <div class="grain" data-layout-ignore></div>
-        <div class="mega-ghost" data-layout-ignore>gear</div>
+        <div class="mega-ghost" data-layout-ignore aria-hidden="true"></div>
         <div class="scene-content">
           <span class="eyebrow">Elige tu instrumento</span>
           <h2 class="section-title">Ruta practica para tocar mejor</h2>
@@ -642,7 +642,7 @@
 
       <section id="final-scene" class="clip scene final-scene" data-start="17" data-duration="3" data-track-index="1">
         <div class="grain" data-layout-ignore></div>
-        <div class="mega-ghost" data-layout-ignore>play</div>
+        <div class="mega-ghost" data-layout-ignore aria-hidden="true"></div>
         <div class="accent-panel purple" data-layout-ignore style="left: -42px; top: 520px; width: 236px; height: 540px"></div>
         <div class="scene-content">
           <span class="eyebrow">La Reina / Santiago Oriente</span>
@@ -663,7 +663,7 @@
       <div id="transition-d" class="clip transition-layer transition-d" data-start="16.72" data-duration="0.33" data-track-index="5" data-layout-ignore></div>
 <!-- Optional music bed:
   Add assets/music.mp3, then uncomment:
-  <audio id="music-bed" data-start="0" data-duration="20" data-track-index="6" src="assets/music.mp3" data-volume="0.75"></audio>
+  &lt;audio id="music-bed" data-start="0" data-duration="20" data-track-index="6" src="assets/music.mp3" data-volume="0.75"&gt;&lt;/audio&gt;
 -->
     </div>
 
