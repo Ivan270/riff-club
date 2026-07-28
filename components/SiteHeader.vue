@@ -1,6 +1,10 @@
 <script setup lang="ts">
 const route = useRoute();
+const { theme } = useTheme();
 const isActive = (path: string) => route.path === path;
+const logoSrc = computed(() =>
+  theme.value === "light" ? "/logo-full-light.svg" : "/logo-full-dark.svg",
+);
 
 const navItems = [
   { label: "Eléctrica", to: "/clases-guitarra-electrica" },
@@ -13,9 +17,9 @@ const navItems = [
 
 <template>
   <header class="site-header tape">
-    <NuxtLink class="brand" to="/" aria-label="Ir al inicio"
-      >Riff Club</NuxtLink
-    >
+    <NuxtLink class="brand" to="/" aria-label="Ir al inicio">
+      <img class="brand-logo" :src="logoSrc" alt="Riff Club" />
+    </NuxtLink>
     <nav aria-label="Navegación principal">
       <NuxtLink
         v-if="route.path !== '/'"
@@ -72,15 +76,17 @@ const navItems = [
 }
 
 .brand {
-  color: var(--acid);
-  font-family: var(--font-display);
-  font-size: clamp(1.2rem, 3vw, 1.8rem);
-  font-weight: 950;
-  line-height: 0.86;
-  text-transform: uppercase;
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  min-width: 0;
   text-decoration: none;
-  letter-spacing: -0.05em;
-  text-shadow: 2px 2px 0 var(--red);
+}
+
+.brand-logo {
+  display: block;
+  width: clamp(132px, 18vw, 190px);
+  height: auto;
 }
 
 nav {
@@ -90,7 +96,8 @@ nav {
   align-items: center;
   justify-content: flex-end;
   overflow: visible;
-  font-size: 0.86rem;
+  font-family: var(--font-body);
+  font-size: var(--type-ui);
 }
 
 .nav-link {
@@ -103,9 +110,11 @@ nav {
   color: var(--page-text);
   white-space: nowrap;
   text-decoration: none;
-  font: 900 0.86rem/1 var(--font-mono);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: var(--type-ui);
+  font-weight: var(--weight-medium);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
 }
 
 .nav-link::after {

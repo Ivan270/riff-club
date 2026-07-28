@@ -20,9 +20,11 @@ const { theme, themeLabel, toggleTheme } = useTheme()
   color: var(--ink);
   box-shadow: 4px 4px 0 var(--acid);
   cursor: pointer;
-  font: 900 .78rem/1 var(--font-mono);
-  letter-spacing: .08em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: var(--type-ui);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
   transform: rotate(-1deg);
 }
 

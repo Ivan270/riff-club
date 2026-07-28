@@ -30,14 +30,29 @@
   --section-border: #fff7e8;
   --section-overlay: rgba(5, 5, 5, 0.9);
   --header-bg: rgba(16, 16, 16, 0.94);
+  --purple-link-text: var(--ink);
   --max: 1120px;
-  --font-display:
-    Impact, Haettenschweiler, "Franklin Gothic Heavy", "Arial Black", sans-serif;
-  /*--font-body: Charter, 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;*/
-  --font-body:
-    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  --font-mono: "IBM Plex Mono", "Courier New", Courier, monospace;
+  --font-display: "Bricolage Grotesque", "Arial Black", Arial, sans-serif;
+  --font-heading: var(--font-display);
+  --font-body: "DM Sans", Arial, Helvetica, sans-serif;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-heavy: 800;
+  --type-hero: clamp(3.5rem, 7vw, 7.5rem);
+  --type-h2: clamp(2.25rem, 4vw, 4rem);
+  --type-h3: clamp(1.5rem, 2.4vw, 2rem);
+  --type-lead: clamp(1.125rem, 1.6vw, 1.375rem);
+  --type-body: clamp(1rem, 1.1vw, 1.125rem);
+  --type-ui: clamp(1rem, 1vw, 1rem);
+  --type-label: clamp(0.75rem, 0.9vw, 0.875rem);
+  --leading-display: 0.92;
+  --leading-heading: 1.02;
+  --leading-body: 1.6;
+  --tracking-display: -0.045em;
+  --tracking-heading: -0.025em;
+  --tracking-label: 0.1em;
   --shadow-hard: 7px 7px 0 var(--black);
   color-scheme: dark;
 }
@@ -73,6 +88,7 @@
   --section-border: #241f1a;
   --section-overlay: rgba(255, 248, 233, 0.92);
   --header-bg: rgba(255, 246, 223, 0.94);
+  --purple-link-text: var(--paper);
   --shadow-hard: 7px 7px 0 rgba(16, 16, 16, 0.82);
   color-scheme: light;
 }
@@ -113,8 +129,9 @@ body {
     );
   color: var(--page-text);
   font-family: var(--font-body);
-  font-size: 18px;
-  line-height: 1.55;
+  font-size: var(--type-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
   text-rendering: optimizeLegibility;
   overflow-x: clip;
 }
@@ -160,7 +177,10 @@ a {
   padding: 12px 16px;
   background: var(--acid);
   color: var(--black);
-  font: 900 0.9rem/1 var(--font-mono);
+  font-family: var(--font-body);
+  font-size: var(--type-ui);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
   text-decoration: none;
   text-transform: uppercase;
 }
@@ -194,19 +214,57 @@ button:focus-visible,
 .eyebrow {
   display: inline-block;
   color: var(--acid);
-  font: 900 0.78rem/1 var(--font-mono);
-  letter-spacing: 0.14em;
+  font-family: var(--font-body);
+  font-size: var(--type-label);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
+}
+
+.lead {
+  font-family: var(--font-body);
+  font-size: var(--type-lead);
+  font-weight: var(--weight-medium);
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--type-hero);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: var(--weight-heavy);
+}
+
+h2 {
+  font-size: var(--type-h2);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
+  font-weight: var(--weight-heavy);
+}
+
+h3 {
+  font-size: var(--type-h3);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  font-weight: var(--weight-bold);
 }
 
 .display {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 14vw, 8.5rem);
-  font-weight: 900;
-  line-height: 0.88;
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
+  font-size: var(--type-hero);
+  font-weight: var(--weight-heavy);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
   text-wrap: balance;
 }
 
@@ -219,10 +277,12 @@ button:focus-visible,
   border: 2px solid currentColor;
   background: var(--paper);
   color: var(--ink);
-  font: 900 0.9rem/1 var(--font-mono);
-  letter-spacing: 0.04em;
+  font-family: var(--font-body);
+  font-size: var(--type-ui);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
   text-decoration: none;
-  text-transform: uppercase;
   box-shadow: 5px 5px 0 var(--paper);
   transition:
     transform 0.16s ease,
@@ -318,8 +378,11 @@ button:focus-visible,
 .sticker {
   display: inline-block;
   padding: 8px 12px;
-  font: 900 0.8rem/1 var(--font-mono);
-  letter-spacing: 0.08em;
+  font-family: var(--font-body);
+  font-size: var(--type-label);
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 

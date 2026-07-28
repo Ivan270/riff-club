@@ -126,7 +126,9 @@ onBeforeUnmount(() => {
 .lead {
   max-width: 680px;
   color: var(--muted);
-  font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+  font-size: var(--type-lead);
+  font-weight: var(--weight-medium);
+  line-height: 1.5;
 }
 
 .actions {
@@ -205,8 +207,11 @@ onBeforeUnmount(() => {
   padding: 8px 10px;
   border: 2px solid var(--ink);
   background: var(--acid);
-  font: 900 0.78rem/1 var(--font-mono);
-  letter-spacing: 0.08em;
+  font-family: var(--font-body);
+  font-size: var(--type-label);
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   transform: rotate(-2deg);
 }
@@ -244,9 +249,8 @@ onBeforeUnmount(() => {
   color: var(--ink);
   font-family: var(--font-display);
   font-size: clamp(3rem, 8vw, 6rem);
-  font-weight: 950;
+  font-weight: var(--weight-heavy);
   line-height: 0.76;
-  text-transform: uppercase;
   letter-spacing: 0.01em;
   box-shadow: 6px 6px 0 var(--ink);
   transform: rotate(-3deg);
@@ -273,8 +277,11 @@ onBeforeUnmount(() => {
   padding: 8px 10px;
   background: var(--ink);
   color: var(--paper);
-  font: 900 0.8rem/1 var(--font-mono);
-  letter-spacing: 0.06em;
+  font-family: var(--font-body);
+  font-size: var(--type-label);
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 

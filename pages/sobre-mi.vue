@@ -76,16 +76,20 @@ article::before {
   top: 14px;
   left: 18px;
   color: var(--red);
-  font-size: 0.9rem;
-  font-weight: 950;
-  letter-spacing: 0.18em;
+  font-family: var(--font-body);
+  font-size: var(--type-label);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
 }
 article p {
   color: #272727;
 }
 h2 {
-  /*text-transform: uppercase;*/
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: var(--type-h2);
+  font-weight: var(--weight-heavy);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
 }
 @media (max-width: 860px) {
   .setlist-steps {

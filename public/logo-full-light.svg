@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="91 272 1677 329" role="img" aria-labelledby="title desc">
+  <title id="title">Riff Club — logotipo A1.4, Light distintiva</title>
+  <desc id="desc">Logotipo completo con isotipo A1.4 y wordmark Riff Club en Bricolage Grotesque Heavy convertido a contornos.</desc>
+  <rect x="91" y="272" width="1677" height="329" fill="#FFF7E8"/>
+  <defs>
+    <g id="f-a1-4-densa">
+      <rect x="14" y="14" width="16" height="72" rx="1.25"/>
+      <path d="M15.25 14H45L50 19V28.75Q50 30 48.75 30H14V15.25Q14 14 15.25 14Z"/>
+      <path d="M14 42H35L40 47V58H14Z"/>
+    </g>
+  </defs>
+  <g transform="translate(145.527778 305.527778) scale(2.569444444)">
+    <use href="#f-a1-4-densa" xlink:href="#f-a1-4-densa" fill="#101010"/>
+    <use href="#f-a1-4-densa" xlink:href="#f-a1-4-densa"
+         transform="rotate(180 50 50)" fill="#A855F7"/>
+    <rect x="45.5" y="45.5" width="9" height="9" rx="0.9"
+          transform="rotate(45 50 50)" fill="#D8FF00"/>
+  </g>
+  <g fill="#101010" stroke="#101010" stroke-width="33.333333"
+     stroke-linejoin="round" paint-order="stroke fill">
+    <path d="M40 0V660H314Q358 660 397.5 652.5Q437 645 469.5 630.0Q502 615 526.0 592.0Q550 569 563.0 537.5Q576 506 576 466Q576 435 565.5 407.5Q555 380 532.5 358.0Q510 336 474.5 321.5Q439 307 390 301V293Q454 290 489.0 268.0Q524 246 541.5 212.5Q559 179 568 140L603 0H424L399 131Q393 165 380.5 186.0Q368 207 345.0 217.0Q322 227 284 227H202V0ZM202 352H296Q351 352 380.0 373.0Q409 394 409 437Q409 484 382.0 507.0Q355 530 300 530H202Z" transform="translate(487.000 514) scale(0.24 -0.24)"/>
+    <path d="M40 0V660H203V0Z" transform="translate(651.600 514) scale(0.24 -0.24)"/>
+    <path d="M40 0V660H202V0ZM121 235V367H457V235ZM121 525V660H491V525Z" transform="translate(726.920 514) scale(0.24 -0.24)"/>
+    <path d="M40 0V660H202V0ZM121 235V367H457V235ZM121 525V660H491V525Z" transform="translate(866.320 514) scale(0.24 -0.24)"/>
+    <path d="M341 -14Q257 -14 197.0 13.0Q137 40 99.0 88.0Q61 136 43.5 197.5Q26 259 26 328Q26 399 44.0 462.0Q62 525 99.5 572.5Q137 620 196.0 647.0Q255 674 338 674Q410 674 462.0 653.5Q514 633 545.5 597.5Q577 562 589.0 516.0Q601 470 595 420L446 402Q448 445 435.5 476.0Q423 507 397.5 524.0Q372 541 333 541Q300 541 274.5 528.0Q249 515 231.5 489.0Q214 463 205.0 424.5Q196 386 196 335Q196 269 212.0 220.5Q228 172 261.0 145.5Q294 119 344 119Q390 119 416.5 140.0Q443 161 454.0 198.0Q465 235 461 281L614 268Q619 213 606.5 162.5Q594 112 561.5 72.0Q529 32 474.5 9.0Q420 -14 341 -14Z" transform="translate(1071.440 514) scale(0.24 -0.24)"/>
+    <path d="M40 0V660H202V0ZM68 0V138H453V0Z" transform="translate(1239.880 514) scale(0.24 -0.24)"/>
+    <path d="M313 -14Q256 -14 211.0 -1.0Q166 12 133.5 36.0Q101 60 79.5 93.5Q58 127 47.5 169.0Q37 211 37 260V660H199V268Q199 217 214.0 186.5Q229 156 254.5 143.0Q280 130 313 130Q347 130 372.5 143.0Q398 156 413.0 186.0Q428 216 428 268V660H590V260Q590 130 520.0 58.0Q450 -14 313 -14Z" transform="translate(1367.280 514) scale(0.24 -0.24)"/>
+    <path d="M40 0V660H306Q367 660 414.5 649.0Q462 638 495.5 616.5Q529 595 546.5 563.0Q564 531 564 488Q564 448 547.5 416.0Q531 384 494.5 364.5Q458 345 399 340V331Q500 326 545.5 284.0Q591 242 591 173Q591 115 561.0 77.0Q531 39 473.5 19.5Q416 0 331 0ZM202 130H324Q375 130 403.0 148.5Q431 167 431 201Q431 239 399.5 257.5Q368 276 305 276H202ZM202 386H289Q346 386 376.0 405.0Q406 424 406 461Q406 496 379.0 513.5Q352 531 298 531H202Z" transform="translate(1534.760 514) scale(0.24 -0.24)"/>
+  </g>
+</svg>

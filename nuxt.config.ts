@@ -11,7 +11,8 @@ export default defineNuxtConfig({
         '/clases-guitarra-acustica',
         '/clases-bajo',
         '/sobre-mi',
-        '/contacto'
+        '/contacto',
+        '/gracias'
       ]
     }
   },
@@ -27,7 +28,16 @@ export default defineNuxtConfig({
         { property: 'og:locale', content: 'es_CL' },
         { name: 'twitter:card', content: 'summary_large_image' }
       ],
-      link: [{ rel: 'icon', href: '/favicon.ico' }]
+      link: [
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap'
+        },
+        { rel: 'icon', href: '/favicon.svg' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }
+      ]
     }
   }
 })

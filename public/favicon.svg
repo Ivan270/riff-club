@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 100 100"
+     preserveAspectRatio="xMidYMid meet"
+     role="img"
+     aria-labelledby="title desc">
+  <title id="title">Riff Club — favicon A1.4</title>
+  <desc id="desc">Isotipo A1.4 ampliado en Lime Yellow con nodo Lavender Purple sobre una placa Onyx redondeada.</desc>
+  <rect width="100" height="100" rx="12" fill="#101010"/>
+  <defs>
+    <g id="f-a1-4-favicon">
+      <rect x="14" y="14" width="16" height="72" rx="1.25"/>
+      <path d="M15.25 14H45L50 19V28.75Q50 30 48.75 30H14V15.25Q14 14 15.25 14Z"/>
+      <path d="M14 42H35L40 47V58H14Z"/>
+    </g>
+  </defs>
+  <g transform="translate(50 50) scale(1.138888889) translate(-50 -50)">
+    <use href="#f-a1-4-favicon"
+         xlink:href="#f-a1-4-favicon"
+         fill="#D8FF00"/>
+    <use href="#f-a1-4-favicon"
+         xlink:href="#f-a1-4-favicon"
+         transform="rotate(180 50 50)"
+         fill="#D8FF00"/>
+  </g>
+  <rect x="44" y="44" width="12" height="12" rx="1.2"
+        transform="rotate(45 50 50)"
+        shape-rendering="crispEdges"
+        fill="#A855F7"/>
+</svg>

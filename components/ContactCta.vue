@@ -111,15 +111,16 @@ h2 {
   margin: 18px 0;
   max-width: 760px;
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 9vw, 6rem);
-  line-height: 0.8;
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
+  font-size: var(--type-h2);
+  font-weight: var(--weight-heavy);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
 }
 p {
   position: relative;
   max-width: 620px;
   color: var(--ink);
+  font-family: var(--font-body);
 }
 .actions {
   display: flex;

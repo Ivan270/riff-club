@@ -73,9 +73,8 @@ onMounted(async () => {
     homeRef,
     ({ gsap, ScrollTrigger }) => {
       const flyer = homeRef.value?.querySelector(".pain-flyer");
-      const services = homeRef.value?.querySelector(".services-stage");
 
-      if (!flyer || !services) {
+      if (!flyer) {
         return;
       }
 
@@ -138,64 +137,6 @@ onMounted(async () => {
             ease: "power2.inOut",
           },
           "+=0.08",
-        );
-
-      gsap
-        .timeline({
-          scrollTrigger: {
-            trigger: services,
-            start: "top top",
-            end: "+=150%",
-            scrub: 0.7,
-            pin: services,
-            anticipatePin: 1,
-          },
-        })
-        .from(".services-stage .eyebrow", { y: 44, opacity: 0, duration: 0.22 })
-        .from(
-          "#servicios-title",
-          {
-            scale: 0.72,
-            y: 70,
-            opacity: 0,
-            transformOrigin: "left center",
-            duration: 0.32,
-            ease: "power3.out",
-          },
-          "-=0.1",
-        )
-        .to("#servicios-title", {
-          x: "50vw",
-          y: "50vh",
-          xPercent: -50,
-          yPercent: -50,
-          scale: 6.8,
-          transformOrigin: "center center",
-          duration: 1.42,
-          ease: "power2.inOut",
-        })
-        .to("#servicios-title", {
-          x: 0,
-          y: 0,
-          xPercent: 0,
-          yPercent: 0,
-          scale: 1,
-          transformOrigin: "center center",
-          duration: 0.26,
-          ease: "power3.out",
-        })
-        .set("#servicios-title", { transformOrigin: "left center" })
-        .from(
-          ".services-stage .service-grid > *",
-          {
-            y: 48,
-            opacity: 0,
-            scale: 0.95,
-            duration: 0.28,
-            stagger: 0.06,
-            ease: "power2.out",
-          },
-          "+=0.02",
         );
 
       ScrollTrigger.refresh();
@@ -290,10 +231,11 @@ onBeforeUnmount(() => {
 
 <style scoped>
 h2 {
-  font-size: clamp(2.6rem, 8vw, 6rem);
-  line-height: 0.82;
-  letter-spacing: -0.06em;
-  text-transform: uppercase;
+  font-family: var(--font-heading);
+  font-size: var(--type-h2);
+  font-weight: var(--weight-heavy);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
   margin: 12px 0 28px;
 }
 .pain-flyer {
@@ -349,6 +291,10 @@ h2 {
   flex-direction: column;
   justify-content: center;
 }
+#servicios-eyebrow {
+  align-self: flex-start;
+  width: max-content;
+}
 .note-grid,
 .service-grid {
   display: grid;
@@ -385,9 +331,11 @@ h2 {
 }
 .note h3 {
   color: var(--ink);
-  font-size: 1.4rem;
-  font-weight: 500;
-  /*text-transform: uppercase;*/
+  font-family: var(--font-display);
+  font-size: var(--type-h3);
+  font-weight: var(--weight-bold);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
 }
 .note p {
   color: #272727;
@@ -421,9 +369,10 @@ h2 {
   padding: 5px 10px;
   border: 1px solid var(--section-border);
   color: var(--section-text);
-  font-size: 0.78rem;
-  font-weight: 950;
-  letter-spacing: 0.18em;
+  font-family: var(--font-body);
+  font-size: var(--type-label);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   transform: rotate(4deg);
 }

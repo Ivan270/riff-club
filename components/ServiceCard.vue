@@ -47,15 +47,15 @@ defineProps<{
 }
 h3 {
   margin: 18px 0 10px;
-  font-size: clamp(2rem, 6vw, 4rem);
-  font-weight: 500;
-  line-height: 0.82;
-  letter-spacing: -0.07em;
-  /*text-transform: uppercase;*/
+  font-family: var(--font-display);
+  font-size: var(--type-h3);
+  font-weight: var(--weight-bold);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
 }
 a {
-  font-weight: 950;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
 }
 .instrument-mark {
   position: relative;

@@ -105,13 +105,14 @@ onBeforeUnmount(() => {
 h2 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 6vw, 4.5rem);
-  line-height: 0.9;
-  letter-spacing: -0.06em;
-  text-transform: uppercase;
+  font-size: var(--type-h2);
+  font-weight: var(--weight-heavy);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
 }
 p {
   color: var(--section-muted);
+  font-family: var(--font-body);
 }
 .footer-stamp {
   display: inline-block;
@@ -120,8 +121,11 @@ p {
   color: var(--ink);
   background: var(--paper);
   border: 2px solid var(--red);
-  font: 900 0.78rem/1 var(--font-mono);
-  letter-spacing: 0.08em;
+  font-family: var(--font-body);
+  font-size: var(--type-label);
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   box-shadow: 4px 4px 0 var(--red);
   transform: rotate(-1deg);
@@ -130,7 +134,10 @@ p {
   position: relative;
   z-index: 1;
   margin-top: 22px;
-  font: 700 0.78rem/1.4 var(--font-mono);
+  font-family: var(--font-body);
+  font-size: var(--type-label);
+  font-weight: var(--weight-bold);
+  line-height: 1.4;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }

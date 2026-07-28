@@ -94,8 +94,9 @@ defineProps<{
 .lead {
   max-width: 760px;
   color: var(--muted);
-  font-size: clamp(1.15rem, 2.5vw, 1.55rem);
-  line-height: 1.45;
+  font-size: var(--type-lead);
+  font-weight: var(--weight-medium);
+  line-height: 1.5;
 }
 
 .content-grid {
@@ -145,11 +146,12 @@ defineProps<{
 }
 
 h2 {
+  font-family: var(--font-heading);
   margin: 14px 0 18px;
-  font-size: clamp(2.1rem, 6vw, 4.8rem);
-  line-height: .86;
-  letter-spacing: -.08em;
-  text-transform: uppercase;
+  font-size: var(--type-h2);
+  font-weight: var(--weight-heavy);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
 }
 
 p {
@@ -181,8 +183,8 @@ p {
   color: var(--ink);
   border: 2px solid var(--ink);
   box-shadow: 6px 6px 0 var(--paper);
-  font-weight: 950;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
   text-decoration: none;
   clip-path: polygon(0 8%, 96% 0, 100% 92%, 4% 100%);
   transform: rotate(-1deg);
@@ -206,6 +208,10 @@ p {
 .service-page--purple {
   --service-accent: var(--purple);
   --area-accent: var(--acid);
+}
+
+.service-page--purple .related-links a:first-child {
+  color: var(--purple-link-text);
 }
 
 @media (max-width: 820px) {
