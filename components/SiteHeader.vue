@@ -40,6 +40,7 @@ const navItems = [
       >
       <ThemeToggle />
     </nav>
+    <MobileMenu :items="navItems" />
   </header>
 </template>
 
@@ -160,13 +161,22 @@ nav {
 
 @media (max-width: 760px) {
   .site-header {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
   }
 
-  nav {
-    justify-content: flex-start;
-    width: 100%;
+  .site-header > nav {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-header {
+    align-items: center;
+  }
+
+  .site-header > nav {
+    display: none;
   }
 }
 </style>
