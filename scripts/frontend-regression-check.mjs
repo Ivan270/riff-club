@@ -25,6 +25,9 @@ const nuxtConfig = read('nuxt.config.ts')
 const netlifyConfig = readOptional('netlify.toml')
 const contact = read('pages/contacto.vue')
 const thankYou = read('pages/gracias.vue')
+const canonicalComposable = readOptional('composables/useCanonicalUrl.ts')
+const robots = readOptional('public/robots.txt')
+const sitemap = readOptional('public/sitemap.xml')
 const css = read('assets/css/main.css')
 const themedSurfaceFiles = [
   'components/ServicePage.vue',
@@ -80,6 +83,22 @@ assert(contact.includes('name="bot-field"'), 'Contact form must include the Netl
 assert(contact.includes('action="/gracias"'), 'Contact form must use the dedicated success route')
 assert(!contact.includes('formspree.io'), 'Contact form must not depend on Formspree')
 assert(thankYou.includes('id="thank-you-title"'), 'Contact success route must include a labeled confirmation heading')
+assert(canonicalComposable.includes('https://riffclub.cl'), 'Canonical URLs must use the primary production domain')
+assert(canonicalComposable.includes('rel: "canonical"'), 'Canonical composable must emit canonical links')
+assert(robots.includes('Sitemap: https://riffclub.cl/sitemap.xml'), 'robots.txt must reference the primary production sitemap')
+for (const path of ['/', '/clases-guitarra-electrica', '/clases-guitarra-acustica', '/clases-bajo', '/sobre-mi', '/contacto']) {
+  assert(sitemap.includes(`<loc>https://riffclub.cl${path}</loc>`), `Sitemap must include ${path}`)
+}
+for (const page of [
+  'pages/index.vue',
+  'pages/clases-guitarra-electrica.vue',
+  'pages/clases-guitarra-acustica.vue',
+  'pages/clases-bajo.vue',
+  'pages/sobre-mi.vue',
+  'pages/contacto.vue'
+]) {
+  assert(read(page).includes('useCanonicalUrl()'), `${page} must use the canonical URL composable`)
+}
 for (const asset of ['public/logo-full-dark.svg', 'public/logo-full-light.svg', 'public/favicon.svg', 'public/apple-touch-icon.png']) {
   assert(existsSync(new URL(`../${asset}`, import.meta.url)), `${asset} must exist`)
 }

@@ -3,6 +3,8 @@ useSeoMeta({
   title: 'Clases de bajo en Santiago | Profesor',
   description: 'Clases presenciales de bajo para trabajar groove, ritmo y técnica. Cerca de La Reina y Santiago Oriente.'
 })
+
+useCanonicalUrl()
 </script>
 
 <template>

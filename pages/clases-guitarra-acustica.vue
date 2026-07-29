@@ -3,6 +3,8 @@ useSeoMeta({
   title: 'Clases de guitarra acústica en La Reina',
   description: 'Aprende acordes, rasgueos y canciones con clases presenciales de guitarra acústica. Escríbeme para agendar.'
 })
+
+useCanonicalUrl()
 </script>
 
 <template>

@@ -3,6 +3,8 @@ useSeoMeta({
   title: 'Clases de guitarra eléctrica en Santiago',
   description: 'Aprende riffs, técnica y canciones con clases presenciales cerca de La Reina. Agenda tu primera clase.'
 })
+
+useCanonicalUrl()
 </script>
 
 <template>

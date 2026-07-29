@@ -8,6 +8,8 @@ const faqs = [
 
 useSeoMeta({ title: 'Contacto | Clases de guitarra en La Reina', description: 'Agenda clases presenciales de guitarra o bajo en La Reina. Escríbeme por WhatsApp o envía el formulario.' })
 
+useCanonicalUrl()
+
 useHead({
   script: [
     {

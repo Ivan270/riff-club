@@ -4,6 +4,8 @@ useSeoMeta({
   description:
     "Conoce el método de clases personalizadas para guitarra eléctrica, acústica y bajo en Santiago Oriente.",
 });
+
+useCanonicalUrl();
 </script>
 
 <template>

@@ -8,6 +8,8 @@ useSeoMeta({
     "Clases presenciales de guitarra y bajo en La Reina. Aprende con método, canciones reales y agenda por WhatsApp.",
 });
 
+useCanonicalUrl();
+
 useHead({
   script: [
     {
@@ -37,7 +39,7 @@ useHead({
           latitude: -33.441,
           longitude: -70.535,
         },
-        url: "https://example.com/",
+         url: "https://riffclub.cl/",
         sameAs: [],
         makesOffer: [
           {
