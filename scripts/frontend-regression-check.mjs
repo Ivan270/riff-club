@@ -87,7 +87,8 @@ assert(canonicalComposable.includes('https://riffclub.cl'), 'Canonical URLs must
 assert(canonicalComposable.includes('rel: "canonical"'), 'Canonical composable must emit canonical links')
 assert(robots.includes('Sitemap: https://riffclub.cl/sitemap.xml'), 'robots.txt must reference the primary production sitemap')
 for (const path of ['/', '/clases-guitarra-electrica', '/clases-guitarra-acustica', '/clases-bajo', '/sobre-mi', '/contacto']) {
-  assert(sitemap.includes(`<loc>https://riffclub.cl${path}</loc>`), `Sitemap must include ${path}`)
+  const sitemapPath = path === '/' ? '/' : `${path}/`
+  assert(sitemap.includes(`<loc>https://riffclub.cl${sitemapPath}</loc>`), `Sitemap must include ${sitemapPath}`)
 }
 for (const page of [
   'pages/index.vue',
