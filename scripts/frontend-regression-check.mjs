@@ -75,8 +75,12 @@ assert(header.includes('aria-current'), 'SiteHeader must expose active page with
 assert(header.includes('ThemeToggle'), 'SiteHeader must render ThemeToggle')
 assert(header.includes('<MobileMenu'), 'SiteHeader must render the responsive mobile menu')
 const menuStringsPattern = /<button\b[^>]*\bclass=(["'])(?:[^"']*\s)?mobile-menu-toggle(?:\s[^"']*)?\1[^>]*>\s*<([a-z][\w-]*)\b[^>]*\bclass=(["'])(?:[^"']*\s)?menu-strings(?:\s[^"']*)?\3[^>]*>\s*(?:<([a-z][\w-]*)\b[^>]*\bclass=(["'])(?:[^"']*\s)?menu-string(?:\s[^"']*)?\5[^>]*>\s*<\/\4>\s*){3}<\/\2>\s*<\/button>/i
+const mobileToggleMarkup = mobileMenu.match(/<button\b[^>]*\bclass=(["'])(?:[^"']*\s)?mobile-menu-toggle(?:\s[^"']*)?\1[^>]*>[\s\S]*?<\/button>/i)?.[0] ?? ''
 assert(menuStringsPattern.test(mobileMenu), 'Mobile trigger must contain exactly three menu-string children inside menu-strings')
-assert(!mobileMenu.includes('<img :src="isotypeSrc"'), 'Mobile trigger must not duplicate the full isotipo')
+assert(!mobileMenu.includes('isotypeSrc'), 'MobileMenu must not define or use an isotipo source')
+assert(!mobileMenu.includes('/isotype-dark.svg'), 'MobileMenu must not include the dark standard isotipo')
+assert(!mobileMenu.includes('/isotype-light.svg'), 'MobileMenu must not include the light standard isotipo')
+assert(!/<img\b/i.test(mobileToggleMarkup), 'Mobile trigger must not contain an image')
 assert(mobileMenu.includes('aria-expanded'), 'Mobile trigger must retain its expanded state')
 assert(mobileMenu.includes('aria-controls="mobile-menu"'), 'Mobile trigger must retain its controlled dialog reference')
 assert(mobileMenu.includes('keydown'), 'Mobile menu must handle keyboard dismissal and focus navigation')
