@@ -36,6 +36,11 @@ hex, RGB, HSL, white, or black color literals outside the primitive block.
 | Header and section overlays | Onyx-derived alpha | Old-Lace-derived alpha |
 | General muted / muted on dark / muted ink | Bone / Bone / Stone | Stone / Bone / Stone |
 | Acid / red / purple accents | Lime / Cinnabar / Lavender | Lime / Cinnabar / Lavender |
+| `--purple-link-text` on Lavender | Onyx, at least `4.5:1` | Onyx, at least `4.5:1` |
+
+`--purple-link-text` is the accessible Onyx foreground for links placed on a
+Lavender service accent. Keep this pairing in both themes so normal text meets
+the WCAG AA `4.5:1` minimum.
 
 Use no more than two accent colors in one composition. Onyx, Old Lace,
 Graphite, Sand, Bone, and Stone are neutrals and do not count toward that limit.

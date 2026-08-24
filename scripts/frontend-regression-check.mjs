@@ -5,8 +5,12 @@ const readBuffer = (path) => readFileSync(new URL(`../${path}`, import.meta.url)
 const stripCssComments = (source) => source.replace(/\/\*[\s\S]*?\*\//g, '')
 const stripVueComments = (source) => source.replace(/<!--[\s\S]*?-->/g, '')
 const readStyles = (source) => [...source.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/g)].map((match) => match[1]).join('\n')
-const readInlineStyles = (source) => [...stripVueComments(source).matchAll(/(?:^|\s):?style\s*=\s*(["'])([\s\S]*?)\1/g)]
-  .map((match) => match[2])
+const readInlineStyles = (source) => [...stripVueComments(source).matchAll(/(?:^|\s)(:?)style\s*=\s*(["'])([\s\S]*?)\2/g)]
+  .flatMap((match) => {
+    if (!match[1]) return [match[3]]
+    return [...match[3].matchAll(/([\w-]+)\s*:\s*(['"])([\s\S]*?)\2/g)]
+      .map((declaration) => `${declaration[1]}: ${declaration[3]}`)
+  })
   .join(';')
 const colorCustomProperties = new Set([
   '--ink', '--paper', '--paper-aged', '--acid', '--acid-glow', '--red', '--red-glow', '--purple', '--purple-link-text', '--gray',
@@ -24,7 +28,7 @@ const isColorDeclaration = (property, value) => {
 }
 const readFunctionCalls = (source, functionName) => {
   const calls = []
-  const pattern = new RegExp(`${functionName}\\s*\\(`, 'gi')
+  const pattern = new RegExp(`(?<![\\w-])${functionName}\\s*\\(`, 'gi')
   let match
 
   while ((match = pattern.exec(source)) !== null) {
@@ -62,12 +66,53 @@ const splitFunctionArguments = (call) => {
   parts.push(body.slice(start).trim())
   return parts
 }
+const removeFunctionCalls = (source, functionNames) => {
+  let result = source
+  for (const functionName of functionNames) {
+    for (const call of readFunctionCalls(result, functionName)) {
+      result = result.replace(call, ' ')
+    }
+  }
+  return result
+}
+const structuralColorKeywords = new Set([
+  'transparent', 'currentcolor', 'inherit', 'initial', 'revert', 'revert-layer', 'unset', 'none',
+  'solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset', 'hidden',
+  'auto', 'center', 'top', 'right', 'bottom', 'left', 'cover', 'contain', 'repeat', 'no-repeat',
+  'repeat-x', 'repeat-y', 'space', 'round', 'scroll', 'fixed', 'local', 'border-box', 'padding-box', 'content-box'
+])
+const findUnsupportedColorIdentifiers = (value, property) => {
+  const violations = []
+
+  for (const call of readFunctionCalls(value, 'var')) {
+    const [token, ...fallbackParts] = splitFunctionArguments(call)
+    if (!/^--[\w-]+$/.test(token)) violations.push(`${property}: invalid var() token`)
+    if (fallbackParts.length > 0) {
+      violations.push(...findUnsupportedColorIdentifiers(fallbackParts.join(','), property))
+    }
+  }
+
+  const remainder = removeFunctionCalls(value, [
+    'var', 'color-mix', 'linear-gradient', 'repeating-linear-gradient', 'radial-gradient',
+    'repeating-radial-gradient', 'conic-gradient', 'repeating-conic-gradient', 'url', 'calc', 'min', 'max', 'clamp'
+  ])
+    .replace(/["']/g, ' ')
+    .replace(/-?(?:\d*\.)?\d+(?:%|[a-z]+)?/gi, ' ')
+  const identifiers = remainder.match(/[a-z][\w-]*/gi) ?? []
+
+  for (const identifier of identifiers) {
+    const normalized = identifier.toLowerCase()
+    if (!structuralColorKeywords.has(normalized)) {
+      violations.push(`${property}: unsupported direct color ${normalized}`)
+    }
+  }
+  return violations
+}
 const auditRuntimeColors = (source) => {
   const violations = []
   const declarations = stripCssComments(`${source};`).matchAll(/((?:--)?[\w-]+)\s*:\s*([^;{}]+)\s*(?:;|(?=\}))/g)
-  const approvedKeywords = new Set(['transparent', 'currentcolor', 'inherit', 'initial', 'revert', 'revert-layer', 'unset'])
-  const noneProperties = /^(?:background(?:-image)?|border(?:-(?:top|right|bottom|left))?|outline|box-shadow|text-shadow|fill|stroke)$/
   const gradientFunctions = ['linear-gradient', 'repeating-linear-gradient', 'radial-gradient', 'repeating-radial-gradient', 'conic-gradient', 'repeating-conic-gradient']
+  const noneProperties = /^(?:background(?:-image)?|border(?:-(?:top|right|bottom|left))?|outline|box-shadow|text-shadow|fill|stroke)$/
 
   for (const [, property, value] of declarations) {
     const normalizedProperty = property.toLowerCase()
@@ -76,9 +121,6 @@ const auditRuntimeColors = (source) => {
 
     for (const match of value.matchAll(/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b|\b(?:rgb|rgba|hsl|hsla|oklch|lab|lch|hwb|color)\s*\(|\b(?:black|white)\b/gi)) {
       violations.push(`${property}: ${match[0]}`)
-    }
-    if (/^[a-z][\w-]*$/i.test(normalizedValue) && !approvedKeywords.has(normalizedValue) && !(normalizedValue === 'none' && noneProperties.test(normalizedProperty))) {
-      violations.push(`${property}: unsupported direct color ${normalizedValue}`)
     }
     for (const call of readFunctionCalls(value, 'color-mix')) {
       if (!/^color-mix\(\s*in\s+srgb\s*,\s*var\(--[\w-]+\)(?:\s+[\d.]+%)?\s*,\s*(?:var\(--[\w-]+\)|transparent|currentcolor|inherit)(?:\s+[\d.]+%)?\s*\)$/i.test(call)) {
@@ -89,12 +131,13 @@ const auditRuntimeColors = (source) => {
       for (const call of readFunctionCalls(value, functionName)) {
         for (const [index, argument] of splitFunctionArguments(call).entries()) {
           if (index === 0 && /^(?:-?[\d.]+(?:deg|rad|turn)|to\b|from\b|at\b|circle\b|ellipse\b|closest-|farthest-)/i.test(argument)) continue
-          const identifier = argument.match(/^([a-z][\w-]*)\b/i)?.[1].toLowerCase()
-          if (identifier && !approvedKeywords.has(identifier) && !['var', 'color-mix'].includes(identifier)) {
-            violations.push(`${property}: unsupported gradient color ${identifier}`)
-          }
+          violations.push(...findUnsupportedColorIdentifiers(argument, property))
         }
       }
+    }
+    violations.push(...findUnsupportedColorIdentifiers(normalizedValue, property))
+    if (normalizedValue === 'none' && !noneProperties.test(normalizedProperty)) {
+      violations.push(`${property}: none is not valid for this property`)
     }
   }
   return violations
@@ -162,6 +205,11 @@ assert(auditRuntimeColors('.fixture { background: linear-gradient(var(--paper), 
 assert(auditRuntimeColors('.fixture { color: initial; border-color: revert; outline-color: revert-layer; text-decoration-color: unset; background: none; }').length === 0, 'Runtime color audit must allow approved cascade keywords and property-appropriate none')
 assert(auditRuntimeColors('.fixture { color: none; }').length > 0, 'Runtime color audit must reject none where the property does not support it')
 assert(auditRuntimeColors(':root { --status-label: red; --font-sample: "Arial Black"; }').length === 0, 'Runtime color audit must not treat arbitrary custom labels or font names as colors')
+assert(auditRuntimeColors('.fixture { border: 1px solid rebeccapurple; }').length > 0, 'Runtime color audit must reject named colors in compound declarations')
+assert(auditRuntimeColors('.fixture { color: var(--fallback, red); }').length > 0, 'Runtime color audit must reject direct colors in var() fallbacks')
+assert(auditRuntimeColors(readInlineStyles(`<i :style="{ color: 'red' }"></i>`)).length > 0, 'Runtime color audit must reject quoted named colors in static bound styles')
+assert(auditRuntimeColors('.fixture { color: var(--fallback, var(--ink)); border-color: var(--fallback, transparent); }').length === 0, 'Runtime color audit must allow token and keyword var() fallbacks')
+assert(auditRuntimeColors(readInlineStyles('<i :style="{ color: themeColor }"></i>')).length === 0, 'Runtime color audit must ignore dynamic bound-style variables')
 
 const hero = read('components/HeroZine.vue')
 const home = read('pages/index.vue')
