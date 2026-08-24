@@ -203,7 +203,7 @@ onBeforeUnmount(() => {
 .menu-string {
   width: 28px;
   height: 3px;
-  background: var(--page-text);
+  background: var(--ink);
 }
 
 .mobile-menu {

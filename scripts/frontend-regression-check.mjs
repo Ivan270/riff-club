@@ -77,6 +77,7 @@ assert(header.includes('<MobileMenu'), 'SiteHeader must render the responsive mo
 const menuStringsPattern = /<button\b[^>]*\bclass=(["'])(?:[^"']*\s)?mobile-menu-toggle(?:\s[^"']*)?\1[^>]*>\s*<([a-z][\w-]*)\b[^>]*\bclass=(["'])(?:[^"']*\s)?menu-strings(?:\s[^"']*)?\3[^>]*>\s*(?:<([a-z][\w-]*)\b[^>]*\bclass=(["'])(?:[^"']*\s)?menu-string(?:\s[^"']*)?\5[^>]*>\s*<\/\4>\s*){3}<\/\2>\s*<\/button>/i
 const mobileToggleMarkup = mobileMenu.match(/<button\b[^>]*\bclass=(["'])(?:[^"']*\s)?mobile-menu-toggle(?:\s[^"']*)?\1[^>]*>[\s\S]*?<\/button>/i)?.[0] ?? ''
 assert(menuStringsPattern.test(mobileMenu), 'Mobile trigger must contain exactly three menu-string children inside menu-strings')
+assert(/\.menu-string\s*\{[^}]*background\s*:\s*var\(--ink\)\s*;/.test(stripCssComments(mobileMenu)), 'Mobile trigger strings must contrast with the paper surface using var(--ink)')
 assert(!mobileMenu.includes('isotypeSrc'), 'MobileMenu must not define or use an isotipo source')
 assert(!mobileMenu.includes('/isotype-dark.svg'), 'MobileMenu must not include the dark standard isotipo')
 assert(!mobileMenu.includes('/isotype-light.svg'), 'MobileMenu must not include the light standard isotipo')
