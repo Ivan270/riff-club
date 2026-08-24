@@ -148,8 +148,6 @@ for (const page of [
 for (const asset of [
   'public/logo-full-dark.svg',
   'public/logo-full-light.svg',
-  'public/badge-navbar-dark.svg',
-  'public/badge-navbar-light.svg',
   'public/isotype-dark.svg',
   'public/isotype-light.svg',
   'public/favicon.svg',
@@ -167,7 +165,7 @@ for (const asset of [
 ]) {
   assert(existsSync(new URL(`../${asset}`, import.meta.url)), `${asset} must exist`)
 }
-for (const asset of ['public/logo-full-dark.svg', 'public/logo-full-light.svg', 'public/badge-navbar-dark.svg', 'public/badge-navbar-light.svg', 'public/isotype-dark.svg', 'public/isotype-light.svg', 'public/favicon.svg', 'public/safari-pinned-tab.svg']) {
+for (const asset of ['public/logo-full-dark.svg', 'public/logo-full-light.svg', 'public/isotype-dark.svg', 'public/isotype-light.svg', 'public/favicon.svg', 'public/safari-pinned-tab.svg']) {
   assert(readOptional(asset).includes('<svg'), `${asset} must contain valid SVG markup`)
 }
 for (const [asset, expectedSize] of [

@@ -2,8 +2,11 @@
 const route = useRoute();
 const { theme } = useTheme();
 const isActive = (path: string) => route.path === path;
-const badgeSrc = computed(() =>
-  theme.value === "light" ? "/badge-navbar-light.svg" : "/badge-navbar-dark.svg",
+const horizontalLogoSrc = computed(() =>
+  theme.value === "light" ? "/logo-full-light.svg" : "/logo-full-dark.svg",
+);
+const symbolSrc = computed(() =>
+  theme.value === "light" ? "/isotype-light.svg" : "/isotype-dark.svg",
 );
 
 const navItems = [
@@ -16,9 +19,10 @@ const navItems = [
 </script>
 
 <template>
-  <header class="site-header tape">
-    <NuxtLink class="brand" to="/" aria-label="Ir al inicio">
-      <img class="brand-badge" :src="badgeSrc" alt="Riff Club" />
+  <header class="site-header">
+    <NuxtLink class="brand" to="/" aria-label="Ir al inicio — Riff Club">
+      <img class="brand-logo" :src="horizontalLogoSrc" alt="Riff Club" />
+      <img class="brand-symbol" :src="symbolSrc" alt="" aria-hidden="true" />
     </NuxtLink>
     <nav aria-label="Navegación principal">
       <NuxtLink
@@ -56,22 +60,6 @@ const navItems = [
   padding: 14px 18px 16px;
   background: var(--header-bg);
   border-bottom: 3px solid var(--section-border);
-  clip-path: polygon(
-    0 0,
-    100% 0,
-    99% 100%,
-    91% 92%,
-    83% 100%,
-    72% 94%,
-    64% 100%,
-    55% 93%,
-    46% 100%,
-    36% 94%,
-    27% 100%,
-    18% 93%,
-    8% 100%,
-    0 96%
-  );
   backdrop-filter: blur(10px);
   box-shadow: 0 10px 0 rgba(0, 0, 0, 0.3);
 }
@@ -84,10 +72,17 @@ const navItems = [
   text-decoration: none;
 }
 
-.brand-badge {
+.brand-logo {
   display: block;
-  width: clamp(68px, 5vw, 72px);
+  width: clamp(180px, 15.3vw, 220px);
+  min-width: 180px;
   height: auto;
+}
+
+.brand-symbol {
+  display: none;
+  width: 52px;
+  height: 52px;
 }
 
 nav {
@@ -159,17 +154,6 @@ nav {
   background: var(--ink);
 }
 
-@media (max-width: 760px) {
-  .site-header {
-    align-items: center;
-    flex-direction: row;
-  }
-
-  .site-header > nav {
-    display: none;
-  }
-}
-
 @media (max-width: 900px) {
   .site-header {
     align-items: center;
@@ -177,6 +161,14 @@ nav {
 
   .site-header > nav {
     display: none;
+  }
+
+  .brand-logo {
+    display: none;
+  }
+
+  .brand-symbol {
+    display: block;
   }
 }
 </style>

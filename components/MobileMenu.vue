@@ -16,10 +16,6 @@ const previousBodyOverflow = shallowRef("")
 const triggerRef = useTemplateRef<HTMLButtonElement>("trigger")
 const menuRef = useTemplateRef<HTMLElement>("menu")
 
-const isotypeSrc = computed(() =>
-  theme.value === "light" ? "/isotype-light.svg" : "/isotype-dark.svg",
-)
-
 const isActive = (path: string) => route.path === path
 
 const getFocusableElements = () => {
@@ -122,7 +118,11 @@ onBeforeUnmount(() => {
       :aria-label="isOpen ? 'Cerrar menú' : 'Abrir menú'"
       @click="toggleMenu"
     >
-      <img :src="isotypeSrc" alt="" aria-hidden="true" />
+      <span class="menu-strings" aria-hidden="true">
+        <span class="menu-string"></span>
+        <span class="menu-string"></span>
+        <span class="menu-string"></span>
+      </span>
     </button>
 
     <Teleport to="body">
@@ -193,10 +193,17 @@ onBeforeUnmount(() => {
   transform: rotate(1deg);
 }
 
-.mobile-menu-toggle img {
-  display: block;
-  width: 100%;
-  height: 100%;
+.menu-strings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transform: rotate(-45deg);
+}
+
+.menu-string {
+  width: 28px;
+  height: 3px;
+  background: var(--page-text);
 }
 
 .mobile-menu {
