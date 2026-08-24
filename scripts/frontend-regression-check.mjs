@@ -169,6 +169,69 @@ const usesDeclaration = (source, selector, property, value) => {
     && new RegExp(`(?:^|;)\\s*${property}\\s*:\\s*${value}\\s*;`).test(declarations)
   )
 }
+const normalizeWhitespace = (value) => value.trim().replace(/\s+/g, ' ')
+const readSelectorDeclarations = (source, selector) => {
+  const style = readStyles(source) || source
+  const normalizedSelector = normalizeWhitespace(selector)
+  const declarations = []
+
+  for (const [, selectorList, body] of stripCssComments(style).matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const selectors = selectorList.split(',').map(normalizeWhitespace)
+    if (!selectors.includes(normalizedSelector)) continue
+
+    for (const [, property, value] of body.matchAll(/(?:^|;)\s*([\w-]+)\s*:\s*([^;]+)/g)) {
+      declarations.push({ property: property.toLowerCase(), value: normalizeWhitespace(value) })
+    }
+  }
+  return declarations
+}
+const declarationValues = (source, selector, property) => readSelectorDeclarations(source, selector)
+  .filter((declaration) => declaration.property === property)
+  .map((declaration) => declaration.value)
+const hasDeclaration = (source, selector, property, value) => declarationValues(source, selector, property)
+  .includes(normalizeWhitespace(value))
+const splitTopLevelValues = (value) => {
+  const values = []
+  let depth = 0
+  let start = 0
+
+  for (let index = 0; index < value.length; index += 1) {
+    if (value[index] === '(') depth += 1
+    if (value[index] === ')') depth -= 1
+    if (value[index] === ',' && depth === 0) {
+      values.push(value.slice(start, index).trim())
+      start = index + 1
+    }
+  }
+  values.push(value.slice(start).trim())
+  return values.filter((part) => part && part !== 'none')
+}
+const countShadowLayers = (source, selector) => declarationValues(source, selector, 'box-shadow')
+  .flatMap(splitTopLevelValues)
+  .length
+const hasTransformFunction = (source, selector, functionName) => declarationValues(source, selector, 'transform')
+  .some((value) => new RegExp(`(?:^|\\s)${functionName}\\s*\\(`).test(value))
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const hasStaticClass = (source, className) => [...stripVueComments(source).matchAll(/\bclass\s*=\s*(["'])([^"']*)\1/g)]
+  .some(([, , classes]) => classes.split(/\s+/).includes(className))
+const readOpeningTags = (source, tagName) => [...stripVueComments(source).matchAll(new RegExp(`<${tagName}\\b[^>]*>`, 'gi'))]
+  .map((match) => match[0])
+const hasAttribute = (tag, attribute, value) => {
+  const match = tag.match(new RegExp(`(?:^|\\s)${escapeRegExp(attribute)}\\s*=\\s*(["'])(.*?)\\1`))
+  return Boolean(match && (value === undefined || normalizeWhitespace(match[2]) === value))
+}
+const readElementContentByClass = (source, tagName, className) => source.match(new RegExp(
+  `<${tagName}\\b(?=[^>]*\\bclass\\s*=\\s*(["'])[^"']*\\b${escapeRegExp(className)}\\b[^"']*\\1)[^>]*>([\\s\\S]*?)<\\/${tagName}>`,
+))?.[2] ?? ''
+const readNumericMap = (source, variableName) => {
+  const body = source.match(new RegExp(`const\\s+${variableName}\\s*=\\s*\\{([\\s\\S]*?)\\}`))?.[1] ?? ''
+  return Object.fromEntries([...body.matchAll(/([\w-]+)\s*:\s*(\d+)/g)].map(([, key, value]) => [key, Number(value)]))
+}
+const hasVueForExpression = (source, item, expression) => new RegExp(
+  `\\bv-for\\s*=\\s*(["'])\\s*${item}\\s+in\\s+${expression}\\s*\\1`,
+).test(stripVueComments(source))
+const readSvgFills = (source) => new Set([...source.matchAll(/\bfill\s*=\s*(["'])(#[0-9a-f]{6})\1/gi)]
+  .map(([, , fill]) => fill.toLowerCase()))
 const readPngSize = (path) => {
   const image = readBuffer(path)
   return [image.readUInt32BE(16), image.readUInt32BE(20)]
@@ -210,6 +273,27 @@ assert(auditRuntimeColors('.fixture { color: var(--fallback, red); }').length > 
 assert(auditRuntimeColors(readInlineStyles(`<i :style="{ color: 'red' }"></i>`)).length > 0, 'Runtime color audit must reject quoted named colors in static bound styles')
 assert(auditRuntimeColors('.fixture { color: var(--fallback, var(--ink)); border-color: var(--fallback, transparent); }').length === 0, 'Runtime color audit must allow token and keyword var() fallbacks')
 assert(auditRuntimeColors(readInlineStyles('<i :style="{ color: themeColor }"></i>')).length === 0, 'Runtime color audit must ignore dynamic bound-style variables')
+const sourceContractFixture = `<style>
+  .surface,
+  .alternate {
+    box-shadow:
+      1px 1px 0 var(--ink),
+      0 0 0 color-mix(in srgb, var(--red) 20%, transparent),
+      2px 2px 0 var(--paper) inset;
+    transform: translateX(0) rotate(1deg);
+  }
+</style>`
+assert(hasDeclaration(sourceContractFixture, '.surface', 'transform', 'translateX(0) rotate(1deg)'), 'Source contracts must normalize selector and declaration whitespace')
+assert(countShadowLayers(sourceContractFixture, '.surface') === 3, 'Source contracts must count comma-separated shadows without splitting function arguments')
+assert(hasTransformFunction(sourceContractFixture, '.alternate', 'rotate'), 'Source contracts must detect rotation in compound transforms')
+assert(Object.entries(readNumericMap('const fixture = { electric : 6,\n acoustic:6, bass : 4 } as const', 'fixture')).length === 3, 'Source contracts must read structural numeric data independent of formatting')
+assert(hasVueForExpression('<span\n v-for = "item in counts[ variant ]" />', 'item', 'counts\\s*\\[\\s*variant\\s*\\]'), 'Source contracts must read Vue structural directives independent of formatting')
+const structuralContractFixture = `<div data-test="fixture" class = 'alpha target beta'>
+  <img aria-hidden = "true" alt = "" class = "logo fixture" />
+</div>`
+assert(hasStaticClass(structuralContractFixture, 'target'), 'Source contracts must read static classes independent of attribute order and spacing')
+const structuralImageFixture = readOpeningTags(readElementContentByClass(structuralContractFixture, 'div', 'target'), 'img')[0] ?? ''
+assert(hasAttribute(structuralImageFixture, 'alt', '') && hasAttribute(structuralImageFixture, 'aria-hidden', 'true'), 'Source contracts must read attributes independent of order and spacing')
 
 const hero = read('components/HeroZine.vue')
 const home = read('pages/index.vue')
@@ -229,6 +313,8 @@ const canonicalComposable = readOptional('composables/useCanonicalUrl.ts')
 const robots = readOptional('public/robots.txt')
 const sitemap = readOptional('public/sitemap.xml')
 const css = read('assets/css/main.css')
+const logoFullLight = read('public/logo-full-light.svg')
+const logoFullDark = read('public/logo-full-dark.svg')
 const themedSurfaceFiles = [
   'components/ServicePage.vue',
   'components/SiteFooter.vue',
@@ -264,47 +350,64 @@ assert(usesDeclaration(servicePage, '.service-page--purple .related-links a:firs
 
 assert(hero.includes('56995296324'), 'Hero WhatsApp CTA must use 56995296324')
 assert(!hero.includes('56912345678'), 'Hero WhatsApp CTA must not use placeholder number')
-assert(hero.includes('class="poster-brand"'), 'Hero poster must include the horizontal brand signature')
-assert(hero.includes(':src="\'/logo-full-light.svg\'"'), 'Hero poster must bind the public Onyx horizontal logo without a Vite import')
-assert(hero.includes('alt="" aria-hidden="true"'), 'Hero poster logo must be decorative')
+assert(hasStaticClass(hero, 'poster-brand'), 'Hero poster must include the horizontal brand signature')
+const heroBrandImage = readOpeningTags(readElementContentByClass(hero, 'div', 'poster-brand'), 'img')[0] ?? ''
+assert(hasAttribute(heroBrandImage, ':src', "'/logo-full-light.svg'"), 'Hero poster must bind the public Onyx horizontal logo without a Vite import')
+assert(hasAttribute(heroBrandImage, 'alt', '') && hasAttribute(heroBrandImage, 'aria-hidden', 'true'), 'Hero poster logo must be decorative')
 assert(!hero.includes('<div class="poster-type">'), 'Hero poster must remove the duplicate Riff Club lettering')
 assert(!hero.includes('<b>01</b>'), 'Hero poster must remove the legacy serial')
-assert(hero.includes('.from(\n        ".poster-brand"'), 'Hero timeline must animate the horizontal brand signature')
-assert(hero.includes('width: min(100%, 300px);'), 'Hero poster logo must stay responsive')
-assert(hero.includes('min-width: min(180px, 100%);'), 'Hero poster logo must preserve its minimum width when space allows')
-const heroStringLines = hero.match(/<div class="string-lines">([\s\S]*?)<\/div>/)?.[1] ?? ''
+assert(/\.from\s*\(\s*(["'])\.poster-brand\1/.test(hero), 'Hero timeline must animate the horizontal brand signature')
+assert(hasDeclaration(hero, '.poster-brand img', 'width', 'min(100%, 300px)'), 'Hero poster logo must stay responsive')
+assert(hasDeclaration(hero, '.poster-brand img', 'min-width', 'min(180px, 100%)'), 'Hero poster logo must preserve its minimum width when space allows')
+const heroStringLines = readElementContentByClass(hero, 'div', 'string-lines')
 assert((heroStringLines.match(/<span\b/g) ?? []).length === 3, 'Hero poster must render exactly three string-lines children')
 assert(hero.includes('transform: rotate(-45deg);'), 'Hero poster strings must use the approved -45deg angle')
 assert(!hero.includes('tape-b'), 'Hero poster must use only one tape strip')
 assert(!hero.includes('.poster::before'), 'Hero poster must not use the redundant dot overlay')
 assert(!/\b(?:class|className)=["'][^"']*\btape\b/.test(header), 'SiteHeader must remain straight and tape-free')
-assert(header.includes('border-bottom: 3px solid var(--section-border);'), 'SiteHeader must retain its straight 3px lower border')
-assert(!header.includes('box-shadow:'), 'SiteHeader and its CTA must not use persistent offset shadows')
-assert(!/rotate\(/.test(header), 'SiteHeader underline and CTA treatments must remain straight')
-assert(header.includes('background: var(--acid);'), 'SiteHeader must retain its Lime navigation underline')
-assert(header.includes('background: var(--red);'), 'SiteHeader must retain its Cinnabar navigation CTA')
-assert(serviceCard.includes('electric: 6') && serviceCard.includes('acoustic: 6') && serviceCard.includes('bass: 4'), 'ServiceCard must explicitly define electric/acoustic/bass string counts as 6/6/4')
-assert(serviceCard.includes('v-for="stringIndex in stringCountByVariant[variant]"'), 'ServiceCard must render the explicit string count for each instrument')
+assert(hasDeclaration(header, '.site-header', 'border-bottom', '3px solid var(--section-border)'), 'SiteHeader must retain its straight 3px lower border')
+for (const selector of ['.site-header', '.nav-cta', '.nav-cta:hover', '.nav-cta.active']) {
+  assert(countShadowLayers(header, selector) === 0, `${selector} must not use a persistent offset shadow`)
+  assert(!hasTransformFunction(header, selector, 'rotate'), `${selector} must remain straight`)
+}
+for (const selector of ['.nav-link::after', '.nav-link:hover::after', '.nav-link.active::after']) {
+  assert(!hasTransformFunction(header, selector, 'rotate'), `${selector} must keep the navigation underline straight`)
+}
+assert(hasDeclaration(header, '.nav-link::after', 'background', 'var(--acid)'), 'SiteHeader must retain its Lime navigation underline')
+assert(hasDeclaration(header, '.nav-cta', 'background', 'var(--red)'), 'SiteHeader must retain its Cinnabar navigation CTA')
+const serviceStringCounts = readNumericMap(serviceCard, 'stringCountByVariant')
+assert(serviceStringCounts.electric === 6 && serviceStringCounts.acoustic === 6 && serviceStringCounts.bass === 4, 'ServiceCard must explicitly define electric/acoustic/bass string counts as 6/6/4')
+const instrumentMarkContent = readElementContentByClass(serviceCard, 'div', 'instrument-mark')
+assert(hasVueForExpression(instrumentMarkContent, 'stringIndex', 'stringCountByVariant\\s*\\[\\s*variant\\s*\\]'), 'ServiceCard must render the explicit string count for each instrument')
 assert(!serviceCard.includes('nth-child(n + 5)'), 'ServiceCard must not fake bass string count by hiding rendered strings')
 assert(!/var\(--red\)|var\(--brand-cinnabar\)/.test(serviceCard), 'Services must not use Cinnabar accents')
 assert(serviceCard.includes('var(--acid)') && serviceCard.includes('var(--purple)'), 'Services must limit accents to Lime and Lavender')
 assert(!serviceCard.includes('radial-gradient') && !serviceCard.includes('border-radius: 50%'), 'Service instrument marks must not include face or unrelated circle motifs')
 assert(!/transform:\s*rotate/.test(serviceCard), 'Service cards and instrument marks must remain mechanically aligned')
-assert(usesDeclaration(serviceCard, '.instrument-mark', 'gap', '7px'), 'All service string patterns must use a shared 7px gap')
-assert(usesDeclaration(serviceCard, '.instrument-mark span', 'height', '3px'), 'All service strings must use a shared 3px thickness')
+assert(hasDeclaration(serviceCard, '.instrument-mark', 'gap', '7px'), 'All service string patterns must use a shared 7px gap')
+assert(hasDeclaration(serviceCard, '.instrument-mark span', 'height', '3px'), 'All service strings must use a shared 3px thickness')
 assert(!/\.instrument-mark\.(?:electric|acoustic|bass)\s+span\s*\{/.test(serviceCard), 'Service variants must not override shared string mechanics')
 assert(!servicePage.includes('rotate:'), 'ServicePage GSAP entrances must not rotate reusable panels or links')
 assert(!/transform:\s*rotate/.test(servicePage), 'ServicePage panels and links must not have default rotations')
 assert(!contactCta.includes('var(--purple)') && contactCta.includes('var(--red)') && contactCta.includes('var(--acid)'), 'Contact CTA accents must be Lime and Cinnabar only')
-assert(!contactCta.includes('box-shadow:\n    '), 'Contact CTA must use one accent shadow instead of stacked shadows')
+assert(countShadowLayers(hero, '.poster') === 1, 'Hero poster must use exactly one hard shadow layer')
+assert(countShadowLayers(contactCta, '.cta-paper') === 1, 'Contact CTA must use exactly one accent shadow layer')
 assert(!contactCta.includes('tear-edge') && !contactCta.includes('tear-offs') && !contactCta.includes('.cta-paper::before'), 'Contact CTA must keep only its hard border and accent shadow treatment')
-assert(footer.includes('class="footer-logo"'), 'SiteFooter must include the approved horizontal logo')
-assert(footer.includes('/logo-full-dark.svg') && footer.includes('/logo-full-light.svg'), 'SiteFooter logo must adapt to the active surface theme')
-assert(footer.includes('min-width: 180px'), 'SiteFooter horizontal logo must render at least 180px wide')
+assert(hasStaticClass(footer, 'footer-logo'), 'SiteFooter must include the approved horizontal logo')
+const footerLogoImage = readOpeningTags(footer, 'img').find((tag) => hasAttribute(tag, 'class', 'footer-logo')) ?? ''
+assert(hasAttribute(footerLogoImage, ':src', 'footerLogoSrc'), 'SiteFooter must render its theme-aware logo source')
+const normalizedFooter = normalizeWhitespace(footer)
+assert(/theme\.value\s*===\s*(["'])light\1\s*\?\s*(["'])\/logo-full-light\.svg\2\s*:\s*(["'])\/logo-full-dark\.svg\3/.test(normalizedFooter), 'SiteFooter must map light theme to logo-full-light and dark theme to logo-full-dark')
+assert(readSvgFills(logoFullLight).size === 1 && readSvgFills(logoFullLight).has('#101010'), 'logo-full-light must be the Onyx horizontal logo for light surfaces')
+assert(readSvgFills(logoFullDark).size === 1 && readSvgFills(logoFullDark).has('#fff7e8'), 'logo-full-dark must be the Old Lace horizontal logo for dark surfaces')
+assert(hasDeclaration(footer, '.footer-logo', 'min-width', '180px'), 'SiteFooter horizontal logo must render at least 180px wide')
 assert(!/var\(--red\)|var\(--brand-cinnabar\)/.test(footer), 'SiteFooter must not use Cinnabar decoration')
 assert(footer.includes('var(--acid)') && footer.includes('var(--purple)'), 'SiteFooter accents must be Lime and Lavender only')
-assert((footer.match(/box-shadow:/g) ?? []).length === 1, 'SiteFooter must use one restrained hard shadow treatment')
+assert(countShadowLayers(footer, '.footer-grid') === 1, 'SiteFooter must use one restrained hard shadow layer')
 assert(!home.includes('radial-gradient('), 'Homepage pain flyer must not stack competing glow or dot circles')
+assert(contrastRatio('#101010', '#fff7e8') >= 4.5, 'Onyx text on Old Lace must meet WCAG AA contrast')
+assert(contrastRatio('#ff3b30', '#fff7e8') < 4.5, 'Cinnabar text on Old Lace contrast fixture must remain below the AA threshold')
+assert(hasDeclaration(home, '.pain-flyer .eyebrow', 'color', 'var(--ink)'), 'Pain flyer eyebrow must consume accessible Onyx text on its paper surface')
 assert(!home.includes('.note:nth-child') && !/\.note\s*\{[^}]*transform:\s*rotate/s.test(home), 'Homepage pain notes must use a stable grid without independent rotations')
 assert(!/\.contact-form-card::before|\.faq-row::before/.test(contact), 'Contact surfaces must not stack tape or floating-circle decoration')
 assert(!/transform:\s*rotate/.test(contact), 'Contact cards and panels must remain aligned')
@@ -338,10 +441,10 @@ assert(header.includes('/logo-full-dark.svg'), 'Desktop header must include the 
 assert(header.includes('/logo-full-light.svg'), 'Desktop header must include the light horizontal logo')
 assert(header.includes('/isotype-dark.svg'), 'Mobile header must include the dark standard isotipo')
 assert(header.includes('/isotype-light.svg'), 'Mobile header must include the light standard isotipo')
-assert(header.includes('class="brand-logo"'), 'Header must expose the desktop horizontal logo class')
-assert(header.includes('class="brand-symbol"'), 'Header must expose the mobile isotipo class')
-assert(header.includes('min-width: 180px'), 'Desktop logo must enforce the 180px minimum')
-assert(header.includes('width: 52px'), 'Mobile brand symbol must render in the approved 48–56px range')
+assert(hasStaticClass(header, 'brand-logo'), 'Header must expose the desktop horizontal logo class')
+assert(hasStaticClass(header, 'brand-symbol'), 'Header must expose the mobile isotipo class')
+assert(hasDeclaration(header, '.brand-logo', 'min-width', '180px'), 'Desktop logo must enforce the 180px minimum')
+assert(hasDeclaration(header, '.brand-symbol', 'width', '52px'), 'Mobile brand symbol must render in the approved 48–56px range')
 assert(!header.includes('/badge-navbar-'), 'Header must not use the badge below its 96px minimum')
 assert(!header.match(/<NuxtLink[^>]*class="brand"[^>]*>\s*Riff Club\s*<\/NuxtLink>/), 'SiteHeader must not render the brand as plain text')
 assert(nuxtConfig.includes("{ rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }"), 'Nuxt must use the SVG favicon with its MIME type')
@@ -642,10 +745,10 @@ assert(motion.includes("import('gsap/ScrollTrigger')"), 'ScrollTrigger must be d
 assert(motion.includes('prefers-reduced-motion: reduce'), 'Motion composable must respect reduced motion')
 assert(motion.includes('gsap.context'), 'Motion composable must use gsap.context for cleanup')
 assert(!motion.includes('scrollerProxy'), 'Motion composable must not use scroll-jacking APIs')
-assert(home.includes('class="pain-flyer"'), 'Homepage pain section must use the pinned flyer scene class')
+assert(hasStaticClass(home, 'pain-flyer'), 'Homepage pain section must use the pinned flyer scene class')
 assert(home.includes('pin: true'), 'Homepage pain flyer animation must pin the section')
 assert(home.includes("trigger: flyer"), 'Homepage pain flyer animation must be triggered by the flyer section')
-assert(home.includes('class="section container services-stage"'), 'Homepage services section must keep the services stage layout class')
+assert(hasStaticClass(home, 'section') && hasStaticClass(home, 'container') && hasStaticClass(home, 'services-stage'), 'Homepage services section must keep the services stage layout classes')
 assert(!home.includes('const services = homeRef.value?.querySelector(".services-stage")'), 'Homepage must not create a services-stage ScrollTrigger animation')
 assert(!home.includes("trigger: services"), 'Homepage services section must not trigger a scroll animation')
 assert(!home.includes('pin: services'), 'Homepage services section must not be pinned')

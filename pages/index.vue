@@ -259,7 +259,7 @@ h2 {
   isolation: isolate;
 }
 .pain-flyer .eyebrow {
-  color: var(--red);
+  color: var(--ink);
 }
 .services-stage {
   min-height: 100svh;
