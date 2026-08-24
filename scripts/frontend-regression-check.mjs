@@ -104,7 +104,7 @@ assert(nuxtConfig.includes('Bricolage+Grotesque'), 'Nuxt must load Bricolage Gro
 assert(nuxtConfig.includes('DM+Sans'), 'Nuxt must load DM Sans')
 assert(nuxtConfig.includes('display=swap'), 'Google Fonts must use display=swap')
 assert(netlifyConfig.includes('command = "pnpm generate"'), 'Netlify must use the static Nuxt generation command')
-assert(netlifyConfig.includes('publish = ".output/public"'), 'Netlify must publish the generated Nuxt static output directory')
+assert(netlifyConfig.includes('publish = "dist"'), 'Netlify must publish the directory produced by its Nuxt build environment')
 assert(contact.includes('data-netlify="true"'), 'Contact form must be enabled for Netlify Forms')
 assert(contact.includes('netlify-honeypot="bot-field"'), 'Contact form must configure a Netlify honeypot')
 assert(contact.includes('name="contacto"'), 'Contact form must keep its Netlify form name')
