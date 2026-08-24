@@ -222,7 +222,16 @@ const cssWithoutComments = stripCssComments(css)
 const normalizedCss = cssWithoutComments.toLowerCase()
 const darkThemeBlock = normalizedCss.match(/:root\s*,\s*\[data-theme="dark"\]\s*\{([\s\S]*?)\}/)?.[1] ?? ''
 const lightThemeBlock = normalizedCss.match(/\[data-theme="light"\]\s*\{([\s\S]*?)\}/)?.[1] ?? ''
-const hasDeclaration = (block, token, value) => new RegExp(`(?:^|;)\\s*${token}\\s*:\\s*${value}\\s*;`).test(block)
+const getDeclarations = (block, token) => [...block.matchAll(new RegExp(`(?:^|;)\\s*${token}\\s*:\\s*([^;{}]+)\\s*;`, 'g'))]
+  .map((match) => match[1].trim())
+const hasUniqueEffectiveDeclaration = (block, token, value) => {
+  const declarations = getDeclarations(block, token)
+  return declarations.length === 1 && declarations[0] === value
+}
+const duplicateSemanticFixture = `${darkThemeBlock}; --surface: var(--brand-sand);`
+const literalAliasFixture = darkThemeBlock.replace('--paper: var(--surface-paper);', '--paper: #fff8e9;')
+assert(!hasUniqueEffectiveDeclaration(duplicateSemanticFixture, '--surface', 'var(--brand-graphite)'), 'Semantic token checks must reject duplicate overrides')
+assert(!hasUniqueEffectiveDeclaration(literalAliasFixture, '--paper', 'var(--surface-paper)'), 'Compatibility alias checks must reject altered color literals')
 const primitiveBlock = `:root {
   --brand-onyx: #101010;
   --brand-old-lace: #fff7e8;
@@ -253,30 +262,93 @@ for (const [token, value] of [
 }
 
 for (const [token, value] of [
-  ['--page-bg', 'var\\(--brand-onyx\\)'],
-  ['--page-text', 'var\\(--brand-old-lace\\)'],
-  ['--surface', 'var\\(--brand-graphite\\)'],
-  ['--surface-paper', 'var\\(--brand-old-lace\\)'],
-  ['--muted', 'var\\(--brand-bone\\)'],
-  ['--border', 'var\\(--brand-old-lace\\)'],
-  ['--accent-primary', 'var\\(--brand-lime\\)'],
-  ['--accent-secondary', 'var\\(--brand-cinnabar\\)'],
-  ['--accent-cultural', 'var\\(--brand-lavender\\)']
+  ['--page-bg', 'var(--brand-onyx)'],
+  ['--page-text', 'var(--brand-old-lace)'],
+  ['--surface', 'var(--brand-graphite)'],
+  ['--surface-paper', 'var(--brand-old-lace)'],
+  ['--muted', 'var(--brand-bone)'],
+  ['--border', 'var(--brand-old-lace)'],
+  ['--accent-primary', 'var(--brand-lime)'],
+  ['--accent-secondary', 'var(--brand-cinnabar)'],
+  ['--accent-cultural', 'var(--brand-lavender)']
 ]) {
-  assert(hasDeclaration(darkThemeBlock, token, value), `${token} must use the approved dark/root semantic mapping`)
+  assert(hasUniqueEffectiveDeclaration(darkThemeBlock, token, value), `${token} must have one effective approved dark/root semantic mapping`)
 }
 for (const [token, value] of [
-  ['--page-bg', 'var\\(--brand-old-lace\\)'],
-  ['--page-text', 'var\\(--brand-onyx\\)'],
-  ['--surface', 'var\\(--brand-sand\\)'],
-  ['--surface-paper', 'var\\(--brand-old-lace\\)'],
-  ['--muted', 'var\\(--brand-stone\\)'],
-  ['--border', 'var\\(--brand-onyx\\)'],
-  ['--accent-primary', 'var\\(--brand-lime\\)'],
-  ['--accent-secondary', 'var\\(--brand-cinnabar\\)'],
-  ['--accent-cultural', 'var\\(--brand-lavender\\)']
+  ['--page-bg', 'var(--brand-old-lace)'],
+  ['--page-text', 'var(--brand-onyx)'],
+  ['--surface', 'var(--brand-sand)'],
+  ['--surface-paper', 'var(--brand-old-lace)'],
+  ['--muted', 'var(--brand-stone)'],
+  ['--border', 'var(--brand-onyx)'],
+  ['--accent-primary', 'var(--brand-lime)'],
+  ['--accent-secondary', 'var(--brand-cinnabar)'],
+  ['--accent-cultural', 'var(--brand-lavender)']
 ]) {
-  assert(hasDeclaration(lightThemeBlock, token, value), `${token} must use the approved light semantic mapping`)
+  assert(hasUniqueEffectiveDeclaration(lightThemeBlock, token, value), `${token} must have one effective approved light semantic mapping`)
+}
+
+for (const [token, value] of [
+  ['--ink', 'var(--brand-onyx)'],
+  ['--paper', 'var(--surface-paper)'],
+  ['--paper-aged', 'var(--brand-sand)'],
+  ['--acid', 'var(--accent-primary)'],
+  ['--red', 'var(--accent-secondary)'],
+  ['--purple', 'var(--accent-cultural)'],
+  ['--gray', 'var(--surface)'],
+  ['--muted-on-dark', 'var(--brand-bone)'],
+  ['--muted-ink', 'var(--brand-stone)'],
+  ['--bg-start', 'var(--surface)'],
+  ['--bg-mid', 'var(--page-bg)'],
+  ['--bg-end', 'var(--page-bg)'],
+  ['--acid-glow', 'color-mix(in srgb, var(--accent-primary) 18%, transparent)'],
+  ['--red-glow', 'color-mix(in srgb, var(--accent-secondary) 16%, transparent)'],
+  ['--grid-line', 'color-mix(in srgb, var(--page-text) 6%, transparent)'],
+  ['--grain-light', 'color-mix(in srgb, var(--surface-paper) 55%, transparent)'],
+  ['--grain-dark', 'color-mix(in srgb, var(--brand-onyx) 70%, transparent)'],
+  ['--section-bg', 'var(--page-bg)'],
+  ['--section-bg-start', 'var(--surface)'],
+  ['--section-bg-end', 'var(--page-bg)'],
+  ['--section-text', 'var(--page-text)'],
+  ['--section-muted', 'var(--muted)'],
+  ['--section-border', 'var(--border)'],
+  ['--section-overlay', 'color-mix(in srgb, var(--page-bg) 90%, transparent)'],
+  ['--header-bg', 'color-mix(in srgb, var(--page-bg) 94%, transparent)'],
+  ['--purple-link-text', 'var(--ink)'],
+  ['--shadow-hard', '7px 7px 0 var(--brand-onyx)']
+]) {
+  assert(hasUniqueEffectiveDeclaration(darkThemeBlock, token, value), `${token} must have one approved dark/root compatibility mapping`)
+}
+for (const [token, value] of [
+  ['--ink', 'var(--brand-onyx)'],
+  ['--paper', 'var(--surface-paper)'],
+  ['--paper-aged', 'var(--brand-sand)'],
+  ['--acid', 'var(--accent-primary)'],
+  ['--red', 'var(--accent-secondary)'],
+  ['--purple', 'var(--accent-cultural)'],
+  ['--gray', 'var(--surface)'],
+  ['--muted-on-dark', 'var(--brand-bone)'],
+  ['--muted-ink', 'var(--brand-stone)'],
+  ['--bg-start', 'var(--surface-paper)'],
+  ['--bg-mid', 'var(--page-bg)'],
+  ['--bg-end', 'var(--surface)'],
+  ['--acid-glow', 'color-mix(in srgb, var(--accent-primary) 26%, transparent)'],
+  ['--red-glow', 'color-mix(in srgb, var(--accent-secondary) 13%, transparent)'],
+  ['--grid-line', 'color-mix(in srgb, var(--page-text) 8%, transparent)'],
+  ['--grain-light', 'color-mix(in srgb, var(--surface-paper) 82%, transparent)'],
+  ['--grain-dark', 'color-mix(in srgb, var(--page-text) 24%, transparent)'],
+  ['--section-bg', 'var(--surface-paper)'],
+  ['--section-bg-start', 'var(--surface-paper)'],
+  ['--section-bg-end', 'var(--surface)'],
+  ['--section-text', 'var(--page-text)'],
+  ['--section-muted', 'var(--muted)'],
+  ['--section-border', 'var(--border)'],
+  ['--section-overlay', 'color-mix(in srgb, var(--surface-paper) 92%, transparent)'],
+  ['--header-bg', 'color-mix(in srgb, var(--page-bg) 94%, transparent)'],
+  ['--purple-link-text', 'var(--surface-paper)'],
+  ['--shadow-hard', '7px 7px 0 color-mix(in srgb, var(--brand-onyx) 82%, transparent)']
+]) {
+  assert(hasUniqueEffectiveDeclaration(lightThemeBlock, token, value), `${token} must have one approved light compatibility mapping`)
 }
 
 const cssWithoutPrimitiveBlock = normalizedCss.slice(primitiveBlock.length)
