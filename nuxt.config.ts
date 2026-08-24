@@ -26,6 +26,7 @@ export default defineNuxtConfig({
         { name: 'theme-color', content: '#101010' },
         { property: 'og:type', content: 'website' },
         { property: 'og:locale', content: 'es_CL' },
+        { property: 'og:image', content: 'https://riffclub.cl/og-image.png' },
         { name: 'twitter:card', content: 'summary_large_image' }
       ],
       link: [
@@ -35,8 +36,13 @@ export default defineNuxtConfig({
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap'
         },
-        { rel: 'icon', href: '/favicon.svg' },
-        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }
+        { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
+        { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
+        { rel: 'icon', href: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+        { rel: 'icon', href: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+        { rel: 'mask-icon', href: '/safari-pinned-tab.svg', color: '#101010' },
+        { rel: 'manifest', href: '/site.webmanifest' }
       ]
     }
   }

@@ -36,15 +36,14 @@ onMounted(async () => {
         "-=0.2",
       )
       .from(
-        ".poster-type span",
+        ".poster-brand",
         {
           x: -24,
           opacity: 0,
-          rotate: -8,
-          scale: 0.9,
-          duration: 0.32,
-          stagger: 0.08,
-          ease: "back.out(2)",
+          rotate: -5,
+          scale: 0.94,
+          duration: 0.38,
+          ease: "back.out(1.6)",
         },
         "-=0.14",
       )
@@ -59,7 +58,7 @@ onMounted(async () => {
         "-=0.28",
       )
       .from(
-        ".poster-local, .poster-note, .poster b",
+        ".poster-local, .poster-note",
         { opacity: 0, scale: 0.92, rotate: -4, duration: 0.28, stagger: 0.06 },
         "-=0.2",
       );
@@ -106,9 +105,10 @@ onBeforeUnmount(() => {
         <span></span><span></span><span></span><span></span><span></span
         ><span></span>
       </div>
-      <div class="poster-type"><span>Riff</span><span>Club</span></div>
+      <div class="poster-brand">
+        <img :src="'/logo-full-light.svg'" alt="" aria-hidden="true" />
+      </div>
       <div class="poster-note">Guitarra electrica / acustica / bajo</div>
-      <b>01</b>
     </div>
   </section>
 </template>
@@ -234,39 +234,25 @@ onBeforeUnmount(() => {
   box-shadow: 0 10px 0 rgba(16, 16, 16, 0.12);
 }
 
-.poster-type {
+.poster-brand {
   position: relative;
   z-index: 2;
-  margin-top: 34px;
+  display: grid;
+  place-items: center;
+  min-height: 190px;
+  margin-top: 30px;
+  padding: 22px 16px;
+  background: color-mix(in srgb, var(--paper) 84%, transparent);
+  border: 3px solid var(--ink);
+  box-shadow: 8px 8px 0 var(--acid);
+  transform: rotate(-2deg);
 }
 
-.poster-type span {
+.poster-brand img {
   display: block;
-  width: max-content;
-  margin: 12px 0;
-  padding: 9px 12px;
-  background: var(--acid);
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-size: clamp(3rem, 8vw, 6rem);
-  font-weight: var(--weight-heavy);
-  line-height: 0.76;
-  letter-spacing: 0.01em;
-  box-shadow: 6px 6px 0 var(--ink);
-  transform: rotate(-3deg);
-}
-
-.poster-type span:nth-child(2) {
-  margin-left: auto;
-  background: var(--purple);
-  color: var(--paper);
-  transform: rotate(2deg);
-}
-
-.poster-type span:nth-child(3) {
-  background: var(--red);
-  color: var(--paper);
-  transform: rotate(-1deg);
+  width: min(100%, 300px);
+  min-width: min(180px, 100%);
+  height: auto;
 }
 
 .poster-note {
@@ -283,17 +269,6 @@ onBeforeUnmount(() => {
   line-height: 1.2;
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-}
-
-.poster b {
-  position: absolute;
-  right: 18px;
-  bottom: 8px;
-  z-index: 2;
-  color: var(--acid);
-  font-size: 7rem;
-  line-height: 1;
-  letter-spacing: -0.12em;
 }
 
 @media (max-width: 860px) {

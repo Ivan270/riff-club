@@ -2,8 +2,8 @@
 const route = useRoute();
 const { theme } = useTheme();
 const isActive = (path: string) => route.path === path;
-const logoSrc = computed(() =>
-  theme.value === "light" ? "/logo-full-light.svg" : "/logo-full-dark.svg",
+const badgeSrc = computed(() =>
+  theme.value === "light" ? "/badge-navbar-light.svg" : "/badge-navbar-dark.svg",
 );
 
 const navItems = [
@@ -18,7 +18,7 @@ const navItems = [
 <template>
   <header class="site-header tape">
     <NuxtLink class="brand" to="/" aria-label="Ir al inicio">
-      <img class="brand-logo" :src="logoSrc" alt="Riff Club" />
+      <img class="brand-badge" :src="badgeSrc" alt="Riff Club" />
     </NuxtLink>
     <nav aria-label="Navegación principal">
       <NuxtLink
@@ -84,9 +84,9 @@ const navItems = [
   text-decoration: none;
 }
 
-.brand-logo {
+.brand-badge {
   display: block;
-  width: clamp(132px, 18vw, 190px);
+  width: clamp(68px, 5vw, 72px);
   height: auto;
 }
 

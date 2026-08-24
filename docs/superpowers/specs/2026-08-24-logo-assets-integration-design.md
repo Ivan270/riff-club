@@ -8,8 +8,7 @@ Actualizar la identidad visual del sitio Nuxt usando solo los activos de marca q
 
 - Header sobre tema oscuro/Onyx: `01-master-dark/logotipo-horizontal.svg`, publicado como `/logo-full-dark.svg`.
 - Header sobre tema claro/Old Lace: `02-master-light/logotipo-horizontal.svg`, publicado como `/logo-full-light.svg`.
-- Boton de navegacion movil de 52 px: `masters/isotipo/isotipo.svg`, publicado como `/isotype-dark.svg` y `/isotype-light.svg` para conservar la API actual del componente.
-- Favicon principal: `web/favicon.svg`, publicado como `/favicon.svg`.
+- Boton de navegacion movil de 52 px: `masters/isotipo/isotipo.svg`, publicado como `/isotype-dark.svg` y `/isotype-light.svg` para conservar la API actual del componente. Favicon principal: `web/favicon.svg`, publicado como `/favicon.svg`.
 - Fallbacks de favicon: `web/favicon.ico`, `web/favicon-16x16.png` y `web/favicon-32x32.png`.
 - Apple Touch Icon: `web/apple-touch-icon.png`.
 - PWA: `web/site.webmanifest`.

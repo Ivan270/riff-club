@@ -1,6 +1,13 @@
 import { existsSync, readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
+const readBuffer = (path) => readFileSync(new URL(`../${path}`, import.meta.url))
+const sha256 = (path) => createHash('sha256').update(readBuffer(path)).digest('hex')
+const readPngSize = (path) => {
+  const image = readBuffer(path)
+  return [image.readUInt32BE(16), image.readUInt32BE(20)]
+}
 const readOptional = (path) => {
   try {
     return read(path)
@@ -44,6 +51,14 @@ const servicePages = [
 
 assert(hero.includes('56995296324'), 'Hero WhatsApp CTA must use 56995296324')
 assert(!hero.includes('56912345678'), 'Hero WhatsApp CTA must not use placeholder number')
+assert(hero.includes('class="poster-brand"'), 'Hero poster must include the horizontal brand signature')
+assert(hero.includes(':src="\'/logo-full-light.svg\'"'), 'Hero poster must bind the public Onyx horizontal logo without a Vite import')
+assert(hero.includes('alt="" aria-hidden="true"'), 'Hero poster logo must be decorative')
+assert(!hero.includes('<div class="poster-type">'), 'Hero poster must remove the duplicate Riff Club lettering')
+assert(!hero.includes('<b>01</b>'), 'Hero poster must remove the legacy serial')
+assert(hero.includes('.from(\n        ".poster-brand"'), 'Hero timeline must animate the horizontal brand signature')
+assert(hero.includes('width: min(100%, 300px);'), 'Hero poster logo must stay responsive')
+assert(hero.includes('min-width: min(180px, 100%);'), 'Hero poster logo must preserve its minimum width when space allows')
 assert(footer.includes('Sitio desarrollado por'), 'SiteFooter must include a small developer credit')
 assert(footer.includes('https://github.com/ivan270'), 'SiteFooter developer credit must link to GitHub')
 assert(footer.includes('rel="noopener noreferrer nofollow"'), 'SiteFooter developer credit must use safe nofollow external link attributes')
@@ -62,19 +77,34 @@ assert(mobileMenu.includes('@click="closeMenu"'), 'Mobile menu links must close 
 assert(mobileMenu.includes('<Teleport to="body">'), 'Mobile menu overlay must escape the clipped header')
 assert(mobileMenu.includes('resize'), 'Mobile menu must close when resizing back to desktop')
 assert(mobileMenu.includes('@media (max-width: 900px)'), 'Mobile menu must target tablet and mobile widths')
-assert(header.includes('/logo-full-dark.svg'), 'SiteHeader must render the dark theme full logo')
-assert(header.includes('/logo-full-light.svg'), 'SiteHeader must render the light theme full logo')
-assert(header.includes('<img class="brand-logo" :src="logoSrc" alt="Riff Club" />'), 'SiteHeader must bind the full logo image to the theme-aware source')
+assert(header.includes('/badge-navbar-dark.svg'), 'SiteHeader must render the dark theme badge')
+assert(header.includes('/badge-navbar-light.svg'), 'SiteHeader must render the light theme badge')
+assert(header.includes('theme.value === "light" ? "/badge-navbar-light.svg" : "/badge-navbar-dark.svg"'), 'SiteHeader must map light and dark themes to the correct badges')
+assert(header.includes('class="brand-badge"'), 'SiteHeader must expose the navbar badge class')
+assert(header.includes('<img class="brand-badge" :src="badgeSrc" alt="Riff Club" />'), 'SiteHeader badge must retain accessible brand text')
+assert(header.includes('<NuxtLink class="brand" to="/" aria-label="Ir al inicio">'), 'SiteHeader badge must remain linked to the homepage')
+assert(header.includes('width: clamp(68px, 5vw, 72px);'), 'SiteHeader badge must use the approved compact size')
+assert(!header.includes('class="brand-logo"'), 'SiteHeader must not keep the horizontal navbar logo')
 assert(!header.match(/<NuxtLink[^>]*class="brand"[^>]*>\s*Riff Club\s*<\/NuxtLink>/), 'SiteHeader must not render the brand as plain text')
-assert(nuxtConfig.includes("{ rel: 'icon', href: '/favicon.svg' }"), 'Nuxt must use the SVG favicon')
+assert(nuxtConfig.includes("{ rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }"), 'Nuxt must use the SVG favicon with its MIME type')
+assert(nuxtConfig.includes("{ rel: 'icon', href: '/favicon.ico', sizes: 'any' }"), 'Nuxt must define the ICO favicon fallback')
+assert(nuxtConfig.includes("{ rel: 'icon', href: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' }"), 'Nuxt must define the 32px PNG favicon')
+assert(nuxtConfig.includes("{ rel: 'icon', href: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' }"), 'Nuxt must define the 16px PNG favicon')
 assert(nuxtConfig.includes("{ rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }"), 'Nuxt must define the Apple touch icon')
+assert(nuxtConfig.includes("{ rel: 'mask-icon', href: '/safari-pinned-tab.svg', color: '#101010' }"), 'Nuxt must define the Safari pinned tab icon')
+assert(nuxtConfig.includes("{ rel: 'manifest', href: '/site.webmanifest' }"), 'Nuxt must define the web manifest')
+assert(nuxtConfig.includes("{ property: 'og:image', content: 'https://riffclub.cl/og-image.png' }"), 'Nuxt must define an absolute Open Graph image URL')
+assert(nuxtConfig.includes("{ name: 'theme-color', content: '#101010' }"), 'Nuxt must retain the theme color')
+assert(nuxtConfig.includes("{ property: 'og:type', content: 'website' }"), 'Nuxt must retain the Open Graph type')
+assert(nuxtConfig.includes("{ property: 'og:locale', content: 'es_CL' }"), 'Nuxt must retain the Open Graph locale')
+assert(nuxtConfig.includes("{ name: 'twitter:card', content: 'summary_large_image' }"), 'Nuxt must retain the Twitter card type')
 assert(nuxtConfig.includes("rel: 'preconnect', href: 'https://fonts.googleapis.com'"), 'Nuxt must preconnect to Google Fonts')
 assert(nuxtConfig.includes("rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: ''"), 'Nuxt must preconnect to the Google Fonts asset host')
 assert(nuxtConfig.includes('Bricolage+Grotesque'), 'Nuxt must load Bricolage Grotesque')
 assert(nuxtConfig.includes('DM+Sans'), 'Nuxt must load DM Sans')
 assert(nuxtConfig.includes('display=swap'), 'Google Fonts must use display=swap')
 assert(netlifyConfig.includes('command = "pnpm generate"'), 'Netlify must use the static Nuxt generation command')
-assert(netlifyConfig.includes('publish = "dist"'), 'Netlify must publish the Nuxt netlify-static output directory')
+assert(netlifyConfig.includes('publish = ".output/public"'), 'Netlify must publish the generated Nuxt static output directory')
 assert(contact.includes('data-netlify="true"'), 'Contact form must be enabled for Netlify Forms')
 assert(contact.includes('netlify-honeypot="bot-field"'), 'Contact form must configure a Netlify honeypot')
 assert(contact.includes('name="contacto"'), 'Contact form must keep its Netlify form name')
@@ -100,9 +130,53 @@ for (const page of [
 ]) {
   assert(read(page).includes('useCanonicalUrl()'), `${page} must use the canonical URL composable`)
 }
-for (const asset of ['public/logo-full-dark.svg', 'public/logo-full-light.svg', 'public/favicon.svg', 'public/apple-touch-icon.png']) {
+for (const asset of [
+  'public/logo-full-dark.svg',
+  'public/logo-full-light.svg',
+  'public/badge-navbar-dark.svg',
+  'public/badge-navbar-light.svg',
+  'public/isotype-dark.svg',
+  'public/isotype-light.svg',
+  'public/favicon.svg',
+  'public/favicon.ico',
+  'public/favicon-16x16.png',
+  'public/favicon-32x32.png',
+  'public/apple-touch-icon.png',
+  'public/site.webmanifest',
+  'public/og-image.png',
+  'public/safari-pinned-tab.svg',
+  'public/pwa-192x192.png',
+  'public/pwa-512x512.png',
+  'public/maskable-192x192.png',
+  'public/maskable-512x512.png'
+]) {
   assert(existsSync(new URL(`../${asset}`, import.meta.url)), `${asset} must exist`)
 }
+for (const asset of ['public/logo-full-dark.svg', 'public/logo-full-light.svg', 'public/badge-navbar-dark.svg', 'public/badge-navbar-light.svg', 'public/isotype-dark.svg', 'public/isotype-light.svg', 'public/favicon.svg', 'public/safari-pinned-tab.svg']) {
+  assert(readOptional(asset).includes('<svg'), `${asset} must contain valid SVG markup`)
+}
+for (const [asset, expectedSize] of [
+  ['public/favicon-16x16.png', [16, 16]],
+  ['public/favicon-32x32.png', [32, 32]],
+  ['public/apple-touch-icon.png', [180, 180]],
+  ['public/pwa-192x192.png', [192, 192]],
+  ['public/pwa-512x512.png', [512, 512]],
+  ['public/maskable-192x192.png', [192, 192]],
+  ['public/maskable-512x512.png', [512, 512]],
+  ['public/og-image.png', [1200, 630]]
+]) {
+  assert(readPngSize(asset).every((size, index) => size === expectedSize[index]), `${asset} must use the expected dimensions`)
+}
+const faviconIco = readBuffer('public/favicon.ico')
+assert(faviconIco.subarray(0, 4).equals(Buffer.from([0, 0, 1, 0])), 'favicon.ico must contain an ICO image')
+const webManifest = JSON.parse(read('public/site.webmanifest'))
+for (const icon of webManifest.icons ?? []) {
+  assert(existsSync(new URL(`../public${icon.src}`, import.meta.url)), `Web manifest icon ${icon.src} must exist`)
+}
+assert(!existsSync(new URL('../public/logo-full.svg', import.meta.url)), 'Legacy logo-full.svg must be removed')
+assert(!existsSync(new URL('../public/isotype.svg', import.meta.url)), 'Legacy isotype.svg must be removed')
+assert(sha256('public/badge-navbar-dark.svg') === 'c5abed44cbaa423e857fa95574785747b4353a617a55bf9f01511f81e8c4fb20', 'Dark navbar badge must match the approved negative master')
+assert(sha256('public/badge-navbar-light.svg') === '3102d0f262c9204a7634b9a833cbb9d37ef441b33c6d8a3684d72492dd62bd7e', 'Light navbar badge must match the approved positive master')
 assert(css.includes('[data-theme="light"]'), 'Global CSS must define light theme variables')
 assert(css.includes('--page-bg'), 'Global CSS must separate page background from ink text color')
 assert(css.includes('--page-text'), 'Global CSS must separate page text from paper surface color')
