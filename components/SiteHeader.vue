@@ -61,7 +61,7 @@ const navItems = [
   background: var(--header-bg);
   border-bottom: 3px solid var(--section-border);
   backdrop-filter: blur(10px);
-  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 0 color-mix(in srgb, var(--brand-onyx) 30%, transparent);
 }
 
 .brand {
@@ -92,7 +92,7 @@ nav {
   align-items: center;
   justify-content: flex-end;
   overflow: visible;
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-ui);
 }
 
@@ -106,7 +106,7 @@ nav {
   color: var(--page-text);
   white-space: nowrap;
   text-decoration: none;
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-ui);
   font-weight: var(--weight-medium);
   line-height: 1.2;

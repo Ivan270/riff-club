@@ -183,9 +183,9 @@ onBeforeUnmount(() => {
   display: block;
   width: 118px;
   height: 30px;
-  background: color-mix(in srgb, var(--tape) 78%, transparent);
-  border: 1px solid rgba(16, 16, 16, 0.16);
-  box-shadow: 0 2px 0 rgba(16, 16, 16, 0.12);
+  background: color-mix(in srgb, var(--brand-sand) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand-onyx) 16%, transparent);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--brand-onyx) 12%, transparent);
 }
 
 .tape-a {
@@ -207,7 +207,7 @@ onBeforeUnmount(() => {
   padding: 8px 10px;
   border: 2px solid var(--ink);
   background: var(--acid);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   line-height: 1.2;
@@ -231,7 +231,7 @@ onBeforeUnmount(() => {
   display: block;
   height: 3px;
   background: var(--ink);
-  box-shadow: 0 10px 0 rgba(16, 16, 16, 0.12);
+  box-shadow: 0 10px 0 color-mix(in srgb, var(--brand-onyx) 12%, transparent);
 }
 
 .poster-brand {
@@ -263,7 +263,7 @@ onBeforeUnmount(() => {
   padding: 8px 10px;
   background: var(--ink);
   color: var(--paper);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   line-height: 1.2;

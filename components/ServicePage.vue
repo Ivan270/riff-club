@@ -183,7 +183,7 @@ p {
   color: var(--ink);
   border: 2px solid var(--ink);
   box-shadow: 6px 6px 0 var(--paper);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-weight: var(--weight-semibold);
   text-decoration: none;
   clip-path: polygon(0 8%, 96% 0, 100% 92%, 4% 100%);

@@ -54,7 +54,7 @@ h3 {
   letter-spacing: -0.015em;
 }
 a {
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-weight: var(--weight-semibold);
 }
 .instrument-mark {
@@ -107,7 +107,7 @@ a {
   top: 58px;
 }
 .instrument-mark.acoustic {
-  background: linear-gradient(90deg, var(--paper-aged), var(--tape));
+  background: linear-gradient(90deg, var(--paper-aged), var(--brand-sand));
   transform: rotate(1deg);
 }
 .instrument-mark.acoustic::before,

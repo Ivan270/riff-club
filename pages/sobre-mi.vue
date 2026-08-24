@@ -62,7 +62,7 @@ article {
   background: var(--paper);
   color: var(--ink);
   border: 2px solid var(--ink);
-  box-shadow: 8px 8px 0 #000;
+  box-shadow: 8px 8px 0 var(--brand-onyx);
   transform: rotate(-1.5deg);
 }
 article:nth-child(2) {
@@ -78,13 +78,13 @@ article::before {
   top: 14px;
   left: 18px;
   color: var(--red);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
 }
 article p {
-  color: #272727;
+  color: var(--muted-ink);
 }
 h2 {
   font-family: var(--font-display);
@@ -101,7 +101,7 @@ h2 {
   article:nth-child(2),
   article:nth-child(3) {
     transform: none;
-    box-shadow: 4px 6px 0 #000;
+    box-shadow: 4px 6px 0 var(--brand-onyx);
   }
 }
 </style>

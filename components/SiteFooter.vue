@@ -121,7 +121,7 @@ p {
   color: var(--ink);
   background: var(--paper);
   border: 2px solid var(--red);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   line-height: 1.2;
@@ -134,7 +134,7 @@ p {
   position: relative;
   z-index: 1;
   margin-top: 22px;
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   line-height: 1.4;

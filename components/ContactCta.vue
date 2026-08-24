@@ -104,7 +104,7 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: 14px;
   pointer-events: none;
-  border: 2px dashed rgba(16, 16, 16, 0.32);
+  border: 2px dashed color-mix(in srgb, var(--brand-onyx) 32%, transparent);
 }
 h2 {
   position: relative;
@@ -142,7 +142,7 @@ p {
   background: linear-gradient(180deg, var(--paper-aged), var(--paper));
   border: 2px solid var(--ink);
   border-bottom: 0;
-  box-shadow: 3px 0 0 rgba(16, 16, 16, 0.18) inset;
+  box-shadow: 3px 0 0 color-mix(in srgb, var(--brand-onyx) 18%, transparent) inset;
 }
 .tear-offs span:nth-child(even) {
   transform: translateY(7px) rotate(1deg);

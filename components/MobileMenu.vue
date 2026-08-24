@@ -253,7 +253,7 @@ onBeforeUnmount(() => {
 
 .mobile-menu__serial {
   color: var(--acid);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
@@ -271,7 +271,7 @@ onBeforeUnmount(() => {
   padding: 12px 16px;
   border: 2px solid transparent;
   color: var(--page-text);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: clamp(2.25rem, 10vw, 5.5rem);
   font-weight: var(--weight-heavy);
   line-height: 0.92;
@@ -306,7 +306,7 @@ onBeforeUnmount(() => {
 .mobile-menu__footer p {
   margin: 0;
   color: var(--section-muted);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-label);

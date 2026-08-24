@@ -1,8 +1,9 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
 const readBuffer = (path) => readFileSync(new URL(`../${path}`, import.meta.url))
 const stripCssComments = (source) => source.replace(/\/\*[\s\S]*?\*\//g, '')
+const readStyles = (source) => [...source.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/g)].map((match) => match[1]).join('\n')
 const usesFontUi = (source, selector) => {
   const style = source.match(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/)?.[1] ?? source
   const rules = stripCssComments(style).matchAll(/([^{}]+)\{([^{}]*)\}/g)
@@ -57,6 +58,14 @@ const servicePages = [
   'pages/clases-guitarra-acustica.vue',
   'pages/clases-bajo.vue'
 ].map((path) => [path, read(path)])
+const vueStyleFiles = ['components', 'pages'].flatMap((directory) =>
+  readdirSync(new URL(`../${directory}`, import.meta.url), { recursive: true })
+    .filter((path) => typeof path === 'string' && path.endsWith('.vue'))
+    .map((path) => `${directory}/${path}`)
+).map((path) => [path, stripCssComments(readStyles(read(path))).toLowerCase()])
+const additionalCssFiles = readdirSync(new URL('../assets/css', import.meta.url), { recursive: true })
+  .filter((path) => typeof path === 'string' && path.endsWith('.css') && path !== 'main.css')
+  .map((path) => [`assets/css/${path}`, stripCssComments(read(`assets/css/${path}`)).toLowerCase()])
 
 assert(hero.includes('56995296324'), 'Hero WhatsApp CTA must use 56995296324')
 assert(!hero.includes('56912345678'), 'Hero WhatsApp CTA must not use placeholder number')
@@ -211,6 +220,18 @@ assert(css.includes('font-weight: var(--weight-heavy);'), 'Global headings must 
 assert(css.includes('--font-heading'), 'Global CSS must define an editorial heading font variable')
 const cssWithoutComments = stripCssComments(css)
 const normalizedCss = cssWithoutComments.toLowerCase()
+const primitiveBlock = `:root {
+  --brand-onyx: #101010;
+  --brand-old-lace: #fff7e8;
+  --brand-lime: #d8ff00;
+  --brand-lavender: #a855f7;
+  --brand-cinnabar: #ff3b30;
+  --brand-graphite: #2a2a2a;
+  --brand-sand: #eadfc7;
+  --brand-bone: #d8d0bf;
+  --brand-stone: #5e574c;
+}`
+assert(normalizedCss.startsWith(primitiveBlock), 'The immutable brand primitive block must be the first rule in Global CSS')
 for (const [token, value] of [
   ['--brand-onyx', '#101010'],
   ['--brand-old-lace', '#fff7e8'],
@@ -228,27 +249,48 @@ for (const [token, value] of [
   assert(declarations.length === 1 && exactDeclaration.test(declarations[0]), `${token} must be declared exactly once with the approved palette value`)
 }
 
-for (const forbidden of ['#050505', '#241f1a', '#fff8e9', '#c5f000', '#e93227', '#8f45dd', '#f3d173']) {
-  assert(!normalizedCss.includes(forbidden), `Global CSS must not use off-palette color ${forbidden}`)
+const cssWithoutPrimitiveBlock = normalizedCss.slice(primitiveBlock.length)
+assert(!/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/.test(cssWithoutPrimitiveBlock), 'Global CSS may hard-code hex colors only in the immutable primitive block')
+assert(!/\b(?:rgb|rgba|hsl|hsla)\(/.test(cssWithoutPrimitiveBlock), 'Global CSS alpha colors must derive from approved primitives with color-mix()')
+assert(!/var\(--(?:black|tape)\)|--(?:black|tape)\s*:/.test(normalizedCss), 'Global CSS must remove the legacy --black and --tape aliases and consumers')
+
+for (const [path, source] of vueStyleFiles) {
+  assert(!/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/.test(source), `${path} styles must not hard-code hex colors`)
+  assert(!/\b(?:rgb|rgba|hsl|hsla)\(/.test(source), `${path} alpha colors must derive from approved primitives with color-mix()`)
+  assert(!/var\(--(?:black|tape)\)/.test(source), `${path} must not consume legacy color aliases`)
+}
+for (const [path, source] of additionalCssFiles) {
+  assert(!/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/.test(source), `${path} must not hard-code hex colors`)
+  assert(!/\b(?:rgb|rgba|hsl|hsla)\(/.test(source), `${path} alpha colors must derive from approved primitives with color-mix()`)
+  assert(!/var\(--(?:black|tape)\)|--(?:black|tape)\s*:/.test(source), `${path} must not define or consume legacy color aliases`)
 }
 
 assert(css.includes('--font-ui: var(--font-display)'), 'Navigation, button, and label typography must use Bricolage')
 for (const [source, selector] of [
   [css, '.button'],
   [css, '.eyebrow'],
+  [css, '.skip-link'],
   [css, '.stamp'],
   [css, '.sticker'],
   [header, '.nav-link'],
   [themeToggle, '.theme-toggle'],
+  [hero, '.poster-local'],
+  [hero, '.poster-note'],
   [mobileMenu, '.mobile-menu__link'],
   [mobileMenu, '.mobile-menu__serial'],
-  [mobileMenu, '.mobile-menu__footer p']
+  [mobileMenu, '.mobile-menu__footer p'],
+  [read('components/ServiceCard.vue'), 'a'],
+  [footer, '.footer-stamp'],
+  [footer, '.site-credit'],
+  [read('components/ServicePage.vue'), '.related-links a'],
+  [home, '.setlist-panel::after'],
+  [read('pages/sobre-mi.vue'), 'article::before']
 ]) {
   assert(usesFontUi(source, selector), `${selector} must use var(--font-ui)`)
 }
 assert(css.includes('background: var(--page-bg);'), 'html background must use page background variable')
 assert(css.includes('color: var(--page-text);'), 'body text must use page text variable')
-assert(css.includes('--bg-end: #fff0cf'), 'Light theme must use a visibly light final background stop')
+assert(css.includes('--bg-end: var(--brand-sand)'), 'Light theme must use Sand as its visibly light final background stop')
 assert(css.includes('overflow-x: clip'), 'Global CSS must clip horizontal overflow')
 assert(!css.includes('color-scheme: dark light'), 'Global CSS must not advertise both schemes globally')
 

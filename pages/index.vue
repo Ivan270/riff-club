@@ -311,7 +311,7 @@ h2 {
   border: 2px solid var(--ink);
   background: var(--paper);
   color: var(--ink);
-  box-shadow: 8px 8px 0 #000;
+  box-shadow: 8px 8px 0 var(--brand-onyx);
   transform: rotate(-1.5deg);
 }
 .note:nth-child(2) {
@@ -327,7 +327,7 @@ h2 {
   left: 24px;
   width: 72px;
   height: 20px;
-  background: color-mix(in srgb, var(--acid) 78%, white);
+  background: color-mix(in srgb, var(--acid) 78%, var(--brand-old-lace));
   border: 1px solid var(--ink);
   transform: rotate(-3deg);
 }
@@ -340,7 +340,7 @@ h2 {
   letter-spacing: -0.015em;
 }
 .note p {
-  color: #272727;
+  color: var(--muted-ink);
 }
 .method p {
   color: var(--section-muted);
@@ -371,7 +371,7 @@ h2 {
   padding: 5px 10px;
   border: 1px solid var(--section-border);
   color: var(--section-text);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
@@ -398,7 +398,7 @@ h2 {
   .note:nth-child(2),
   .note:nth-child(3) {
     transform: none;
-    box-shadow: 4px 6px 0 #000;
+    box-shadow: 4px 6px 0 var(--brand-onyx);
   }
   .setlist-panel {
     box-shadow: 4px 6px 0 var(--red);
