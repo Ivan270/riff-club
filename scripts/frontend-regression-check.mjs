@@ -2,6 +2,16 @@ import { existsSync, readFileSync } from 'node:fs'
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
 const readBuffer = (path) => readFileSync(new URL(`../${path}`, import.meta.url))
+const stripCssComments = (source) => source.replace(/\/\*[\s\S]*?\*\//g, '')
+const usesFontUi = (source, selector) => {
+  const style = source.match(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/)?.[1] ?? source
+  const rules = stripCssComments(style).matchAll(/([^{}]+)\{([^{}]*)\}/g)
+
+  return [...rules].some(([, selectorList, declarations]) =>
+    selectorList.split(',').some((candidate) => candidate.trim() === selector)
+    && /(?:^|;)\s*font-family\s*:\s*var\(--font-ui\)\s*;/.test(declarations)
+  )
+}
 const readPngSize = (path) => {
   const image = readBuffer(path)
   return [image.readUInt32BE(16), image.readUInt32BE(20)]
@@ -26,6 +36,7 @@ const home = read('pages/index.vue')
 const footer = read('components/SiteFooter.vue')
 const header = read('components/SiteHeader.vue')
 const mobileMenu = readOptional('components/MobileMenu.vue')
+const themeToggle = read('components/ThemeToggle.vue')
 const nuxtConfig = read('nuxt.config.ts')
 const netlifyConfig = readOptional('netlify.toml')
 const contact = read('pages/contacto.vue')
@@ -63,8 +74,8 @@ assert(footer.includes('rel="noopener noreferrer nofollow"'), 'SiteFooter develo
 assert(header.includes('aria-current'), 'SiteHeader must expose active page with aria-current')
 assert(header.includes('ThemeToggle'), 'SiteHeader must render ThemeToggle')
 assert(header.includes('<MobileMenu'), 'SiteHeader must render the responsive mobile menu')
-assert(mobileMenu.includes('class="menu-strings"'), 'Mobile trigger must use the three-string brand gesture')
-assert((mobileMenu.match(/class="menu-string"/g) ?? []).length === 3, 'Mobile trigger must render exactly three strings')
+const menuStringsPattern = /<button\b[^>]*\bclass=(["'])(?:[^"']*\s)?mobile-menu-toggle(?:\s[^"']*)?\1[^>]*>\s*<([a-z][\w-]*)\b[^>]*\bclass=(["'])(?:[^"']*\s)?menu-strings(?:\s[^"']*)?\3[^>]*>\s*(?:<([a-z][\w-]*)\b[^>]*\bclass=(["'])(?:[^"']*\s)?menu-string(?:\s[^"']*)?\5[^>]*>\s*<\/\4>\s*){3}<\/\2>\s*<\/button>/i
+assert(menuStringsPattern.test(mobileMenu), 'Mobile trigger must contain exactly three menu-string children inside menu-strings')
 assert(!mobileMenu.includes('<img :src="isotypeSrc"'), 'Mobile trigger must not duplicate the full isotipo')
 assert(mobileMenu.includes('aria-expanded'), 'Mobile trigger must retain its expanded state')
 assert(mobileMenu.includes('aria-controls="mobile-menu"'), 'Mobile trigger must retain its controlled dialog reference')
@@ -195,6 +206,8 @@ assert(css.includes('--purple-link-text: var(--paper)'), 'Light theme must defin
 assert(css.includes('font-size: var(--type-body);'), 'Body must use the shared body type token')
 assert(css.includes('font-weight: var(--weight-heavy);'), 'Global headings must use the shared heavy weight token')
 assert(css.includes('--font-heading'), 'Global CSS must define an editorial heading font variable')
+const cssWithoutComments = stripCssComments(css)
+const normalizedCss = cssWithoutComments.toLowerCase()
 for (const [token, value] of [
   ['--brand-onyx', '#101010'],
   ['--brand-old-lace', '#fff7e8'],
@@ -206,14 +219,30 @@ for (const [token, value] of [
   ['--brand-bone', '#d8d0bf'],
   ['--brand-stone', '#5e574c']
 ]) {
-  assert(css.toLowerCase().includes(`${token}: ${value}`), `${token} must use the approved palette value`)
+  const declarationPattern = new RegExp(`(?:^|[;{])\\s*(${token}\\s*:\\s*[^;{}]+;)`, 'g')
+  const declarations = [...normalizedCss.matchAll(declarationPattern)].map((match) => match[1])
+  const exactDeclaration = new RegExp(`^${token}\\s*:\\s*${value}\\s*;$`)
+  assert(declarations.length === 1 && exactDeclaration.test(declarations[0]), `${token} must be declared exactly once with the approved palette value`)
 }
 
 for (const forbidden of ['#050505', '#241f1a', '#fff8e9', '#c5f000', '#e93227', '#8f45dd', '#f3d173']) {
-  assert(!css.toLowerCase().includes(forbidden), `Global CSS must not use off-palette color ${forbidden}`)
+  assert(!normalizedCss.includes(forbidden), `Global CSS must not use off-palette color ${forbidden}`)
 }
 
 assert(css.includes('--font-ui: var(--font-display)'), 'Navigation, button, and label typography must use Bricolage')
+for (const [source, selector] of [
+  [css, '.button'],
+  [css, '.eyebrow'],
+  [css, '.stamp'],
+  [css, '.sticker'],
+  [header, '.nav-link'],
+  [themeToggle, '.theme-toggle'],
+  [mobileMenu, '.mobile-menu__link'],
+  [mobileMenu, '.mobile-menu__serial'],
+  [mobileMenu, '.mobile-menu__footer p']
+]) {
+  assert(usesFontUi(source, selector), `${selector} must use var(--font-ui)`)
+}
 assert(css.includes('background: var(--page-bg);'), 'html background must use page background variable')
 assert(css.includes('color: var(--page-text);'), 'body text must use page text variable')
 assert(css.includes('--bg-end: #fff0cf'), 'Light theme must use a visibly light final background stop')
