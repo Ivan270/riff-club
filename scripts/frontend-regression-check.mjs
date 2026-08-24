@@ -3,7 +3,67 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
 const readBuffer = (path) => readFileSync(new URL(`../${path}`, import.meta.url))
 const stripCssComments = (source) => source.replace(/\/\*[\s\S]*?\*\//g, '')
+const stripVueComments = (source) => source.replace(/<!--[\s\S]*?-->/g, '')
 const readStyles = (source) => [...source.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/g)].map((match) => match[1]).join('\n')
+const readInlineStyles = (source) => [...stripVueComments(source).matchAll(/(?:^|\s):?style\s*=\s*(["'])([\s\S]*?)\1/g)]
+  .map((match) => match[2])
+  .join(';')
+const isColorDeclaration = (property) => {
+  if (property.startsWith('--')) {
+    return !/^--(?:max|font-(?:display|ui|heading|body)|weight-.+|type-.+|leading-.+|tracking-.+)$/.test(property)
+  }
+  return /^(?:color|background(?:-.+)?|border(?:-.+)?|outline(?:-.+)?|box-shadow|text-shadow|fill|stroke|caret-color|accent-color|text-decoration-color)$/.test(property)
+}
+const readFunctionCalls = (source, functionName) => {
+  const calls = []
+  const pattern = new RegExp(`${functionName}\\s*\\(`, 'gi')
+  let match
+
+  while ((match = pattern.exec(source)) !== null) {
+    let depth = 0
+    let opened = false
+    for (let index = match.index; index < source.length; index += 1) {
+      if (source[index] === '(') {
+        depth += 1
+        opened = true
+      }
+      if (source[index] === ')') depth -= 1
+      if (opened && depth === 0) {
+        calls.push(source.slice(match.index, index + 1))
+        pattern.lastIndex = index + 1
+        break
+      }
+    }
+  }
+  return calls
+}
+const auditRuntimeColors = (source) => {
+  const violations = []
+  const declarations = stripCssComments(`${source};`).matchAll(/((?:--)?[\w-]+)\s*:\s*([^;{}]+)\s*(?:;|(?=\}))/g)
+
+  for (const [, property, value] of declarations) {
+    if (!isColorDeclaration(property.toLowerCase())) continue
+
+    for (const match of value.matchAll(/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b|\b(?:rgb|rgba|hsl|hsla|oklch|lab|lch|hwb|color)\s*\(|\b(?:black|white)\b/gi)) {
+      violations.push(`${property}: ${match[0]}`)
+    }
+    for (const call of readFunctionCalls(value, 'color-mix')) {
+      if (!/^color-mix\(\s*in\s+srgb\s*,\s*var\(--[\w-]+\)(?:\s+[\d.]+%)?\s*,\s*(?:var\(--[\w-]+\)|transparent|currentcolor|inherit)(?:\s+[\d.]+%)?\s*\)$/i.test(call)) {
+        violations.push(`${property}: color-mix() must derive from a token`)
+      }
+    }
+  }
+  return violations
+}
+const contrastRatio = (foreground, background) => {
+  const luminance = (hex) => {
+    const channels = hex.match(/[0-9a-f]{2}/gi).map((channel) => Number.parseInt(channel, 16) / 255)
+      .map((channel) => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
+  }
+  const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a)
+  return (values[0] + 0.05) / (values[1] + 0.05)
+}
 const usesFontUi = (source, selector) => {
   const style = source.match(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/)?.[1] ?? source
   const rules = stripCssComments(style).matchAll(/([^{}]+)\{([^{}]*)\}/g)
@@ -32,6 +92,18 @@ const assert = (condition, message) => {
   }
 }
 
+for (const syntax of ['#000', 'rgb(0 0 0)', 'hsl(0 0% 0%)', 'black', 'white', 'oklch(60% 0.2 20)', 'lab(60% 20 30)', 'lch(60% 20 30)', 'hwb(20 10% 20%)', 'color(display-p3 1 0 0)']) {
+  assert(auditRuntimeColors(`.fixture { color: ${syntax}; }`).length > 0, `Runtime color audit must reject ${syntax}`)
+}
+assert(auditRuntimeColors(':root { --duplicate-primitive: #101010; }').length > 0, 'Runtime color audit must allow primitive hex values only in the canonical definition block')
+assert(auditRuntimeColors('.black.white { white-space: nowrap; content: "black white oklch(1 0 0)"; color: var(--ink); } /* color: black; */').length === 0, 'Runtime color audit must ignore selectors, non-color declarations, and CSS comments')
+assert(auditRuntimeColors('.fixture { color: color-mix(in srgb, var(--ink), red); }').length > 0, 'Runtime color audit must reject color-mix() operands that are not tokens or approved keywords')
+assert(auditRuntimeColors('.fixture { color: var(--ink); border-color: transparent; outline-color: currentColor; text-decoration-color: inherit; }').length === 0, 'Runtime color audit must allow tokens and approved color keywords')
+const safeVueNoise = '<p class="black white">black white oklch(1 0 0)</p><!-- <i style="color: white"></i> -->'
+assert(auditRuntimeColors(readInlineStyles(safeVueNoise)).length === 0, 'Runtime color audit must ignore Vue text, classes, and comments')
+assert(auditRuntimeColors(readInlineStyles('<i style="color: black"></i>')).length > 0, 'Runtime color audit must inspect static Vue template inline styles')
+assert(auditRuntimeColors(readInlineStyles(`<i :style="{ color: 'oklch(60% 0.2 20)' }"></i>`)).length > 0, 'Runtime color audit must inspect bound Vue template inline styles')
+
 const hero = read('components/HeroZine.vue')
 const home = read('pages/index.vue')
 const footer = read('components/SiteFooter.vue')
@@ -58,11 +130,13 @@ const servicePages = [
   'pages/clases-guitarra-acustica.vue',
   'pages/clases-bajo.vue'
 ].map((path) => [path, read(path)])
-const vueStyleFiles = ['components', 'pages'].flatMap((directory) =>
+const vueFiles = ['components', 'pages'].flatMap((directory) =>
   readdirSync(new URL(`../${directory}`, import.meta.url), { recursive: true })
     .filter((path) => typeof path === 'string' && path.endsWith('.vue'))
     .map((path) => `${directory}/${path}`)
-).map((path) => [path, stripCssComments(readStyles(read(path))).toLowerCase()])
+).map((path) => [path, read(path)])
+const vueStyleFiles = vueFiles.map(([path, source]) => [path, readStyles(source).toLowerCase()])
+const vueInlineStyleFiles = vueFiles.map(([path, source]) => [`${path} inline styles`, readInlineStyles(source).toLowerCase()])
 const additionalCssFiles = readdirSync(new URL('../assets/css', import.meta.url), { recursive: true })
   .filter((path) => typeof path === 'string' && path.endsWith('.css') && path !== 'main.css')
   .map((path) => [`assets/css/${path}`, stripCssComments(read(`assets/css/${path}`)).toLowerCase()])
@@ -214,7 +288,7 @@ assert(css.includes('--weight-heavy: 800'), 'Typography tokens must define the h
 assert(css.includes('--type-hero: clamp(3.5rem, 7vw, 7.5rem)'), 'Typography tokens must define the responsive hero scale')
 assert(css.includes('--type-body: clamp(1rem, 1.1vw, 1.125rem)'), 'Typography tokens must define the readable body scale')
 assert(css.includes('--type-ui: clamp(1rem, 1vw, 1rem)'), 'Interactive UI typography must not fall below 16px')
-assert(css.includes('--purple-link-text: var(--surface-paper)'), 'Light theme must define a readable purple link foreground')
+assert(contrastRatio('#101010', '#a855f7') >= 4.5, 'Onyx text on Lavender must meet WCAG AA contrast')
 assert(css.includes('font-size: var(--type-body);'), 'Body must use the shared body type token')
 assert(css.includes('font-weight: var(--weight-heavy);'), 'Global headings must use the shared heavy weight token')
 assert(css.includes('--font-heading'), 'Global CSS must define an editorial heading font variable')
@@ -314,7 +388,7 @@ for (const [token, value] of [
   ['--section-border', 'var(--border)'],
   ['--section-overlay', 'color-mix(in srgb, var(--page-bg) 90%, transparent)'],
   ['--header-bg', 'color-mix(in srgb, var(--page-bg) 94%, transparent)'],
-  ['--purple-link-text', 'var(--ink)'],
+  ['--purple-link-text', 'var(--brand-onyx)'],
   ['--shadow-hard', '7px 7px 0 var(--brand-onyx)']
 ]) {
   assert(hasUniqueEffectiveDeclaration(darkThemeBlock, token, value), `${token} must have one approved dark/root compatibility mapping`)
@@ -345,25 +419,23 @@ for (const [token, value] of [
   ['--section-border', 'var(--border)'],
   ['--section-overlay', 'color-mix(in srgb, var(--surface-paper) 92%, transparent)'],
   ['--header-bg', 'color-mix(in srgb, var(--page-bg) 94%, transparent)'],
-  ['--purple-link-text', 'var(--surface-paper)'],
+  ['--purple-link-text', 'var(--brand-onyx)'],
   ['--shadow-hard', '7px 7px 0 color-mix(in srgb, var(--brand-onyx) 82%, transparent)']
 ]) {
   assert(hasUniqueEffectiveDeclaration(lightThemeBlock, token, value), `${token} must have one approved light compatibility mapping`)
 }
 
 const cssWithoutPrimitiveBlock = normalizedCss.slice(primitiveBlock.length)
-assert(!/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/.test(cssWithoutPrimitiveBlock), 'Global CSS may hard-code hex colors only in the immutable primitive block')
-assert(!/\b(?:rgb|rgba|hsl|hsla)\(/.test(cssWithoutPrimitiveBlock), 'Global CSS alpha colors must derive from approved primitives with color-mix()')
 assert(!/var\(--(?:black|tape)\)|--(?:black|tape)\s*:/.test(normalizedCss), 'Global CSS must remove the legacy --black and --tape aliases and consumers')
 
-for (const [path, source] of vueStyleFiles) {
-  assert(!/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/.test(source), `${path} styles must not hard-code hex colors`)
-  assert(!/\b(?:rgb|rgba|hsl|hsla)\(/.test(source), `${path} alpha colors must derive from approved primitives with color-mix()`)
-  assert(!/var\(--(?:black|tape)\)/.test(source), `${path} must not consume legacy color aliases`)
-}
-for (const [path, source] of additionalCssFiles) {
-  assert(!/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/.test(source), `${path} must not hard-code hex colors`)
-  assert(!/\b(?:rgb|rgba|hsl|hsla)\(/.test(source), `${path} alpha colors must derive from approved primitives with color-mix()`)
+for (const [path, source] of [
+  ['assets/css/main.css runtime declarations', cssWithoutPrimitiveBlock],
+  ...additionalCssFiles,
+  ...vueStyleFiles,
+  ...vueInlineStyleFiles
+]) {
+  const violations = auditRuntimeColors(source)
+  assert(violations.length === 0, `${path} must use only approved runtime color forms${violations.length ? ` (${violations.join(', ')})` : ''}`)
   assert(!/var\(--(?:black|tape)\)|--(?:black|tape)\s*:/.test(source), `${path} must not define or consume legacy color aliases`)
 }
 

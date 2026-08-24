@@ -46,7 +46,7 @@
   --section-border: var(--border);
   --section-overlay: color-mix(in srgb, var(--page-bg) 90%, transparent);
   --header-bg: color-mix(in srgb, var(--page-bg) 94%, transparent);
-  --purple-link-text: var(--ink);
+  --purple-link-text: var(--brand-onyx);
   --max: 1120px;
   --font-display: "Bricolage Grotesque", "Arial Black", Arial, sans-serif;
   --font-ui: var(--font-display);
@@ -109,7 +109,7 @@
   --section-border: var(--border);
   --section-overlay: color-mix(in srgb, var(--surface-paper) 92%, transparent);
   --header-bg: color-mix(in srgb, var(--page-bg) 94%, transparent);
-  --purple-link-text: var(--surface-paper);
+  --purple-link-text: var(--brand-onyx);
   --shadow-hard: 7px 7px 0 color-mix(in srgb, var(--brand-onyx) 82%, transparent);
   color-scheme: light;
 }
