@@ -23,7 +23,7 @@ onMounted(async () => {
         {
           y: 34,
           opacity: 0,
-          rotate: -3,
+          rotate: -1,
           scale: 0.97,
           duration: 0.58,
           ease: "back.out(1.5)",
@@ -32,7 +32,7 @@ onMounted(async () => {
       )
       .from(
         ".poster-tape",
-        { y: -18, opacity: 0, rotate: -14, duration: 0.28, stagger: 0.08 },
+        { y: -18, opacity: 0, duration: 0.28 },
         "-=0.2",
       )
       .from(
@@ -40,7 +40,6 @@ onMounted(async () => {
         {
           x: -24,
           opacity: 0,
-          rotate: -5,
           scale: 0.94,
           duration: 0.38,
           ease: "back.out(1.6)",
@@ -59,7 +58,7 @@ onMounted(async () => {
       )
       .from(
         ".poster-local, .poster-note",
-        { opacity: 0, scale: 0.92, rotate: -4, duration: 0.28, stagger: 0.06 },
+        { opacity: 0, scale: 0.92, duration: 0.28, stagger: 0.06 },
         "-=0.2",
       );
   });
@@ -99,11 +98,9 @@ onBeforeUnmount(() => {
     </div>
     <div class="poster" aria-hidden="true">
       <i class="poster-tape tape-a"></i>
-      <i class="poster-tape tape-b"></i>
       <div class="poster-local">La Reina / Santiago Oriente</div>
       <div class="string-lines">
-        <span></span><span></span><span></span><span></span><span></span
-        ><span></span>
+        <span></span><span></span><span></span>
       </div>
       <div class="poster-brand">
         <img :src="'/logo-full-light.svg'" alt="" aria-hidden="true" />
@@ -145,24 +142,8 @@ onBeforeUnmount(() => {
   background: var(--paper);
   color: var(--ink);
   border: 3px solid var(--ink);
-  box-shadow: 14px 14px 0 var(--red);
+  box-shadow: 10px 10px 0 var(--red);
   overflow: hidden;
-  transform: rotate(1deg);
-}
-
-.poster::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.22;
-  background-image: radial-gradient(
-    circle,
-    var(--ink) 0 1px,
-    transparent 1.5px
-  );
-  background-size: 7px 7px;
-  mix-blend-mode: multiply;
 }
 
 .poster::after {
@@ -185,19 +166,11 @@ onBeforeUnmount(() => {
   height: 30px;
   background: color-mix(in srgb, var(--brand-sand) 78%, transparent);
   border: 1px solid color-mix(in srgb, var(--brand-onyx) 16%, transparent);
-  box-shadow: 0 2px 0 color-mix(in srgb, var(--brand-onyx) 12%, transparent);
 }
 
 .tape-a {
   top: 18px;
   left: 22px;
-  transform: rotate(-9deg);
-}
-
-.tape-b {
-  top: 24px;
-  right: 24px;
-  transform: rotate(7deg);
 }
 
 .poster-local {
@@ -213,7 +186,6 @@ onBeforeUnmount(() => {
   line-height: 1.2;
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  transform: rotate(-2deg);
 }
 
 .string-lines {
@@ -224,14 +196,13 @@ onBeforeUnmount(() => {
   z-index: 1;
   display: grid;
   gap: 13px;
-  transform: rotate(-5deg);
+  transform: rotate(-45deg);
 }
 
 .string-lines span {
   display: block;
   height: 3px;
   background: var(--ink);
-  box-shadow: 0 10px 0 color-mix(in srgb, var(--brand-onyx) 12%, transparent);
 }
 
 .poster-brand {
@@ -244,8 +215,6 @@ onBeforeUnmount(() => {
   padding: 22px 16px;
   background: color-mix(in srgb, var(--paper) 84%, transparent);
   border: 3px solid var(--ink);
-  box-shadow: 8px 8px 0 var(--acid);
-  transform: rotate(-2deg);
 }
 
 .poster-brand img {

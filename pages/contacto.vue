@@ -70,19 +70,15 @@ useHead({
 </template>
 
 <style scoped>
-.contact { display: grid; grid-template-columns: 1fr 420px; gap: 36px; align-items: start; }
+.contact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 420px); gap: clamp(40px, 6vw, 72px); align-items: start; }
 .contact p { color: var(--muted); }
 details p { color: var(--section-muted); }
 form { display: grid; gap: 14px; padding: 22px; background: var(--paper); color: var(--ink); box-shadow: 8px 8px 0 var(--red); }
-.contact-form-card { position: relative; box-sizing: border-box; max-width: calc(100% - 12px); border: 2px solid var(--ink); transform: rotate(1deg); }
-.contact-form-card::before { content: ''; position: absolute; top: -12px; left: 28px; width: 86px; height: 22px; background: color-mix(in srgb, var(--acid) 72%, var(--brand-old-lace)); border: 1px solid var(--ink); transform: rotate(-4deg); }
+.contact-form-card { position: relative; box-sizing: border-box; border: 2px solid var(--ink); }
 label { display: grid; gap: 6px; font-family: var(--font-body); font-weight: var(--weight-medium); }
 input, textarea { box-sizing: border-box; width: 100%; padding: 12px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); font: inherit; }
 h2 { font-family: var(--font-heading); font-size: var(--type-h2); font-weight: var(--weight-heavy); line-height: var(--leading-heading); letter-spacing: var(--tracking-heading); }
-.faq-row { position: relative; box-sizing: border-box; max-width: calc(100% - 12px); margin-bottom: 14px; padding: 18px 20px; border: 2px solid var(--section-border); background: var(--section-bg); color: var(--section-text); box-shadow: 6px 6px 0 var(--brand-onyx); }
-.faq-row::before { content: ''; position: absolute; top: -8px; right: 26px; width: 18px; height: 18px; border: 2px solid var(--paper); border-radius: 50%; background: var(--red); }
-.faq-row:nth-child(even) { transform: rotate(.5deg); }
-.faq-row:nth-child(odd) { transform: rotate(-.5deg); }
+.faq-row { position: relative; box-sizing: border-box; margin-bottom: 14px; padding: 18px 20px; border: 2px solid var(--section-border); background: var(--section-bg); color: var(--section-text); box-shadow: 6px 6px 0 var(--brand-onyx); }
 summary { cursor: pointer; font-family: var(--font-body); font-weight: var(--weight-medium); font-size: var(--type-ui); }
-@media (max-width: 860px) { .contact { grid-template-columns: 1fr; } .contact-form-card { transform: none; box-shadow: 4px 6px 0 var(--red); } .faq-row, .faq-row:nth-child(even), .faq-row:nth-child(odd) { transform: none; box-shadow: 4px 5px 0 var(--brand-onyx); } }
+@media (max-width: 860px) { .contact { grid-template-columns: 1fr; } .contact-form-card { box-shadow: 4px 6px 0 var(--red); } .faq-row { box-shadow: 4px 5px 0 var(--brand-onyx); } }
 </style>

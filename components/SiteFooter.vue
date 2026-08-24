@@ -1,5 +1,9 @@
 <script setup lang="ts">
 const footerRef = useTemplateRef<HTMLElement>("footerRef");
+const { theme } = useTheme();
+const footerLogoSrc = computed(() =>
+  theme.value === "light" ? "/logo-full-light.svg" : "/logo-full-dark.svg",
+);
 const { bindPressFeedback, runWhenMotionAllowed } = useGsapMotion();
 let cleanupTimeline: (() => void) | undefined;
 let cleanupButtons: (() => void) | undefined;
@@ -9,7 +13,6 @@ onMounted(async () => {
     gsap.from(".footer-grid", {
       y: 30,
       opacity: 0,
-      rotate: -1.5,
       duration: 0.48,
       ease: "back.out(1.4)",
       scrollTrigger: {
@@ -34,6 +37,13 @@ onBeforeUnmount(() => {
 <template>
   <footer ref="footerRef" class="footer">
     <div class="container footer-grid">
+      <NuxtLink
+        class="footer-brand"
+        to="/"
+        aria-label="Ir al inicio — Riff Club"
+      >
+        <img class="footer-logo" :src="footerLogoSrc" alt="Riff Club" />
+      </NuxtLink>
       <div>
         <p class="eyebrow">Clases presenciales</p>
         <h2>Guitarra y bajo en La Reina</h2>
@@ -72,24 +82,6 @@ onBeforeUnmount(() => {
   color: var(--section-text);
   overflow: hidden;
 }
-.footer::before,
-.footer::after {
-  content: "";
-  position: absolute;
-  inset: 18px auto auto 5%;
-  width: min(520px, 70vw);
-  height: 86px;
-  border: 2px solid var(--paper);
-  background: var(--red);
-  transform: rotate(-2deg);
-  opacity: 0.8;
-}
-.footer::after {
-  inset: auto 6% 20px auto;
-  width: min(420px, 62vw);
-  background: var(--purple);
-  transform: rotate(2deg);
-}
 .footer-grid {
   position: relative;
   z-index: 1;
@@ -101,6 +93,16 @@ onBeforeUnmount(() => {
   background: var(--section-overlay);
   border: 2px dashed var(--section-border);
   box-shadow: 9px 9px 0 var(--acid);
+}
+.footer-brand {
+  grid-column: 1 / -1;
+  width: fit-content;
+}
+.footer-logo {
+  display: block;
+  width: clamp(180px, 20vw, 240px);
+  min-width: 180px;
+  height: auto;
 }
 h2 {
   margin: 0;
@@ -120,15 +122,13 @@ p {
   padding: 8px 10px;
   color: var(--ink);
   background: var(--paper);
-  border: 2px solid var(--red);
+  border: 2px solid var(--purple);
   font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   line-height: 1.2;
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  box-shadow: 4px 4px 0 var(--red);
-  transform: rotate(-1deg);
 }
 .site-credit {
   position: relative;

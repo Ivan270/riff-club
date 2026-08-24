@@ -94,7 +94,7 @@ onMounted(async () => {
         .from(".pain-flyer__sheet", {
           yPercent: 18,
           scale: 0.92,
-          rotate: -2.5,
+          rotate: -1,
           opacity: 0,
           duration: 0.32,
           ease: "power3.out",
@@ -110,7 +110,6 @@ onMounted(async () => {
             y: 46,
             opacity: 0,
             scale: 0.88,
-            rotate: 1.2,
             duration: 0.28,
             ease: "back.out(1.4)",
           },
@@ -122,7 +121,6 @@ onMounted(async () => {
             y: 70,
             opacity: 0,
             scale: 0.82,
-            rotate: 7,
             duration: 0.3,
             stagger: 0.08,
             ease: "back.out(1.8)",
@@ -255,34 +253,10 @@ h2 {
   justify-content: center;
   padding: clamp(28px, 6vw, 72px);
   border: 3px solid var(--ink);
-  background:
-    radial-gradient(
-      circle at 18% 20%,
-      color-mix(in srgb, var(--red) 22%, transparent) 0 8rem,
-      transparent 8.2rem
-    ),
-    radial-gradient(
-      circle at 88% 18%,
-      color-mix(in srgb, var(--acid) 26%, transparent) 0 7rem,
-      transparent 7.2rem
-    ),
-    linear-gradient(135deg, var(--paper) 0%, var(--paper-aged) 100%);
+  background: linear-gradient(135deg, var(--paper) 0%, var(--paper-aged) 100%);
   color: var(--ink);
   box-shadow: 18px 18px 0 var(--red);
   isolation: isolate;
-}
-.pain-flyer__sheet::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.18;
-  background-image: radial-gradient(
-    circle,
-    var(--ink) 0 1px,
-    transparent 1.4px
-  );
-  background-size: 8px 8px;
 }
 .pain-flyer .eyebrow {
   color: var(--red);
@@ -312,24 +286,6 @@ h2 {
   background: var(--paper);
   color: var(--ink);
   box-shadow: 8px 8px 0 var(--brand-onyx);
-  transform: rotate(-1.5deg);
-}
-.note:nth-child(2) {
-  transform: rotate(1deg);
-}
-.note:nth-child(3) {
-  transform: rotate(-0.5deg);
-}
-.note::before {
-  content: "";
-  position: absolute;
-  top: -11px;
-  left: 24px;
-  width: 72px;
-  height: 20px;
-  background: color-mix(in srgb, var(--acid) 78%, var(--brand-old-lace));
-  border: 1px solid var(--ink);
-  transform: rotate(-3deg);
 }
 .note h3 {
   color: var(--ink);
@@ -376,7 +332,6 @@ h2 {
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  transform: rotate(4deg);
 }
 @media (max-width: 860px) {
   .pain-flyer {
@@ -394,10 +349,7 @@ h2 {
   .service-grid {
     grid-template-columns: 1fr;
   }
-  .note,
-  .note:nth-child(2),
-  .note:nth-child(3) {
-    transform: none;
+  .note {
     box-shadow: 4px 6px 0 var(--brand-onyx);
   }
   .setlist-panel {

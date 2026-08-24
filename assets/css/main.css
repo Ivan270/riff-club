@@ -340,11 +340,6 @@ h3 {
 
 .zine-card {
   padding: clamp(18px, 3vw, 28px);
-  transform: rotate(-0.6deg);
-}
-
-.zine-card:nth-child(even) {
-  transform: rotate(0.8deg);
 }
 
 .tape {
@@ -360,7 +355,7 @@ h3 {
   height: 24px;
   background: color-mix(in srgb, var(--brand-sand) 78%, transparent);
   border: 1px solid color-mix(in srgb, var(--brand-onyx) 18%, transparent);
-  transform: translateX(-50%) rotate(-4deg);
+  transform: translateX(-50%);
   box-shadow: 0 2px 0 color-mix(in srgb, var(--brand-onyx) 12%, transparent);
 }
 
@@ -410,14 +405,14 @@ h3 {
   border: 2px solid var(--red);
   color: var(--ink);
   box-shadow: 3px 3px 0 var(--red);
-  transform: rotate(3deg);
+  transform: rotate(1deg);
 }
 
 .sticker {
   background: var(--paper);
   color: var(--ink);
   box-shadow: 4px 4px 0 var(--brand-onyx);
-  transform: rotate(-2deg);
+  transform: rotate(-1deg);
 }
 
 @media (prefers-reduced-motion: reduce) {

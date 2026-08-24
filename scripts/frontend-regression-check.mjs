@@ -215,6 +215,9 @@ const hero = read('components/HeroZine.vue')
 const home = read('pages/index.vue')
 const footer = read('components/SiteFooter.vue')
 const header = read('components/SiteHeader.vue')
+const serviceCard = read('components/ServiceCard.vue')
+const contactCta = read('components/ContactCta.vue')
+const about = read('pages/sobre-mi.vue')
 const mobileMenu = readOptional('components/MobileMenu.vue')
 const servicePage = read('components/ServicePage.vue')
 const themeToggle = read('components/ThemeToggle.vue')
@@ -269,6 +272,34 @@ assert(!hero.includes('<b>01</b>'), 'Hero poster must remove the legacy serial')
 assert(hero.includes('.from(\n        ".poster-brand"'), 'Hero timeline must animate the horizontal brand signature')
 assert(hero.includes('width: min(100%, 300px);'), 'Hero poster logo must stay responsive')
 assert(hero.includes('min-width: min(180px, 100%);'), 'Hero poster logo must preserve its minimum width when space allows')
+const heroStringLines = hero.match(/<div class="string-lines">([\s\S]*?)<\/div>/)?.[1] ?? ''
+assert((heroStringLines.match(/<span\b/g) ?? []).length === 3, 'Hero poster must render exactly three string-lines children')
+assert(hero.includes('transform: rotate(-45deg);'), 'Hero poster strings must use the approved -45deg angle')
+assert(!hero.includes('tape-b'), 'Hero poster must use only one tape strip')
+assert(!hero.includes('.poster::before'), 'Hero poster must not use the redundant dot overlay')
+assert(!/\b(?:class|className)=["'][^"']*\btape\b/.test(header), 'SiteHeader must remain straight and tape-free')
+assert(serviceCard.includes('electric: 6') && serviceCard.includes('acoustic: 6') && serviceCard.includes('bass: 4'), 'ServiceCard must explicitly define electric/acoustic/bass string counts as 6/6/4')
+assert(serviceCard.includes('v-for="stringIndex in stringCountByVariant[variant]"'), 'ServiceCard must render the explicit string count for each instrument')
+assert(!serviceCard.includes('nth-child(n + 5)'), 'ServiceCard must not fake bass string count by hiding rendered strings')
+assert(!/var\(--red\)|var\(--brand-cinnabar\)/.test(serviceCard), 'Services must not use Cinnabar accents')
+assert(serviceCard.includes('var(--acid)') && serviceCard.includes('var(--purple)'), 'Services must limit accents to Lime and Lavender')
+assert(!serviceCard.includes('radial-gradient') && !serviceCard.includes('border-radius: 50%'), 'Service instrument marks must not include face or unrelated circle motifs')
+assert(!/transform:\s*rotate/.test(serviceCard), 'Service cards and instrument marks must remain mechanically aligned')
+assert(!contactCta.includes('var(--purple)') && contactCta.includes('var(--red)') && contactCta.includes('var(--acid)'), 'Contact CTA accents must be Lime and Cinnabar only')
+assert(!contactCta.includes('box-shadow:\n    '), 'Contact CTA must use one accent shadow instead of stacked shadows')
+assert(!contactCta.includes('tear-edge') && !contactCta.includes('tear-offs') && !contactCta.includes('.cta-paper::before'), 'Contact CTA must keep only its hard border and accent shadow treatment')
+assert(footer.includes('class="footer-logo"'), 'SiteFooter must include the approved horizontal logo')
+assert(footer.includes('/logo-full-dark.svg') && footer.includes('/logo-full-light.svg'), 'SiteFooter logo must adapt to the active surface theme')
+assert(footer.includes('min-width: 180px'), 'SiteFooter horizontal logo must render at least 180px wide')
+assert(!/var\(--red\)|var\(--brand-cinnabar\)/.test(footer), 'SiteFooter must not use Cinnabar decoration')
+assert(footer.includes('var(--acid)') && footer.includes('var(--purple)'), 'SiteFooter accents must be Lime and Lavender only')
+assert((footer.match(/box-shadow:/g) ?? []).length === 1, 'SiteFooter must use one restrained hard shadow treatment')
+assert(!home.includes('radial-gradient('), 'Homepage pain flyer must not stack competing glow or dot circles')
+assert(!home.includes('.note:nth-child') && !/\.note\s*\{[^}]*transform:\s*rotate/s.test(home), 'Homepage pain notes must use a stable grid without independent rotations')
+assert(!/\.contact-form-card::before|\.faq-row::before/.test(contact), 'Contact surfaces must not stack tape or floating-circle decoration')
+assert(!/transform:\s*rotate/.test(contact), 'Contact cards and panels must remain aligned')
+assert(!/transform:\s*rotate/.test(about), 'About cards must remain aligned')
+assert(!/\.zine-card\s*\{[^}]*transform:\s*rotate|\.zine-card:nth-child/.test(css), 'Default zine cards must not rotate')
 assert(footer.includes('Sitio desarrollado por'), 'SiteFooter must include a small developer credit')
 assert(footer.includes('https://github.com/ivan270'), 'SiteFooter developer credit must link to GitHub')
 assert(footer.includes('rel="noopener noreferrer nofollow"'), 'SiteFooter developer credit must use safe nofollow external link attributes')
@@ -571,12 +602,12 @@ for (const [source, selector] of [
   [mobileMenu, '.mobile-menu__link'],
   [mobileMenu, '.mobile-menu__serial'],
   [mobileMenu, '.mobile-menu__footer p'],
-  [read('components/ServiceCard.vue'), 'a'],
+  [serviceCard, 'a'],
   [footer, '.footer-stamp'],
   [footer, '.site-credit'],
   [servicePage, '.related-links a'],
   [home, '.setlist-panel::after'],
-  [read('pages/sobre-mi.vue'), 'article::before']
+  [about, 'article::before']
 ]) {
   assert(usesFontUi(source, selector), `${selector} must use var(--font-ui)`)
 }

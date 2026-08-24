@@ -63,13 +63,6 @@ article {
   color: var(--ink);
   border: 2px solid var(--ink);
   box-shadow: 8px 8px 0 var(--brand-onyx);
-  transform: rotate(-1.5deg);
-}
-article:nth-child(2) {
-  transform: rotate(1deg);
-}
-article:nth-child(3) {
-  transform: rotate(-0.5deg);
 }
 article::before {
   counter-increment: setlist;
@@ -97,10 +90,7 @@ h2 {
   .setlist-steps {
     grid-template-columns: 1fr;
   }
-  article,
-  article:nth-child(2),
-  article:nth-child(3) {
-    transform: none;
+  article {
     box-shadow: 4px 6px 0 var(--brand-onyx);
   }
 }
