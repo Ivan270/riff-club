@@ -80,23 +80,16 @@ a {
   display: block;
   flex: 0 0 auto;
   width: 100%;
+  height: 3px;
   background: var(--ink);
 }
 .instrument-mark.electric {
   background: var(--acid);
 }
-.instrument-mark.electric span,
-.instrument-mark.acoustic span {
-  height: 3px;
-}
 .instrument-mark.acoustic {
   background: linear-gradient(90deg, var(--paper-aged), var(--brand-sand));
 }
 .instrument-mark.bass {
-  gap: 10px;
   background: var(--purple);
-}
-.instrument-mark.bass span {
-  height: 4px;
 }
 </style>

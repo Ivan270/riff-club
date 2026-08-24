@@ -61,7 +61,6 @@ const navItems = [
   background: var(--header-bg);
   border-bottom: 3px solid var(--section-border);
   backdrop-filter: blur(10px);
-  box-shadow: 0 10px 0 color-mix(in srgb, var(--brand-onyx) 30%, transparent);
 }
 
 .brand {
@@ -121,14 +120,14 @@ nav {
   bottom: 0;
   height: 4px;
   background: var(--acid);
-  transform: scaleX(0) rotate(-1deg);
+  transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.16s ease;
 }
 
 .nav-link:hover::after,
 .nav-link.active::after {
-  transform: scaleX(1) rotate(-1deg);
+  transform: scaleX(1);
 }
 
 .nav-link.active {
@@ -139,19 +138,12 @@ nav {
   background: var(--red);
   color: var(--ink);
   border: 2px solid var(--paper);
-  box-shadow: 4px 4px 0 var(--acid);
-  transform: rotate(1deg);
 }
 
 .nav-cta:hover,
 .nav-cta.active {
-  background: var(--acid);
+  background: var(--red);
   color: var(--ink);
-  box-shadow: 4px 4px 0 var(--red);
-}
-
-.nav-cta::after {
-  background: var(--ink);
 }
 
 @media (max-width: 900px) {

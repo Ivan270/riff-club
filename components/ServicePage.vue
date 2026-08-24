@@ -11,11 +11,10 @@ onMounted(async () => {
     const page = servicePageRef.value
     const animatedElements = page ? Array.from(page.querySelectorAll<HTMLElement>('.service-motion-target')) : []
 
-    animatedElements.forEach((element, index) => {
+    animatedElements.forEach((element) => {
       gsap.from(element, {
         y: 28,
         opacity: 0,
-        rotate: index % 2 === 0 ? -2 : 2,
         duration: 0.48,
         ease: 'back.out(1.4)',
         scrollTrigger: {
@@ -137,7 +136,6 @@ defineProps<{
 .area-panel {
   background: var(--paper);
   color: var(--ink);
-  transform: rotate(1deg);
 }
 
 .venue-note {
@@ -187,12 +185,10 @@ p {
   font-weight: var(--weight-semibold);
   text-decoration: none;
   clip-path: polygon(0 8%, 96% 0, 100% 92%, 4% 100%);
-  transform: rotate(-1deg);
 }
 
 .related-links a:nth-child(2) {
   background: var(--paper);
-  transform: rotate(1deg);
 }
 
 .service-page--red {
@@ -230,12 +226,6 @@ p {
 
   .venue-note {
     box-shadow: -4px 6px 0 var(--area-accent);
-  }
-
-  .area-panel,
-  .related-links a,
-  .related-links a:nth-child(2) {
-    transform: none;
   }
 
   .related-links a {
