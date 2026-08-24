@@ -214,12 +214,15 @@ assert(css.includes('--weight-heavy: 800'), 'Typography tokens must define the h
 assert(css.includes('--type-hero: clamp(3.5rem, 7vw, 7.5rem)'), 'Typography tokens must define the responsive hero scale')
 assert(css.includes('--type-body: clamp(1rem, 1.1vw, 1.125rem)'), 'Typography tokens must define the readable body scale')
 assert(css.includes('--type-ui: clamp(1rem, 1vw, 1rem)'), 'Interactive UI typography must not fall below 16px')
-assert(css.includes('--purple-link-text: var(--paper)'), 'Light theme must define a readable purple link foreground')
+assert(css.includes('--purple-link-text: var(--surface-paper)'), 'Light theme must define a readable purple link foreground')
 assert(css.includes('font-size: var(--type-body);'), 'Body must use the shared body type token')
 assert(css.includes('font-weight: var(--weight-heavy);'), 'Global headings must use the shared heavy weight token')
 assert(css.includes('--font-heading'), 'Global CSS must define an editorial heading font variable')
 const cssWithoutComments = stripCssComments(css)
 const normalizedCss = cssWithoutComments.toLowerCase()
+const darkThemeBlock = normalizedCss.match(/:root\s*,\s*\[data-theme="dark"\]\s*\{([\s\S]*?)\}/)?.[1] ?? ''
+const lightThemeBlock = normalizedCss.match(/\[data-theme="light"\]\s*\{([\s\S]*?)\}/)?.[1] ?? ''
+const hasDeclaration = (block, token, value) => new RegExp(`(?:^|;)\\s*${token}\\s*:\\s*${value}\\s*;`).test(block)
 const primitiveBlock = `:root {
   --brand-onyx: #101010;
   --brand-old-lace: #fff7e8;
@@ -247,6 +250,33 @@ for (const [token, value] of [
   const declarations = [...normalizedCss.matchAll(declarationPattern)].map((match) => match[1])
   const exactDeclaration = new RegExp(`^${token}\\s*:\\s*${value}\\s*;$`)
   assert(declarations.length === 1 && exactDeclaration.test(declarations[0]), `${token} must be declared exactly once with the approved palette value`)
+}
+
+for (const [token, value] of [
+  ['--page-bg', 'var\\(--brand-onyx\\)'],
+  ['--page-text', 'var\\(--brand-old-lace\\)'],
+  ['--surface', 'var\\(--brand-graphite\\)'],
+  ['--surface-paper', 'var\\(--brand-old-lace\\)'],
+  ['--muted', 'var\\(--brand-bone\\)'],
+  ['--border', 'var\\(--brand-old-lace\\)'],
+  ['--accent-primary', 'var\\(--brand-lime\\)'],
+  ['--accent-secondary', 'var\\(--brand-cinnabar\\)'],
+  ['--accent-cultural', 'var\\(--brand-lavender\\)']
+]) {
+  assert(hasDeclaration(darkThemeBlock, token, value), `${token} must use the approved dark/root semantic mapping`)
+}
+for (const [token, value] of [
+  ['--page-bg', 'var\\(--brand-old-lace\\)'],
+  ['--page-text', 'var\\(--brand-onyx\\)'],
+  ['--surface', 'var\\(--brand-sand\\)'],
+  ['--surface-paper', 'var\\(--brand-old-lace\\)'],
+  ['--muted', 'var\\(--brand-stone\\)'],
+  ['--border', 'var\\(--brand-onyx\\)'],
+  ['--accent-primary', 'var\\(--brand-lime\\)'],
+  ['--accent-secondary', 'var\\(--brand-cinnabar\\)'],
+  ['--accent-cultural', 'var\\(--brand-lavender\\)']
+]) {
+  assert(hasDeclaration(lightThemeBlock, token, value), `${token} must use the approved light semantic mapping`)
 }
 
 const cssWithoutPrimitiveBlock = normalizedCss.slice(primitiveBlock.length)
@@ -290,7 +320,7 @@ for (const [source, selector] of [
 }
 assert(css.includes('background: var(--page-bg);'), 'html background must use page background variable')
 assert(css.includes('color: var(--page-text);'), 'body text must use page text variable')
-assert(css.includes('--bg-end: var(--brand-sand)'), 'Light theme must use Sand as its visibly light final background stop')
+assert(css.includes('--bg-end: var(--surface)'), 'Light theme must use its Sand surface as the final background stop')
 assert(css.includes('overflow-x: clip'), 'Global CSS must clip horizontal overflow')
 assert(!css.includes('color-scheme: dark light'), 'Global CSS must not advertise both schemes globally')
 
