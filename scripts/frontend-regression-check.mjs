@@ -1,9 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { createHash } from 'node:crypto'
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
 const readBuffer = (path) => readFileSync(new URL(`../${path}`, import.meta.url))
-const sha256 = (path) => createHash('sha256').update(readBuffer(path)).digest('hex')
 const readPngSize = (path) => {
   const image = readBuffer(path)
   return [image.readUInt32BE(16), image.readUInt32BE(20)]
@@ -65,10 +63,11 @@ assert(footer.includes('rel="noopener noreferrer nofollow"'), 'SiteFooter develo
 assert(header.includes('aria-current'), 'SiteHeader must expose active page with aria-current')
 assert(header.includes('ThemeToggle'), 'SiteHeader must render ThemeToggle')
 assert(header.includes('<MobileMenu'), 'SiteHeader must render the responsive mobile menu')
-assert(mobileMenu.includes('/isotype-dark.svg'), 'Mobile menu must use the dark theme isotype')
-assert(mobileMenu.includes('/isotype-light.svg'), 'Mobile menu must use the light theme isotype')
-assert(mobileMenu.includes('aria-expanded'), 'Mobile menu trigger must expose aria-expanded')
-assert(mobileMenu.includes('aria-controls="mobile-menu"'), 'Mobile menu trigger must identify the controlled menu')
+assert(mobileMenu.includes('class="menu-strings"'), 'Mobile trigger must use the three-string brand gesture')
+assert((mobileMenu.match(/class="menu-string"/g) ?? []).length === 3, 'Mobile trigger must render exactly three strings')
+assert(!mobileMenu.includes('<img :src="isotypeSrc"'), 'Mobile trigger must not duplicate the full isotipo')
+assert(mobileMenu.includes('aria-expanded'), 'Mobile trigger must retain its expanded state')
+assert(mobileMenu.includes('aria-controls="mobile-menu"'), 'Mobile trigger must retain its controlled dialog reference')
 assert(mobileMenu.includes('keydown'), 'Mobile menu must handle keyboard dismissal and focus navigation')
 assert(mobileMenu.includes("event.key === \"Escape\""), 'Mobile menu must close on Escape')
 assert(mobileMenu.includes('body.style.overflow'), 'Mobile menu must lock body scrolling while open')
@@ -77,14 +76,15 @@ assert(mobileMenu.includes('@click="closeMenu"'), 'Mobile menu links must close 
 assert(mobileMenu.includes('<Teleport to="body">'), 'Mobile menu overlay must escape the clipped header')
 assert(mobileMenu.includes('resize'), 'Mobile menu must close when resizing back to desktop')
 assert(mobileMenu.includes('@media (max-width: 900px)'), 'Mobile menu must target tablet and mobile widths')
-assert(header.includes('/badge-navbar-dark.svg'), 'SiteHeader must render the dark theme badge')
-assert(header.includes('/badge-navbar-light.svg'), 'SiteHeader must render the light theme badge')
-assert(header.includes('theme.value === "light" ? "/badge-navbar-light.svg" : "/badge-navbar-dark.svg"'), 'SiteHeader must map light and dark themes to the correct badges')
-assert(header.includes('class="brand-badge"'), 'SiteHeader must expose the navbar badge class')
-assert(header.includes('<img class="brand-badge" :src="badgeSrc" alt="Riff Club" />'), 'SiteHeader badge must retain accessible brand text')
-assert(header.includes('<NuxtLink class="brand" to="/" aria-label="Ir al inicio">'), 'SiteHeader badge must remain linked to the homepage')
-assert(header.includes('width: clamp(68px, 5vw, 72px);'), 'SiteHeader badge must use the approved compact size')
-assert(!header.includes('class="brand-logo"'), 'SiteHeader must not keep the horizontal navbar logo')
+assert(header.includes('/logo-full-dark.svg'), 'Desktop header must include the dark horizontal logo')
+assert(header.includes('/logo-full-light.svg'), 'Desktop header must include the light horizontal logo')
+assert(header.includes('/isotype-dark.svg'), 'Mobile header must include the dark standard isotipo')
+assert(header.includes('/isotype-light.svg'), 'Mobile header must include the light standard isotipo')
+assert(header.includes('class="brand-logo"'), 'Header must expose the desktop horizontal logo class')
+assert(header.includes('class="brand-symbol"'), 'Header must expose the mobile isotipo class')
+assert(header.includes('min-width: 180px'), 'Desktop logo must enforce the 180px minimum')
+assert(header.includes('width: 52px'), 'Mobile brand symbol must render in the approved 48–56px range')
+assert(!header.includes('/badge-navbar-'), 'Header must not use the badge below its 96px minimum')
 assert(!header.match(/<NuxtLink[^>]*class="brand"[^>]*>\s*Riff Club\s*<\/NuxtLink>/), 'SiteHeader must not render the brand as plain text')
 assert(nuxtConfig.includes("{ rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }"), 'Nuxt must use the SVG favicon with its MIME type')
 assert(nuxtConfig.includes("{ rel: 'icon', href: '/favicon.ico', sizes: 'any' }"), 'Nuxt must define the ICO favicon fallback')
@@ -175,8 +175,6 @@ for (const icon of webManifest.icons ?? []) {
 }
 assert(!existsSync(new URL('../public/logo-full.svg', import.meta.url)), 'Legacy logo-full.svg must be removed')
 assert(!existsSync(new URL('../public/isotype.svg', import.meta.url)), 'Legacy isotype.svg must be removed')
-assert(sha256('public/badge-navbar-dark.svg') === 'c5abed44cbaa423e857fa95574785747b4353a617a55bf9f01511f81e8c4fb20', 'Dark navbar badge must match the approved negative master')
-assert(sha256('public/badge-navbar-light.svg') === '3102d0f262c9204a7634b9a833cbb9d37ef441b33c6d8a3684d72492dd62bd7e', 'Light navbar badge must match the approved positive master')
 assert(css.includes('[data-theme="light"]'), 'Global CSS must define light theme variables')
 assert(css.includes('--page-bg'), 'Global CSS must separate page background from ink text color')
 assert(css.includes('--page-text'), 'Global CSS must separate page text from paper surface color')
@@ -197,6 +195,25 @@ assert(css.includes('--purple-link-text: var(--paper)'), 'Light theme must defin
 assert(css.includes('font-size: var(--type-body);'), 'Body must use the shared body type token')
 assert(css.includes('font-weight: var(--weight-heavy);'), 'Global headings must use the shared heavy weight token')
 assert(css.includes('--font-heading'), 'Global CSS must define an editorial heading font variable')
+for (const [token, value] of [
+  ['--brand-onyx', '#101010'],
+  ['--brand-old-lace', '#fff7e8'],
+  ['--brand-lime', '#d8ff00'],
+  ['--brand-lavender', '#a855f7'],
+  ['--brand-cinnabar', '#ff3b30'],
+  ['--brand-graphite', '#2a2a2a'],
+  ['--brand-sand', '#eadfc7'],
+  ['--brand-bone', '#d8d0bf'],
+  ['--brand-stone', '#5e574c']
+]) {
+  assert(css.toLowerCase().includes(`${token}: ${value}`), `${token} must use the approved palette value`)
+}
+
+for (const forbidden of ['#050505', '#241f1a', '#fff8e9', '#c5f000', '#e93227', '#8f45dd', '#f3d173']) {
+  assert(!css.toLowerCase().includes(forbidden), `Global CSS must not use off-palette color ${forbidden}`)
+}
+
+assert(css.includes('--font-ui: var(--font-display)'), 'Navigation, button, and label typography must use Bricolage')
 assert(css.includes('background: var(--page-bg);'), 'html background must use page background variable')
 assert(css.includes('color: var(--page-text);'), 'body text must use page text variable')
 assert(css.includes('--bg-end: #fff0cf'), 'Light theme must use a visibly light final background stop')
