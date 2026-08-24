@@ -8,11 +8,19 @@ const readStyles = (source) => [...source.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?
 const readInlineStyles = (source) => [...stripVueComments(source).matchAll(/(?:^|\s):?style\s*=\s*(["'])([\s\S]*?)\1/g)]
   .map((match) => match[2])
   .join(';')
-const isColorDeclaration = (property) => {
+const colorCustomProperties = new Set([
+  '--ink', '--paper', '--paper-aged', '--acid', '--acid-glow', '--red', '--red-glow', '--purple', '--purple-link-text', '--gray',
+  '--muted', '--muted-on-dark', '--muted-ink', '--border', '--surface', '--surface-paper', '--page-bg', '--page-text',
+  '--bg-start', '--bg-mid', '--bg-end', '--grid-line', '--grain-light', '--grain-dark', '--section-bg', '--section-bg-start',
+  '--section-bg-end', '--section-text', '--section-muted', '--section-border', '--section-overlay', '--header-bg', '--shadow-hard',
+  '--service-accent', '--area-accent'
+])
+const hasDirectColorSyntax = (value) => /#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b|\b(?:rgb|rgba|hsl|hsla|oklch|lab|lch|hwb|color|color-mix|(?:repeating-)?(?:linear|radial|conic)-gradient)\s*\(/i.test(value)
+const isColorDeclaration = (property, value) => {
   if (property.startsWith('--')) {
-    return !/^--(?:max|font-(?:display|ui|heading|body)|weight-.+|type-.+|leading-.+|tracking-.+)$/.test(property)
+    return /^--(?:brand-|accent-)/.test(property) || colorCustomProperties.has(property) || hasDirectColorSyntax(value)
   }
-  return /^(?:color|background(?:-.+)?|border(?:-.+)?|outline(?:-.+)?|box-shadow|text-shadow|fill|stroke|caret-color|accent-color|text-decoration-color)$/.test(property)
+  return /^(?:color|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left))?|border-color|border-(?:top|right|bottom|left)-color|outline|outline-color|box-shadow|text-shadow|fill|stroke|caret-color|accent-color|text-decoration-color)$/.test(property)
 }
 const readFunctionCalls = (source, functionName) => {
   const calls = []
@@ -37,19 +45,55 @@ const readFunctionCalls = (source, functionName) => {
   }
   return calls
 }
+const splitFunctionArguments = (call) => {
+  const body = call.slice(call.indexOf('(') + 1, -1)
+  const parts = []
+  let depth = 0
+  let start = 0
+
+  for (let index = 0; index < body.length; index += 1) {
+    if (body[index] === '(') depth += 1
+    if (body[index] === ')') depth -= 1
+    if (body[index] === ',' && depth === 0) {
+      parts.push(body.slice(start, index).trim())
+      start = index + 1
+    }
+  }
+  parts.push(body.slice(start).trim())
+  return parts
+}
 const auditRuntimeColors = (source) => {
   const violations = []
   const declarations = stripCssComments(`${source};`).matchAll(/((?:--)?[\w-]+)\s*:\s*([^;{}]+)\s*(?:;|(?=\}))/g)
+  const approvedKeywords = new Set(['transparent', 'currentcolor', 'inherit', 'initial', 'revert', 'revert-layer', 'unset'])
+  const noneProperties = /^(?:background(?:-image)?|border(?:-(?:top|right|bottom|left))?|outline|box-shadow|text-shadow|fill|stroke)$/
+  const gradientFunctions = ['linear-gradient', 'repeating-linear-gradient', 'radial-gradient', 'repeating-radial-gradient', 'conic-gradient', 'repeating-conic-gradient']
 
   for (const [, property, value] of declarations) {
-    if (!isColorDeclaration(property.toLowerCase())) continue
+    const normalizedProperty = property.toLowerCase()
+    const normalizedValue = value.trim().replace(/\s*!important\s*$/i, '').toLowerCase()
+    if (!isColorDeclaration(normalizedProperty, normalizedValue)) continue
 
     for (const match of value.matchAll(/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b|\b(?:rgb|rgba|hsl|hsla|oklch|lab|lch|hwb|color)\s*\(|\b(?:black|white)\b/gi)) {
       violations.push(`${property}: ${match[0]}`)
     }
+    if (/^[a-z][\w-]*$/i.test(normalizedValue) && !approvedKeywords.has(normalizedValue) && !(normalizedValue === 'none' && noneProperties.test(normalizedProperty))) {
+      violations.push(`${property}: unsupported direct color ${normalizedValue}`)
+    }
     for (const call of readFunctionCalls(value, 'color-mix')) {
       if (!/^color-mix\(\s*in\s+srgb\s*,\s*var\(--[\w-]+\)(?:\s+[\d.]+%)?\s*,\s*(?:var\(--[\w-]+\)|transparent|currentcolor|inherit)(?:\s+[\d.]+%)?\s*\)$/i.test(call)) {
         violations.push(`${property}: color-mix() must derive from a token`)
+      }
+    }
+    for (const functionName of gradientFunctions) {
+      for (const call of readFunctionCalls(value, functionName)) {
+        for (const [index, argument] of splitFunctionArguments(call).entries()) {
+          if (index === 0 && /^(?:-?[\d.]+(?:deg|rad|turn)|to\b|from\b|at\b|circle\b|ellipse\b|closest-|farthest-)/i.test(argument)) continue
+          const identifier = argument.match(/^([a-z][\w-]*)\b/i)?.[1].toLowerCase()
+          if (identifier && !approvedKeywords.has(identifier) && !['var', 'color-mix'].includes(identifier)) {
+            violations.push(`${property}: unsupported gradient color ${identifier}`)
+          }
+        }
       }
     }
   }
@@ -71,6 +115,15 @@ const usesFontUi = (source, selector) => {
   return [...rules].some(([, selectorList, declarations]) =>
     selectorList.split(',').some((candidate) => candidate.trim() === selector)
     && /(?:^|;)\s*font-family\s*:\s*var\(--font-ui\)\s*;/.test(declarations)
+  )
+}
+const usesDeclaration = (source, selector, property, value) => {
+  const style = readStyles(source)
+  const rules = stripCssComments(style).matchAll(/([^{}]+)\{([^{}]*)\}/g)
+
+  return [...rules].some(([, selectorList, declarations]) =>
+    selectorList.split(',').some((candidate) => candidate.trim() === selector)
+    && new RegExp(`(?:^|;)\\s*${property}\\s*:\\s*${value}\\s*;`).test(declarations)
   )
 }
 const readPngSize = (path) => {
@@ -103,12 +156,19 @@ const safeVueNoise = '<p class="black white">black white oklch(1 0 0)</p><!-- <i
 assert(auditRuntimeColors(readInlineStyles(safeVueNoise)).length === 0, 'Runtime color audit must ignore Vue text, classes, and comments')
 assert(auditRuntimeColors(readInlineStyles('<i style="color: black"></i>')).length > 0, 'Runtime color audit must inspect static Vue template inline styles')
 assert(auditRuntimeColors(readInlineStyles(`<i :style="{ color: 'oklch(60% 0.2 20)' }"></i>`)).length > 0, 'Runtime color audit must inspect bound Vue template inline styles')
+assert(auditRuntimeColors('.fixture { color: red; }').length > 0, 'Runtime color audit must reject arbitrary named text colors')
+assert(auditRuntimeColors('.fixture { background: rebeccapurple; }').length > 0, 'Runtime color audit must reject arbitrary named background colors')
+assert(auditRuntimeColors('.fixture { background: linear-gradient(var(--paper), rebeccapurple); }').length > 0, 'Runtime color audit must reject arbitrary named colors nested in gradients')
+assert(auditRuntimeColors('.fixture { color: initial; border-color: revert; outline-color: revert-layer; text-decoration-color: unset; background: none; }').length === 0, 'Runtime color audit must allow approved cascade keywords and property-appropriate none')
+assert(auditRuntimeColors('.fixture { color: none; }').length > 0, 'Runtime color audit must reject none where the property does not support it')
+assert(auditRuntimeColors(':root { --status-label: red; --font-sample: "Arial Black"; }').length === 0, 'Runtime color audit must not treat arbitrary custom labels or font names as colors')
 
 const hero = read('components/HeroZine.vue')
 const home = read('pages/index.vue')
 const footer = read('components/SiteFooter.vue')
 const header = read('components/SiteHeader.vue')
 const mobileMenu = readOptional('components/MobileMenu.vue')
+const servicePage = read('components/ServicePage.vue')
 const themeToggle = read('components/ThemeToggle.vue')
 const nuxtConfig = read('nuxt.config.ts')
 const netlifyConfig = readOptional('netlify.toml')
@@ -130,16 +190,26 @@ const servicePages = [
   'pages/clases-guitarra-acustica.vue',
   'pages/clases-bajo.vue'
 ].map((path) => [path, read(path)])
-const vueFiles = ['components', 'pages'].flatMap((directory) =>
-  readdirSync(new URL(`../${directory}`, import.meta.url), { recursive: true })
-    .filter((path) => typeof path === 'string' && path.endsWith('.vue'))
-    .map((path) => `${directory}/${path}`)
-).map((path) => [path, read(path)])
+const runtimeVuePaths = [
+  ...(existsSync(new URL('../app.vue', import.meta.url)) ? ['app.vue'] : []),
+  ...['components', 'pages', 'layouts'].flatMap((directory) => {
+    const directoryUrl = new URL(`../${directory}`, import.meta.url)
+    if (!existsSync(directoryUrl)) return []
+    return readdirSync(directoryUrl, { recursive: true })
+      .filter((path) => typeof path === 'string' && path.endsWith('.vue'))
+      .map((path) => `${directory}/${path}`)
+  })
+]
+const vueFiles = runtimeVuePaths.map((path) => [path, read(path)])
 const vueStyleFiles = vueFiles.map(([path, source]) => [path, readStyles(source).toLowerCase()])
 const vueInlineStyleFiles = vueFiles.map(([path, source]) => [`${path} inline styles`, readInlineStyles(source).toLowerCase()])
 const additionalCssFiles = readdirSync(new URL('../assets/css', import.meta.url), { recursive: true })
   .filter((path) => typeof path === 'string' && path.endsWith('.css') && path !== 'main.css')
   .map((path) => [`assets/css/${path}`, stripCssComments(read(`assets/css/${path}`)).toLowerCase()])
+
+assert(vueFiles.some(([path]) => path === 'app.vue'), 'Runtime Vue audit must include root app.vue')
+assert(runtimeVuePaths.every((path) => !/(?:^|\/)(?:docs|node_modules|\.agents|\.superpowers|\.nuxt|\.output|dist)(?:\/|$)/.test(path)), 'Runtime Vue audit must exclude documentation, dependencies, agent files, and generated output')
+assert(usesDeclaration(servicePage, '.service-page--purple .related-links a:first-child', 'color', 'var\\(--purple-link-text\\)'), 'Purple service links must consume color: var(--purple-link-text) in their scoped rule')
 
 assert(hero.includes('56995296324'), 'Hero WhatsApp CTA must use 56995296324')
 assert(!hero.includes('56912345678'), 'Hero WhatsApp CTA must not use placeholder number')
@@ -456,7 +526,7 @@ for (const [source, selector] of [
   [read('components/ServiceCard.vue'), 'a'],
   [footer, '.footer-stamp'],
   [footer, '.site-credit'],
-  [read('components/ServicePage.vue'), '.related-links a'],
+  [servicePage, '.related-links a'],
   [home, '.setlist-panel::after'],
   [read('pages/sobre-mi.vue'), 'article::before']
 ]) {
@@ -500,7 +570,7 @@ assert(!home.includes('scale: 6.8'), 'Homepage services eyebrow must not use ext
 assert(!home.includes('fontSize: "clamp(5rem, 18vw, 18rem)"'), 'Homepage services eyebrow font-size animation must be removed')
 assert(home.includes('ScrollTrigger.refresh()'), 'Homepage scroll animation must refresh ScrollTrigger after setup')
 assert(home.includes('font-family: var(--font-heading)'), 'Homepage h2 hierarchy must use the editorial heading font')
-assert(read('components/ServicePage.vue').includes('font-family: var(--font-heading)'), 'Service page h2 hierarchy must use the editorial heading font')
+assert(servicePage.includes('font-family: var(--font-heading)'), 'Service page h2 hierarchy must use the editorial heading font')
 assert(read('pages/contacto.vue').includes('font-family: var(--font-heading)'), 'Contact page h2 hierarchy must use the editorial heading font')
 assert(read('pages/sobre-mi.vue').includes('font-family: var(--font-display)'), 'About page h2 hierarchy must use the expressive display font')
 
