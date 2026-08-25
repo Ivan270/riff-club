@@ -131,7 +131,7 @@ nav {
 }
 
 .nav-link.active {
-  color: var(--red);
+  color: var(--page-text);
 }
 
 .nav-cta {

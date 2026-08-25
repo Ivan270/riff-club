@@ -70,7 +70,7 @@ article::before {
   position: absolute;
   top: 14px;
   left: 18px;
-  color: var(--red);
+  color: var(--ink);
   font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);

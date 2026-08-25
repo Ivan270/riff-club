@@ -230,6 +230,17 @@ const readNumericMap = (source, variableName) => {
 const hasVueForExpression = (source, item, expression) => new RegExp(
   `\\bv-for\\s*=\\s*(["'])\\s*${item}\\s+in\\s+${expression}\\s*\\1`,
 ).test(stripVueComments(source))
+const stripSourceComments = (source) => stripVueComments(source)
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^\w:])\/\/.*$/gm, '$1')
+const readComputedArrowExpression = (source, variableName) => normalizeWhitespace(
+  stripSourceComments(source).match(new RegExp(
+    `const\\s+${variableName}\\s*=\\s*computed\\s*\\(\\s*\\(\\s*\\)\\s*=>\\s*([\\s\\S]*?)\\s*,?\\s*\\)\\s*;`,
+  ))?.[1] ?? '',
+)
+const hasExactFooterLogoMapping = (source) => /^(?:theme\.value)\s*===\s*(["'])light\1\s*\?\s*(["'])\/logo-full-light\.svg\2\s*:\s*(["'])\/logo-full-dark\.svg\3$/.test(
+  readComputedArrowExpression(source, 'footerLogoSrc'),
+)
 const readSvgFills = (source) => new Set([...source.matchAll(/\bfill\s*=\s*(["'])(#[0-9a-f]{6})\1/gi)]
   .map(([, , fill]) => fill.toLowerCase()))
 const readPngSize = (path) => {
@@ -294,6 +305,12 @@ const structuralContractFixture = `<div data-test="fixture" class = 'alpha targe
 assert(hasStaticClass(structuralContractFixture, 'target'), 'Source contracts must read static classes independent of attribute order and spacing')
 const structuralImageFixture = readOpeningTags(readElementContentByClass(structuralContractFixture, 'div', 'target'), 'img')[0] ?? ''
 assert(hasAttribute(structuralImageFixture, 'alt', '') && hasAttribute(structuralImageFixture, 'aria-hidden', 'true'), 'Source contracts must read attributes independent of order and spacing')
+const misleadingFooterMappingFixture = `
+  // const footerLogoSrc = computed(() => theme.value === "light" ? "/logo-full-light.svg" : "/logo-full-dark.svg");
+  const footerLogoSrc = computed(() => theme.value === "light" ? "/logo-full-dark.svg" : "/logo-full-light.svg");
+`
+assert(!hasExactFooterLogoMapping(misleadingFooterMappingFixture), 'Footer logo mapping contract must ignore comments and inspect only footerLogoSrc')
+assert(hasExactFooterLogoMapping('const footerLogoSrc = computed(() => theme.value === "light" ? "/logo-full-light.svg" : "/logo-full-dark.svg");'), 'Footer logo mapping contract must accept the exact theme mapping declaration')
 
 const hero = read('components/HeroZine.vue')
 const home = read('pages/index.vue')
@@ -375,6 +392,7 @@ for (const selector of ['.nav-link::after', '.nav-link:hover::after', '.nav-link
 }
 assert(hasDeclaration(header, '.nav-link::after', 'background', 'var(--acid)'), 'SiteHeader must retain its Lime navigation underline')
 assert(hasDeclaration(header, '.nav-cta', 'background', 'var(--red)'), 'SiteHeader must retain its Cinnabar navigation CTA')
+assert(hasDeclaration(header, '.nav-link.active', 'color', 'var(--page-text)'), 'SiteHeader active link text must consume the accessible theme-neutral text token')
 const serviceStringCounts = readNumericMap(serviceCard, 'stringCountByVariant')
 assert(serviceStringCounts.electric === 6 && serviceStringCounts.acoustic === 6 && serviceStringCounts.bass === 4, 'ServiceCard must explicitly define electric/acoustic/bass string counts as 6/6/4')
 const instrumentMarkContent = readElementContentByClass(serviceCard, 'div', 'instrument-mark')
@@ -396,8 +414,7 @@ assert(!contactCta.includes('tear-edge') && !contactCta.includes('tear-offs') &&
 assert(hasStaticClass(footer, 'footer-logo'), 'SiteFooter must include the approved horizontal logo')
 const footerLogoImage = readOpeningTags(footer, 'img').find((tag) => hasAttribute(tag, 'class', 'footer-logo')) ?? ''
 assert(hasAttribute(footerLogoImage, ':src', 'footerLogoSrc'), 'SiteFooter must render its theme-aware logo source')
-const normalizedFooter = normalizeWhitespace(footer)
-assert(/theme\.value\s*===\s*(["'])light\1\s*\?\s*(["'])\/logo-full-light\.svg\2\s*:\s*(["'])\/logo-full-dark\.svg\3/.test(normalizedFooter), 'SiteFooter must map light theme to logo-full-light and dark theme to logo-full-dark')
+assert(hasExactFooterLogoMapping(footer), 'SiteFooter footerLogoSrc must map light theme to logo-full-light and dark theme to logo-full-dark')
 assert(readSvgFills(logoFullLight).size === 1 && readSvgFills(logoFullLight).has('#101010'), 'logo-full-light must be the Onyx horizontal logo for light surfaces')
 assert(readSvgFills(logoFullDark).size === 1 && readSvgFills(logoFullDark).has('#fff7e8'), 'logo-full-dark must be the Old Lace horizontal logo for dark surfaces')
 assert(hasDeclaration(footer, '.footer-logo', 'min-width', '180px'), 'SiteFooter horizontal logo must render at least 180px wide')
@@ -408,6 +425,7 @@ assert(!home.includes('radial-gradient('), 'Homepage pain flyer must not stack c
 assert(contrastRatio('#101010', '#fff7e8') >= 4.5, 'Onyx text on Old Lace must meet WCAG AA contrast')
 assert(contrastRatio('#ff3b30', '#fff7e8') < 4.5, 'Cinnabar text on Old Lace contrast fixture must remain below the AA threshold')
 assert(hasDeclaration(home, '.pain-flyer .eyebrow', 'color', 'var(--ink)'), 'Pain flyer eyebrow must consume accessible Onyx text on its paper surface')
+assert(hasDeclaration(about, 'article::before', 'color', 'var(--ink)'), 'About article counters must consume accessible Onyx text on their paper surfaces')
 assert(!home.includes('.note:nth-child') && !/\.note\s*\{[^}]*transform:\s*rotate/s.test(home), 'Homepage pain notes must use a stable grid without independent rotations')
 assert(!/\.contact-form-card::before|\.faq-row::before/.test(contact), 'Contact surfaces must not stack tape or floating-circle decoration')
 assert(!/transform:\s*rotate/.test(contact), 'Contact cards and panels must remain aligned')
