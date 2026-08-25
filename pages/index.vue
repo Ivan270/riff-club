@@ -85,10 +85,12 @@ onMounted(async () => {
           scrollTrigger: {
             trigger: flyer,
             start: "top top",
-            end: "+=135%",
+            end: () => `+=${Math.max(flyer.scrollHeight, window.innerHeight)}`,
             scrub: 0.8,
             pin: true,
+            pinSpacing: true,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
           },
         })
         .from(".pain-flyer__sheet", {
@@ -107,23 +109,21 @@ onMounted(async () => {
         .from(
           "#dolores-title",
           {
-            y: 46,
+            y: 22,
             opacity: 0,
-            scale: 0.88,
-            duration: 0.28,
-            ease: "back.out(1.4)",
+            duration: 0.24,
+            ease: "power2.out",
           },
           "-=0.06",
         )
         .from(
           ".pain-flyer .note",
           {
-            y: 70,
+            y: 20,
             opacity: 0,
-            scale: 0.82,
-            duration: 0.3,
-            stagger: 0.08,
-            ease: "back.out(1.8)",
+            duration: 0.24,
+            stagger: 0.06,
+            ease: "power2.out",
           },
           "+=0.08",
         )

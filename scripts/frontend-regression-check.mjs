@@ -66,6 +66,53 @@ const splitFunctionArguments = (call) => {
   parts.push(body.slice(start).trim())
   return parts
 }
+const splitJavaScriptArguments = (call) => {
+  const body = call.slice(call.indexOf('(') + 1, -1)
+  const parts = []
+  const closingToken = { '(': ')', '[': ']', '{': '}' }
+  const stack = []
+  let quote = ''
+  let escaped = false
+  let start = 0
+
+  for (let index = 0; index < body.length; index += 1) {
+    const character = body[index]
+    if (quote) {
+      if (escaped) escaped = false
+      else if (character === '\\') escaped = true
+      else if (character === quote) quote = ''
+      continue
+    }
+    if (character === '"' || character === "'" || character === '`') {
+      quote = character
+      continue
+    }
+    if (closingToken[character]) stack.push(closingToken[character])
+    else if (character === stack.at(-1)) stack.pop()
+    else if (character === ',' && stack.length === 0) {
+      parts.push(body.slice(start, index).trim())
+      start = index + 1
+    }
+  }
+  parts.push(body.slice(start).trim())
+  return parts
+}
+const readGsapTween = (source, methodName, selector) => readFunctionCalls(source, methodName)
+  .map((call) => splitJavaScriptArguments(call))
+  .filter(([target]) => target?.slice(1, -1) === selector)
+  .map(([, options = '', position = '']) => ({ options, position }))
+const readNumericProperty = (source, property) => Number(source.match(
+  new RegExp(`(?:^|[,\\s])${property}\\s*:\\s*(-?[\\d.]+)`),
+)?.[1])
+const readStringProperty = (source, property) => source.match(
+  new RegExp(`(?:^|[,\\s])${property}\\s*:\\s*(["'])(.*?)\\1`),
+)?.[2]
+const tweenActiveEnd = ({ options, position }, targetCount = 1) => {
+  const start = Number(position)
+  const duration = readNumericProperty(options, 'duration')
+  const stagger = readNumericProperty(options, 'stagger') || 0
+  return start + duration + stagger * (targetCount - 1)
+}
 const removeFunctionCalls = (source, functionNames) => {
   let result = source
   for (const functionName of functionNames) {
@@ -763,9 +810,43 @@ assert(motion.includes("import('gsap/ScrollTrigger')"), 'ScrollTrigger must be d
 assert(motion.includes('prefers-reduced-motion: reduce'), 'Motion composable must respect reduced motion')
 assert(motion.includes('gsap.context'), 'Motion composable must use gsap.context for cleanup')
 assert(!motion.includes('scrollerProxy'), 'Motion composable must not use scroll-jacking APIs')
+const heroCopyTweens = readGsapTween(hero, 'from', '.hero-copy > *')
+const heroPosterTweens = readGsapTween(hero, 'from', '.poster')
+const heroStringTweens = readGsapTween(hero, 'from', '.string-lines span')
+const heroBrandTweens = readGsapTween(hero, 'from', '.poster-brand')
+const heroDetailTweens = readGsapTween(hero, 'from', '.poster-tape, .poster-local, .poster-note')
+const heroMotionTweens = [heroCopyTweens[0], heroPosterTweens[0], heroStringTweens[0], heroBrandTweens[0], heroDetailTweens[0]]
+assert(!/back\.out|elastic/i.test(hero), 'Hero motion must not use back or elastic overshoot')
+assert(heroCopyTweens.length === 1, 'Hero copy must rise in one clear entrance tween')
+assert(readNumericProperty(heroCopyTweens[0]?.options ?? '', 'y') >= 16 && readNumericProperty(heroCopyTweens[0]?.options ?? '', 'y') <= 22, 'Hero copy entrance must rise 16-22px')
+assert(readNumericProperty(heroCopyTweens[0]?.options ?? '', 'opacity') === 0, 'Hero copy entrance must include opacity')
+assert(heroStringTweens.length === 1 && (heroStringLines.match(/<span\b/g) ?? []).length === 3, 'Hero must reveal exactly three strings once')
+assert(readNumericProperty(heroStringTweens[0]?.options ?? '', 'scaleX') === 0 && readStringProperty(heroStringTweens[0]?.options ?? '', 'transformOrigin') === 'left center', 'Hero strings must reveal left-to-right')
+assert(readNumericProperty(heroStringTweens[0]?.options ?? '', 'stagger') === 0.05, 'Hero strings must use a 0.05s stagger')
+assert(heroBrandTweens.length === 1, 'Hero horizontal logo must reveal exactly once')
+assert(readStringProperty(heroBrandTweens[0]?.options ?? '', 'clipPath') === 'inset(0 100% 0 0)' && readNumericProperty(heroBrandTweens[0]?.options ?? '', 'opacity') === 0, 'Hero horizontal logo must use a short rectangular opacity reveal')
+assert(heroPosterTweens.length === 1 && readStringProperty(heroPosterTweens[0]?.options ?? '', 'ease') === 'power3.out', 'Hero poster must settle once with power3.out')
+assert(heroMotionTweens.every(Boolean) && heroMotionTweens.every((tween) => Number.isFinite(Number(tween.position))), 'Hero sequence must use explicit seek-safe start positions')
+assert(heroMotionTweens.every(Boolean) && Math.max(
+  tweenActiveEnd(heroCopyTweens[0], 4),
+  tweenActiveEnd(heroPosterTweens[0]),
+  tweenActiveEnd(heroStringTweens[0], 3),
+  tweenActiveEnd(heroBrandTweens[0]),
+  tweenActiveEnd(heroDetailTweens[0], 3),
+) < 1.2, 'Hero active sequence must total less than 1.2s')
+assert(!/\brepeat\s*:|\byoyo\s*:/.test(hero), 'Hero sequence must not loop')
 assert(hasStaticClass(home, 'pain-flyer'), 'Homepage pain section must use the pinned flyer scene class')
 assert(home.includes('pin: true'), 'Homepage pain flyer animation must pin the section')
 assert(home.includes("trigger: flyer"), 'Homepage pain flyer animation must be triggered by the flyer section')
+assert(home.includes('pinSpacing: true') && home.includes('invalidateOnRefresh: true'), 'Homepage pain flyer pin must preserve responsive layout and recalculate at 390px, 768px, and desktop widths')
+assert(/end:\s*\(\)\s*=>/.test(home), 'Homepage pain flyer pin distance must respond to the rendered viewport and section size')
+const painTitleTween = readGsapTween(home, 'from', '#dolores-title')[0]
+const painNoteTween = readGsapTween(home, 'from', '.pain-flyer .note')[0]
+assert(!/back\.out|elastic/i.test(home), 'Homepage later motion must not use overshoot easing')
+assert(readStringProperty(painTitleTween?.options ?? '', 'ease') === 'power2.out' && readNumericProperty(painTitleTween?.options ?? '', 'y') <= 24, 'Homepage pain title must use a short power2.out move')
+assert(readStringProperty(painNoteTween?.options ?? '', 'ease') === 'power2.out' && readNumericProperty(painNoteTween?.options ?? '', 'y') <= 24, 'Homepage pain notes must use short power2.out moves')
+assert(Number.isNaN(readNumericProperty(painTitleTween?.options ?? '', 'rotate')) && Number.isNaN(readNumericProperty(painNoteTween?.options ?? '', 'rotate')), 'Homepage pain title and notes must not rotate on entrance')
+assert(!/<img\b[^>]*(?:logo|isotype)|\/(?:logo|isotype)-/i.test(home), 'Homepage must not introduce another logo below the hero')
 assert(hasStaticClass(home, 'section') && hasStaticClass(home, 'container') && hasStaticClass(home, 'services-stage'), 'Homepage services section must keep the services stage layout classes')
 assert(!home.includes('const services = homeRef.value?.querySelector(".services-stage")'), 'Homepage must not create a services-stage ScrollTrigger animation')
 assert(!home.includes("trigger: services"), 'Homepage services section must not trigger a scroll animation')

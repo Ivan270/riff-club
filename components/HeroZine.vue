@@ -13,53 +13,47 @@ onMounted(async () => {
 
     timeline
       .from(".hero-copy > *", {
-        y: 22,
+        y: 20,
         opacity: 0,
-        duration: 0.45,
-        stagger: 0.08,
-      })
+        duration: 0.4,
+        stagger: 0.05,
+      }, 0)
       .from(
         ".poster",
         {
-          y: 34,
+          y: 28,
           opacity: 0,
-          rotate: -1,
-          scale: 0.97,
-          duration: 0.58,
-          ease: "back.out(1.5)",
+          scale: 0.98,
+          duration: 0.55,
+          ease: "power3.out",
         },
-        "-=0.28",
-      )
-      .from(
-        ".poster-tape",
-        { y: -18, opacity: 0, duration: 0.28 },
-        "-=0.2",
-      )
-      .from(
-        ".poster-brand",
-        {
-          x: -24,
-          opacity: 0,
-          scale: 0.94,
-          duration: 0.38,
-          ease: "back.out(1.6)",
-        },
-        "-=0.14",
+        0.08,
       )
       .from(
         ".string-lines span",
         {
           scaleX: 0,
           transformOrigin: "left center",
-          duration: 0.32,
-          stagger: 0.045,
+          duration: 0.24,
+          stagger: 0.05,
         },
-        "-=0.28",
+        0.24,
       )
       .from(
-        ".poster-local, .poster-note",
-        { opacity: 0, scale: 0.92, duration: 0.28, stagger: 0.06 },
-        "-=0.2",
+        ".poster-brand",
+        {
+          x: -14,
+          clipPath: "inset(0 100% 0 0)",
+          opacity: 0,
+          duration: 0.3,
+          ease: "power3.inOut",
+        },
+        0.36,
+      )
+      .from(
+        ".poster-tape, .poster-local, .poster-note",
+        { y: 12, opacity: 0, duration: 0.2, stagger: 0.04 },
+        0.42,
       );
   });
 
