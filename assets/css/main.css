@@ -1,38 +1,56 @@
+:root {
+  --brand-onyx: #101010;
+  --brand-old-lace: #fff7e8;
+  --brand-lime: #d8ff00;
+  --brand-lavender: #a855f7;
+  --brand-cinnabar: #ff3b30;
+  --brand-graphite: #2a2a2a;
+  --brand-sand: #eadfc7;
+  --brand-bone: #d8d0bf;
+  --brand-stone: #5e574c;
+}
+
 :root,
 [data-theme="dark"] {
-  --ink: #101010;
-  --black: #050505;
-  --paper: #fff7e8;
-  --paper-aged: #eadfc7;
-  --acid: #d8ff00;
-  --red: #ff3b30;
-  --purple: #a855f7;
-  --tape: #f3d173;
-  --gray: #2a2a2a;
-  --muted: #d8d0bf;
-  --muted-on-dark: #d8d0bf;
-  --muted-ink: #5e574c;
-  --page-bg: #101010;
-  --page-text: #fff7e8;
-  --bg-start: #171717;
-  --bg-mid: #101010;
-  --bg-end: #050505;
-  --acid-glow: rgba(216, 255, 0, 0.18);
-  --red-glow: rgba(255, 59, 48, 0.16);
-  --grid-line: rgba(255, 247, 232, 0.06);
-  --grain-light: rgba(255, 255, 255, 0.55);
-  --grain-dark: rgba(0, 0, 0, 0.7);
-  --section-bg: #050505;
-  --section-bg-start: #181818;
-  --section-bg-end: #0b0b0b;
-  --section-text: #fff7e8;
-  --section-muted: #d8d0bf;
-  --section-border: #fff7e8;
-  --section-overlay: rgba(5, 5, 5, 0.9);
-  --header-bg: rgba(16, 16, 16, 0.94);
-  --purple-link-text: var(--ink);
+  --page-bg: var(--brand-onyx);
+  --page-text: var(--brand-old-lace);
+  --surface: var(--brand-graphite);
+  --surface-paper: var(--brand-old-lace);
+  --muted: var(--brand-bone);
+  --border: var(--brand-old-lace);
+  --accent-primary: var(--brand-lime);
+  --accent-secondary: var(--brand-cinnabar);
+  --accent-cultural: var(--brand-lavender);
+  --ink: var(--brand-onyx);
+  --paper: var(--surface-paper);
+  --paper-aged: var(--brand-sand);
+  --acid: var(--accent-primary);
+  --red: var(--accent-secondary);
+  --purple: var(--accent-cultural);
+  --gray: var(--surface);
+  --muted-on-dark: var(--brand-bone);
+  --muted-ink: var(--brand-stone);
+  --bg-start: var(--surface);
+  --bg-mid: var(--page-bg);
+  --bg-end: var(--page-bg);
+  --acid-glow: color-mix(in srgb, var(--accent-primary) 18%, transparent);
+  --red-glow: color-mix(in srgb, var(--accent-secondary) 16%, transparent);
+  --grid-line: color-mix(in srgb, var(--page-text) 6%, transparent);
+  --grain-light: color-mix(in srgb, var(--surface-paper) 55%, transparent);
+  --grain-dark: color-mix(in srgb, var(--brand-onyx) 70%, transparent);
+  --section-bg: var(--page-bg);
+  --section-bg-start: var(--surface);
+  --section-bg-end: var(--page-bg);
+  --section-text: var(--page-text);
+  --section-muted: var(--muted);
+  --section-border: var(--border);
+  --section-overlay: color-mix(in srgb, var(--page-bg) 90%, transparent);
+  --header-bg: color-mix(in srgb, var(--page-bg) 94%, transparent);
+  --compact-accent-label-foreground: var(--brand-lime);
+  --purple-link-text: var(--brand-onyx);
   --max: 1120px;
   --font-display: "Bricolage Grotesque", "Arial Black", Arial, sans-serif;
+  --font-ui: var(--font-display);
   --font-heading: var(--font-display);
   --font-body: "DM Sans", Arial, Helvetica, sans-serif;
   --weight-regular: 400;
@@ -53,43 +71,48 @@
   --tracking-display: -0.045em;
   --tracking-heading: -0.025em;
   --tracking-label: 0.1em;
-  --shadow-hard: 7px 7px 0 var(--black);
+  --shadow-hard: 7px 7px 0 var(--brand-onyx);
   color-scheme: dark;
 }
 
 [data-theme="light"] {
-  --ink: #241f1a;
-  --black: #101010;
-  --paper: #fff8e9;
-  --paper-aged: #e8dcc4;
-  --acid: #c5f000;
-  --red: #e93227;
-  --purple: #8f45dd;
-  --tape: #e9c769;
-  --gray: #f0e5d0;
-  --muted: #3f382f;
-  --muted-on-dark: #f0e4cb;
-  --muted-ink: #6a5d4e;
-  --page-bg: #fff6df;
-  --page-text: #241f1a;
-  --bg-start: #fffaf0;
-  --bg-mid: #fff6df;
-  --bg-end: #fff0cf;
-  --acid-glow: rgba(197, 240, 0, 0.26);
-  --red-glow: rgba(233, 50, 39, 0.13);
-  --grid-line: rgba(36, 31, 26, 0.08);
-  --grain-light: rgba(255, 255, 255, 0.82);
-  --grain-dark: rgba(36, 31, 26, 0.24);
-  --section-bg: #fff2d2;
-  --section-bg-start: #fffaf0;
-  --section-bg-end: #ffe5ad;
-  --section-text: #241f1a;
-  --section-muted: #574b3c;
-  --section-border: #241f1a;
-  --section-overlay: rgba(255, 248, 233, 0.92);
-  --header-bg: rgba(255, 246, 223, 0.94);
-  --purple-link-text: var(--paper);
-  --shadow-hard: 7px 7px 0 rgba(16, 16, 16, 0.82);
+  --page-bg: var(--brand-old-lace);
+  --page-text: var(--brand-onyx);
+  --surface: var(--brand-sand);
+  --surface-paper: var(--brand-old-lace);
+  --muted: var(--brand-stone);
+  --border: var(--brand-onyx);
+  --accent-primary: var(--brand-lime);
+  --accent-secondary: var(--brand-cinnabar);
+  --accent-cultural: var(--brand-lavender);
+  --ink: var(--brand-onyx);
+  --paper: var(--surface-paper);
+  --paper-aged: var(--brand-sand);
+  --acid: var(--accent-primary);
+  --red: var(--accent-secondary);
+  --purple: var(--accent-cultural);
+  --gray: var(--surface);
+  --muted-on-dark: var(--brand-bone);
+  --muted-ink: var(--brand-stone);
+  --bg-start: var(--surface-paper);
+  --bg-mid: var(--page-bg);
+  --bg-end: var(--surface);
+  --acid-glow: color-mix(in srgb, var(--accent-primary) 26%, transparent);
+  --red-glow: color-mix(in srgb, var(--accent-secondary) 13%, transparent);
+  --grid-line: color-mix(in srgb, var(--page-text) 8%, transparent);
+  --grain-light: color-mix(in srgb, var(--surface-paper) 82%, transparent);
+  --grain-dark: color-mix(in srgb, var(--page-text) 24%, transparent);
+  --section-bg: var(--surface-paper);
+  --section-bg-start: var(--surface-paper);
+  --section-bg-end: var(--surface);
+  --section-text: var(--page-text);
+  --section-muted: var(--muted);
+  --section-border: var(--border);
+  --section-overlay: color-mix(in srgb, var(--surface-paper) 92%, transparent);
+  --header-bg: color-mix(in srgb, var(--page-bg) 94%, transparent);
+  --compact-accent-label-foreground: var(--brand-onyx);
+  --purple-link-text: var(--brand-onyx);
+  --shadow-hard: 7px 7px 0 color-mix(in srgb, var(--brand-onyx) 82%, transparent);
   color-scheme: light;
 }
 
@@ -176,8 +199,8 @@ a {
   transform: translateY(-120%);
   padding: 12px 16px;
   background: var(--acid);
-  color: var(--black);
-  font-family: var(--font-body);
+  color: var(--ink);
+  font-family: var(--font-ui);
   font-size: var(--type-ui);
   font-weight: var(--weight-semibold);
   line-height: 1;
@@ -194,12 +217,12 @@ button:focus-visible,
 [tabindex]:focus-visible {
   outline: 4px solid var(--acid);
   outline-offset: 4px;
-  box-shadow: 0 0 0 8px var(--black);
+  box-shadow: 0 0 0 8px var(--brand-onyx);
 }
 
 ::selection {
   background: var(--acid);
-  color: var(--black);
+  color: var(--ink);
 }
 
 .container {
@@ -213,8 +236,8 @@ button:focus-visible,
 
 .eyebrow {
   display: inline-block;
-  color: var(--acid);
-  font-family: var(--font-body);
+  color: var(--compact-accent-label-foreground);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-semibold);
   line-height: 1.2;
@@ -277,7 +300,7 @@ h3 {
   border: 2px solid currentColor;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-ui);
   font-weight: var(--weight-semibold);
   line-height: 1.2;
@@ -307,7 +330,7 @@ h3 {
 .paper-panel,
 .zine-card {
   position: relative;
-  border: 3px solid var(--black);
+  border: 3px solid var(--brand-onyx);
   background: var(--paper);
   color: var(--ink);
   box-shadow: var(--shadow-hard);
@@ -319,11 +342,6 @@ h3 {
 
 .zine-card {
   padding: clamp(18px, 3vw, 28px);
-  transform: rotate(-0.6deg);
-}
-
-.zine-card:nth-child(even) {
-  transform: rotate(0.8deg);
 }
 
 .tape {
@@ -337,16 +355,15 @@ h3 {
   left: 50%;
   width: 92px;
   height: 24px;
-  background: rgba(243, 209, 115, 0.78);
-  background: color-mix(in srgb, var(--tape) 78%, transparent);
-  border: 1px solid rgba(16, 16, 16, 0.18);
-  transform: translateX(-50%) rotate(-4deg);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+  background: color-mix(in srgb, var(--brand-sand) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand-onyx) 18%, transparent);
+  transform: translateX(-50%);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--brand-onyx) 12%, transparent);
 }
 
 .halftone {
   background-image:
-    radial-gradient(circle, rgba(16, 16, 16, 0.28) 0 1px, transparent 1.5px),
+    radial-gradient(circle, color-mix(in srgb, var(--brand-onyx) 28%, transparent) 0 1px, transparent 1.5px),
     linear-gradient(135deg, var(--paper), var(--paper-aged));
   background-size:
     8px 8px,
@@ -378,7 +395,7 @@ h3 {
 .sticker {
   display: inline-block;
   padding: 8px 12px;
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   line-height: 1.2;
@@ -390,14 +407,14 @@ h3 {
   border: 2px solid var(--red);
   color: var(--ink);
   box-shadow: 3px 3px 0 var(--red);
-  transform: rotate(3deg);
+  transform: rotate(1deg);
 }
 
 .sticker {
   background: var(--paper);
   color: var(--ink);
-  box-shadow: 4px 4px 0 var(--black);
-  transform: rotate(-2deg);
+  box-shadow: 4px 4px 0 var(--brand-onyx);
+  transform: rotate(-1deg);
 }
 
 @media (prefers-reduced-motion: reduce) {

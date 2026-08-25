@@ -13,54 +13,47 @@ onMounted(async () => {
 
     timeline
       .from(".hero-copy > *", {
-        y: 22,
+        y: 20,
         opacity: 0,
-        duration: 0.45,
-        stagger: 0.08,
-      })
+        duration: 0.4,
+        stagger: 0.05,
+      }, 0)
       .from(
         ".poster",
         {
-          y: 34,
+          y: 28,
           opacity: 0,
-          rotate: -3,
-          scale: 0.97,
-          duration: 0.58,
-          ease: "back.out(1.5)",
+          scale: 0.98,
+          duration: 0.55,
+          ease: "power3.out",
         },
-        "-=0.28",
-      )
-      .from(
-        ".poster-tape",
-        { y: -18, opacity: 0, rotate: -14, duration: 0.28, stagger: 0.08 },
-        "-=0.2",
-      )
-      .from(
-        ".poster-brand",
-        {
-          x: -24,
-          opacity: 0,
-          rotate: -5,
-          scale: 0.94,
-          duration: 0.38,
-          ease: "back.out(1.6)",
-        },
-        "-=0.14",
+        0.08,
       )
       .from(
         ".string-lines span",
         {
           scaleX: 0,
           transformOrigin: "left center",
-          duration: 0.32,
-          stagger: 0.045,
+          duration: 0.24,
+          stagger: 0.05,
         },
-        "-=0.28",
+        0.24,
       )
       .from(
-        ".poster-local, .poster-note",
-        { opacity: 0, scale: 0.92, rotate: -4, duration: 0.28, stagger: 0.06 },
-        "-=0.2",
+        ".poster-brand",
+        {
+          x: -14,
+          clipPath: "inset(0 100% 0 0)",
+          opacity: 0,
+          duration: 0.3,
+          ease: "power3.inOut",
+        },
+        0.36,
+      )
+      .from(
+        ".poster-tape, .poster-local, .poster-note",
+        { y: 12, opacity: 0, duration: 0.2, stagger: 0.04 },
+        0.42,
       );
   });
 
@@ -99,11 +92,9 @@ onBeforeUnmount(() => {
     </div>
     <div class="poster" aria-hidden="true">
       <i class="poster-tape tape-a"></i>
-      <i class="poster-tape tape-b"></i>
       <div class="poster-local">La Reina / Santiago Oriente</div>
       <div class="string-lines">
-        <span></span><span></span><span></span><span></span><span></span
-        ><span></span>
+        <span></span><span></span><span></span>
       </div>
       <div class="poster-brand">
         <img :src="'/logo-full-light.svg'" alt="" aria-hidden="true" />
@@ -145,24 +136,8 @@ onBeforeUnmount(() => {
   background: var(--paper);
   color: var(--ink);
   border: 3px solid var(--ink);
-  box-shadow: 14px 14px 0 var(--red);
+  box-shadow: 10px 10px 0 var(--red);
   overflow: hidden;
-  transform: rotate(1deg);
-}
-
-.poster::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.22;
-  background-image: radial-gradient(
-    circle,
-    var(--ink) 0 1px,
-    transparent 1.5px
-  );
-  background-size: 7px 7px;
-  mix-blend-mode: multiply;
 }
 
 .poster::after {
@@ -183,21 +158,13 @@ onBeforeUnmount(() => {
   display: block;
   width: 118px;
   height: 30px;
-  background: color-mix(in srgb, var(--tape) 78%, transparent);
-  border: 1px solid rgba(16, 16, 16, 0.16);
-  box-shadow: 0 2px 0 rgba(16, 16, 16, 0.12);
+  background: color-mix(in srgb, var(--brand-sand) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand-onyx) 16%, transparent);
 }
 
 .tape-a {
   top: 18px;
   left: 22px;
-  transform: rotate(-9deg);
-}
-
-.tape-b {
-  top: 24px;
-  right: 24px;
-  transform: rotate(7deg);
 }
 
 .poster-local {
@@ -207,13 +174,12 @@ onBeforeUnmount(() => {
   padding: 8px 10px;
   border: 2px solid var(--ink);
   background: var(--acid);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   line-height: 1.2;
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  transform: rotate(-2deg);
 }
 
 .string-lines {
@@ -224,14 +190,13 @@ onBeforeUnmount(() => {
   z-index: 1;
   display: grid;
   gap: 13px;
-  transform: rotate(-5deg);
+  transform: rotate(-45deg);
 }
 
 .string-lines span {
   display: block;
   height: 3px;
   background: var(--ink);
-  box-shadow: 0 10px 0 rgba(16, 16, 16, 0.12);
 }
 
 .poster-brand {
@@ -244,8 +209,6 @@ onBeforeUnmount(() => {
   padding: 22px 16px;
   background: color-mix(in srgb, var(--paper) 84%, transparent);
   border: 3px solid var(--ink);
-  box-shadow: 8px 8px 0 var(--acid);
-  transform: rotate(-2deg);
 }
 
 .poster-brand img {
@@ -263,7 +226,7 @@ onBeforeUnmount(() => {
   padding: 8px 10px;
   background: var(--ink);
   color: var(--paper);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   line-height: 1.2;

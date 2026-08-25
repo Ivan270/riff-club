@@ -80,21 +80,39 @@ onMounted(async () => {
         return;
       }
 
+      const flyerSheet = flyer.querySelector(".pain-flyer__sheet");
+      let refreshFrame: number | undefined;
+      let motionDisposed = false;
+      const scheduleRefresh = () => {
+        if (motionDisposed || refreshFrame !== undefined) {
+          return;
+        }
+
+        refreshFrame = window.requestAnimationFrame(() => {
+          refreshFrame = undefined;
+          if (!motionDisposed) {
+            ScrollTrigger.refresh();
+          }
+        });
+      };
+
       gsap
         .timeline({
           scrollTrigger: {
             trigger: flyer,
             start: "top top",
-            end: "+=135%",
+            end: () => `+=${Math.max(flyer.scrollHeight, window.innerHeight)}`,
             scrub: 0.8,
             pin: true,
+            pinSpacing: true,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
           },
         })
         .from(".pain-flyer__sheet", {
           yPercent: 18,
           scale: 0.92,
-          rotate: -2.5,
+          rotate: -1,
           opacity: 0,
           duration: 0.32,
           ease: "power3.out",
@@ -107,25 +125,21 @@ onMounted(async () => {
         .from(
           "#dolores-title",
           {
-            y: 46,
+            y: 22,
             opacity: 0,
-            scale: 0.88,
-            rotate: 1.2,
-            duration: 0.28,
-            ease: "back.out(1.4)",
+            duration: 0.24,
+            ease: "power2.out",
           },
           "-=0.06",
         )
         .from(
           ".pain-flyer .note",
           {
-            y: 70,
+            y: 20,
             opacity: 0,
-            scale: 0.82,
-            rotate: 7,
-            duration: 0.3,
-            stagger: 0.08,
-            ease: "back.out(1.8)",
+            duration: 0.24,
+            stagger: 0.06,
+            ease: "power2.out",
           },
           "+=0.08",
         )
@@ -141,7 +155,23 @@ onMounted(async () => {
           "+=0.08",
         );
 
-      ScrollTrigger.refresh();
+      const resizeObserver = new ResizeObserver(scheduleRefresh);
+      resizeObserver.observe(flyer);
+      if (flyerSheet) {
+        resizeObserver.observe(flyerSheet);
+      }
+
+      void document.fonts.ready.then(scheduleRefresh);
+      scheduleRefresh();
+
+      return () => {
+        motionDisposed = true;
+        resizeObserver.disconnect();
+        if (refreshFrame !== undefined) {
+          window.cancelAnimationFrame(refreshFrame);
+          refreshFrame = undefined;
+        }
+      };
     },
   );
 });
@@ -255,37 +285,13 @@ h2 {
   justify-content: center;
   padding: clamp(28px, 6vw, 72px);
   border: 3px solid var(--ink);
-  background:
-    radial-gradient(
-      circle at 18% 20%,
-      color-mix(in srgb, var(--red) 22%, transparent) 0 8rem,
-      transparent 8.2rem
-    ),
-    radial-gradient(
-      circle at 88% 18%,
-      color-mix(in srgb, var(--acid) 26%, transparent) 0 7rem,
-      transparent 7.2rem
-    ),
-    linear-gradient(135deg, var(--paper) 0%, var(--paper-aged) 100%);
+  background: linear-gradient(135deg, var(--paper) 0%, var(--paper-aged) 100%);
   color: var(--ink);
   box-shadow: 18px 18px 0 var(--red);
   isolation: isolate;
 }
-.pain-flyer__sheet::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.18;
-  background-image: radial-gradient(
-    circle,
-    var(--ink) 0 1px,
-    transparent 1.4px
-  );
-  background-size: 8px 8px;
-}
 .pain-flyer .eyebrow {
-  color: var(--red);
+  color: var(--ink);
 }
 .services-stage {
   min-height: 100svh;
@@ -311,25 +317,7 @@ h2 {
   border: 2px solid var(--ink);
   background: var(--paper);
   color: var(--ink);
-  box-shadow: 8px 8px 0 #000;
-  transform: rotate(-1.5deg);
-}
-.note:nth-child(2) {
-  transform: rotate(1deg);
-}
-.note:nth-child(3) {
-  transform: rotate(-0.5deg);
-}
-.note::before {
-  content: "";
-  position: absolute;
-  top: -11px;
-  left: 24px;
-  width: 72px;
-  height: 20px;
-  background: color-mix(in srgb, var(--acid) 78%, white);
-  border: 1px solid var(--ink);
-  transform: rotate(-3deg);
+  box-shadow: 8px 8px 0 var(--brand-onyx);
 }
 .note h3 {
   color: var(--ink);
@@ -340,7 +328,7 @@ h2 {
   letter-spacing: -0.015em;
 }
 .note p {
-  color: #272727;
+  color: var(--muted-ink);
 }
 .method p {
   color: var(--section-muted);
@@ -371,12 +359,11 @@ h2 {
   padding: 5px 10px;
   border: 1px solid var(--section-border);
   color: var(--section-text);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  transform: rotate(4deg);
 }
 @media (max-width: 860px) {
   .pain-flyer {
@@ -394,11 +381,8 @@ h2 {
   .service-grid {
     grid-template-columns: 1fr;
   }
-  .note,
-  .note:nth-child(2),
-  .note:nth-child(3) {
-    transform: none;
-    box-shadow: 4px 6px 0 #000;
+  .note {
+    box-shadow: 4px 6px 0 var(--brand-onyx);
   }
   .setlist-panel {
     box-shadow: 4px 6px 0 var(--red);

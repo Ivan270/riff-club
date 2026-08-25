@@ -20,7 +20,7 @@ const { theme, themeLabel, toggleTheme } = useTheme()
   color: var(--ink);
   box-shadow: 4px 4px 0 var(--acid);
   cursor: pointer;
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-ui);
   font-weight: var(--weight-semibold);
   line-height: 1.2;

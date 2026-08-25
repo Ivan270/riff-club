@@ -16,10 +16,6 @@ const previousBodyOverflow = shallowRef("")
 const triggerRef = useTemplateRef<HTMLButtonElement>("trigger")
 const menuRef = useTemplateRef<HTMLElement>("menu")
 
-const isotypeSrc = computed(() =>
-  theme.value === "light" ? "/isotype-light.svg" : "/isotype-dark.svg",
-)
-
 const isActive = (path: string) => route.path === path
 
 const getFocusableElements = () => {
@@ -122,7 +118,11 @@ onBeforeUnmount(() => {
       :aria-label="isOpen ? 'Cerrar menú' : 'Abrir menú'"
       @click="toggleMenu"
     >
-      <img :src="isotypeSrc" alt="" aria-hidden="true" />
+      <span class="menu-strings" aria-hidden="true">
+        <span class="menu-string"></span>
+        <span class="menu-string"></span>
+        <span class="menu-string"></span>
+      </span>
     </button>
 
     <Teleport to="body">
@@ -193,10 +193,17 @@ onBeforeUnmount(() => {
   transform: rotate(1deg);
 }
 
-.mobile-menu-toggle img {
-  display: block;
-  width: 100%;
-  height: 100%;
+.menu-strings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transform: rotate(-45deg);
+}
+
+.menu-string {
+  width: 28px;
+  height: 3px;
+  background: var(--ink);
 }
 
 .mobile-menu {
@@ -245,8 +252,8 @@ onBeforeUnmount(() => {
 }
 
 .mobile-menu__serial {
-  color: var(--acid);
-  font-family: var(--font-body);
+  color: var(--compact-accent-label-foreground);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
@@ -264,7 +271,7 @@ onBeforeUnmount(() => {
   padding: 12px 16px;
   border: 2px solid transparent;
   color: var(--page-text);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: clamp(2.25rem, 10vw, 5.5rem);
   font-weight: var(--weight-heavy);
   line-height: 0.92;
@@ -299,7 +306,7 @@ onBeforeUnmount(() => {
 .mobile-menu__footer p {
   margin: 0;
   color: var(--section-muted);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-label);

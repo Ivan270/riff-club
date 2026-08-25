@@ -62,14 +62,7 @@ article {
   background: var(--paper);
   color: var(--ink);
   border: 2px solid var(--ink);
-  box-shadow: 8px 8px 0 #000;
-  transform: rotate(-1.5deg);
-}
-article:nth-child(2) {
-  transform: rotate(1deg);
-}
-article:nth-child(3) {
-  transform: rotate(-0.5deg);
+  box-shadow: 8px 8px 0 var(--brand-onyx);
 }
 article::before {
   counter-increment: setlist;
@@ -77,14 +70,14 @@ article::before {
   position: absolute;
   top: 14px;
   left: 18px;
-  color: var(--red);
-  font-family: var(--font-body);
+  color: var(--ink);
+  font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
 }
 article p {
-  color: #272727;
+  color: var(--muted-ink);
 }
 h2 {
   font-family: var(--font-display);
@@ -97,11 +90,8 @@ h2 {
   .setlist-steps {
     grid-template-columns: 1fr;
   }
-  article,
-  article:nth-child(2),
-  article:nth-child(3) {
-    transform: none;
-    box-shadow: 4px 6px 0 #000;
+  article {
+    box-shadow: 4px 6px 0 var(--brand-onyx);
   }
 }
 </style>

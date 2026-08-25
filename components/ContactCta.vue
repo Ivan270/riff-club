@@ -21,7 +21,7 @@ onMounted(async () => {
       .from(".cta-paper", {
         y: 30,
         opacity: 0,
-        rotate: -3,
+        rotate: -1,
         duration: 0.48,
         ease: "back.out(1.4)",
       })
@@ -30,16 +30,11 @@ onMounted(async () => {
         {
           scale: 0.86,
           opacity: 0,
-          rotate: -8,
+          rotate: -1,
           duration: 0.24,
           ease: "back.out(2)",
         },
         "-=0.2",
-      )
-      .from(
-        ".tear-offs span",
-        { y: 14, opacity: 0, duration: 0.22, stagger: 0.04 },
-        "-=0.12",
       );
   });
 
@@ -56,7 +51,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section ref="ctaRef" class="cta" aria-labelledby="cta-title">
-    <div class="cta-paper tear-edge">
+    <div class="cta-paper">
       <p class="stamp">Cupos presenciales</p>
       <h2 id="cta-title">¿Listo para tocar con dirección?</h2>
       <p>
@@ -75,9 +70,6 @@ onBeforeUnmount(() => {
           >Enviar formulario</NuxtLink
         >
       </div>
-      <div class="tear-offs" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span>
-      </div>
     </div>
   </section>
 </template>
@@ -94,17 +86,7 @@ onBeforeUnmount(() => {
   background: var(--paper);
   color: var(--ink);
   border: 3px solid var(--ink);
-  box-shadow:
-    10px 10px 0 var(--purple),
-    18px 18px 0 var(--acid);
-  transform: rotate(-0.5deg);
-}
-.cta-paper::before {
-  content: "";
-  position: absolute;
-  inset: 14px;
-  pointer-events: none;
-  border: 2px dashed rgba(16, 16, 16, 0.32);
+  box-shadow: 10px 10px 0 var(--red);
 }
 h2 {
   position: relative;
@@ -128,26 +110,7 @@ p {
   gap: 16px;
   margin-top: 22px;
 }
-.tear-offs {
-  position: absolute;
-  right: clamp(18px, 5vw, 48px);
-  bottom: -2px;
-  left: clamp(18px, 5vw, 48px);
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-}
-.tear-offs span {
-  height: 34px;
-  background: linear-gradient(180deg, var(--paper-aged), var(--paper));
-  border: 2px solid var(--ink);
-  border-bottom: 0;
-  box-shadow: 3px 0 0 rgba(16, 16, 16, 0.18) inset;
-}
-.tear-offs span:nth-child(even) {
-  transform: translateY(7px) rotate(1deg);
-}
-.tear-offs span:nth-child(odd) {
-  transform: rotate(-1deg);
+.button-primary {
+  background: var(--acid);
 }
 </style>

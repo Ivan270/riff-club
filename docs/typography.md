@@ -5,7 +5,8 @@ Riff Club uses contrast between expressive headlines and calm functional text.
 ## Font Roles
 
 - **Bricolage Grotesque:** hero headlines, H1-H3 headings, card titles, large numbers, pull quotes, and short campaign statements.
-- **DM Sans:** body copy, lead paragraphs, navigation, buttons, forms, labels, captions, schedules, FAQs, and metadata.
+- **Bricolage Grotesque UI:** navigation, buttons, menu controls, eyebrows, stamps, stickers, compact labels, badges, tabs, and metadata.
+- **DM Sans:** body copy, lead paragraphs, descriptions, forms, schedules, and FAQs.
 - **Official logo SVGs:** the wordmark is always an image asset. Do not recreate `RIFF CLUB` with live text.
 
 ## Responsive Hierarchy
@@ -17,8 +18,8 @@ Riff Club uses contrast between expressive headlines and calm functional text.
 | H3 | Bricolage Grotesque | 700 | `clamp(1.5rem, 2.4vw, 2rem)` |
 | Lead | DM Sans | 500 | `clamp(1.125rem, 1.6vw, 1.375rem)` |
 | Body | DM Sans | 400 | `clamp(1rem, 1.1vw, 1.125rem)` |
-| UI | DM Sans | 500-600 | `clamp(1rem, 1vw, 1rem)` |
-| Label | DM Sans | 600-700 | `clamp(0.75rem, 0.9vw, 0.875rem)` |
+| UI | Bricolage Grotesque | 500-600 | `clamp(1rem, 1vw, 1rem)` |
+| Label | Bricolage Grotesque | 600-700 | `clamp(0.75rem, 0.9vw, 0.875rem)` |
 
 Large headlines use tight leading and modest negative tracking. On small screens,
 reduce tracking before reducing readability or forcing words to collide.
@@ -48,5 +49,5 @@ theme-aware foreground token so they remain readable in dark and light modes.
 ## Tokens
 
 The implementation lives in `assets/css/main.css`. Reuse `--font-display`,
-`--font-body`, the `--weight-*` tokens, and the `--type-*` tokens instead of
-adding one-off font declarations in components.
+`--font-ui`, `--font-body`, the `--weight-*` tokens, and the `--type-*` tokens
+instead of adding one-off font declarations in components.
