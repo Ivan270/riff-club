@@ -184,6 +184,7 @@ export const useGsapMotion = () => {
           element.removeEventListener('pointerleave', onPointerUp)
           element.removeEventListener('pointercancel', onPointerUp)
           gsap.killTweensOf(element)
+          gsap.set(element, { clearProps: 'transform' })
         }
       })
 

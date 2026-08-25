@@ -855,6 +855,7 @@ assert(/setupCleanup\?\.\(\)/.test(motion), 'Motion setup callbacks must be able
 assert(motion.includes('isCurrent') && motion.includes('generation'), 'Motion initialization must guard lazy-import races with a current generation')
 assert((motion.match(/bindWhenMotionAllowed\s*\(/g) ?? []).length >= 2, 'Timelines and press feedback must share the dynamic reduced-motion lifecycle')
 assert(motion.includes('gsap.killTweensOf(element)'), 'Reduced-motion cleanup must kill active press-feedback tweens')
+assert(/gsap\.set\s*\(\s*element\s*,\s*\{[^}]*clearProps\s*:\s*(["'])transform\1[^}]*\}\s*\)/s.test(motion), 'Press-feedback cleanup must remove only its inline transform so stylesheet transforms resume')
 const heroCopyTweens = readGsapTween(hero, 'from', '.hero-copy > *')
 const heroPosterTweens = readGsapTween(hero, 'from', '.poster')
 const heroStringTweens = readGsapTween(hero, 'from', '.string-lines span')
