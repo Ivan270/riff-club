@@ -261,15 +261,53 @@ const hasTransformFunction = (source, selector, functionName) => declarationValu
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const hasStaticClass = (source, className) => [...stripVueComments(source).matchAll(/\bclass\s*=\s*(["'])([^"']*)\1/g)]
   .some(([, , classes]) => classes.split(/\s+/).includes(className))
+const countStaticClass = (source, className) => [...stripVueComments(source).matchAll(/\bclass\s*=\s*(["'])([^"']*)\1/g)]
+  .filter(([, , classes]) => classes.split(/\s+/).includes(className))
+  .length
+const countDirectElementChildren = (source) => {
+  const voidElements = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'])
+  let count = 0
+  let depth = 0
+
+  for (const match of stripVueComments(source).matchAll(/<\s*(\/?)\s*([a-z][\w-]*)\b[^>]*?(\/?)>/gi)) {
+    const [, closing, tagName, selfClosing] = match
+    if (closing) {
+      depth = Math.max(0, depth - 1)
+      continue
+    }
+    if (depth === 0) count += 1
+    if (!selfClosing && !voidElements.has(tagName.toLowerCase())) depth += 1
+  }
+  return count
+}
 const readOpeningTags = (source, tagName) => [...stripVueComments(source).matchAll(new RegExp(`<${tagName}\\b[^>]*>`, 'gi'))]
   .map((match) => match[0])
 const hasAttribute = (tag, attribute, value) => {
   const match = tag.match(new RegExp(`(?:^|\\s)${escapeRegExp(attribute)}\\s*=\\s*(["'])(.*?)\\1`))
   return Boolean(match && (value === undefined || normalizeWhitespace(match[2]) === value))
 }
-const readElementContentByClass = (source, tagName, className) => source.match(new RegExp(
-  `<${tagName}\\b(?=[^>]*\\bclass\\s*=\\s*(["'])[^"']*\\b${escapeRegExp(className)}\\b[^"']*\\1)[^>]*>([\\s\\S]*?)<\\/${tagName}>`,
-))?.[2] ?? ''
+const readElementContentByClass = (source, tagName, className) => {
+  const cleanSource = stripVueComments(source)
+  const openingPattern = new RegExp(`<${tagName}\\b[^>]*>`, 'gi')
+
+  for (const opening of cleanSource.matchAll(openingPattern)) {
+    const classes = opening[0].match(/\bclass\s*=\s*(["'])([^"']*)\1/)?.[2].split(/\s+/) ?? []
+    if (!classes.includes(className)) continue
+
+    const contentStart = (opening.index ?? 0) + opening[0].length
+    const tagPattern = new RegExp(`<\\/?${tagName}\\b[^>]*>`, 'gi')
+    tagPattern.lastIndex = contentStart
+    let depth = 1
+    let tag
+
+    while ((tag = tagPattern.exec(cleanSource)) !== null) {
+      depth += tag[0].startsWith('</') ? -1 : 1
+      if (depth === 0) return cleanSource.slice(contentStart, tag.index)
+    }
+  }
+
+  return ''
+}
 const readNumericMap = (source, variableName) => {
   const body = source.match(new RegExp(`const\\s+${variableName}\\s*=\\s*\\{([\\s\\S]*?)\\}`))?.[1] ?? ''
   return Object.fromEntries([...body.matchAll(/([\w-]+)\s*:\s*(\d+)/g)].map(([, key, value]) => [key, Number(value)]))
@@ -810,12 +848,26 @@ assert(motion.includes("import('gsap/ScrollTrigger')"), 'ScrollTrigger must be d
 assert(motion.includes('prefers-reduced-motion: reduce'), 'Motion composable must respect reduced motion')
 assert(motion.includes('gsap.context'), 'Motion composable must use gsap.context for cleanup')
 assert(!motion.includes('scrollerProxy'), 'Motion composable must not use scroll-jacking APIs')
+assert(/\.addEventListener\(\s*['"]change['"]/.test(motion), 'Motion composable must listen for reduced-motion preference changes')
+assert(/\.removeEventListener\(\s*['"]change['"]/.test(motion), 'Motion composable must remove its reduced-motion preference listener')
+assert(motion.includes('context.revert()'), 'Reduced-motion changes must revert active GSAP contexts and ScrollTriggers')
+assert(/setupCleanup\?\.\(\)/.test(motion), 'Motion setup callbacks must be able to return lifecycle cleanup')
+assert(motion.includes('isCurrent') && motion.includes('generation'), 'Motion initialization must guard lazy-import races with a current generation')
+assert((motion.match(/bindWhenMotionAllowed\s*\(/g) ?? []).length >= 2, 'Timelines and press feedback must share the dynamic reduced-motion lifecycle')
+assert(motion.includes('gsap.killTweensOf(element)'), 'Reduced-motion cleanup must kill active press-feedback tweens')
 const heroCopyTweens = readGsapTween(hero, 'from', '.hero-copy > *')
 const heroPosterTweens = readGsapTween(hero, 'from', '.poster')
 const heroStringTweens = readGsapTween(hero, 'from', '.string-lines span')
 const heroBrandTweens = readGsapTween(hero, 'from', '.poster-brand')
 const heroDetailTweens = readGsapTween(hero, 'from', '.poster-tape, .poster-local, .poster-note')
 const heroMotionTweens = [heroCopyTweens[0], heroPosterTweens[0], heroStringTweens[0], heroBrandTweens[0], heroDetailTweens[0]]
+const heroCopyTargetCount = countDirectElementChildren(readElementContentByClass(hero, 'div', 'hero-copy'))
+const heroStringTargetCount = countDirectElementChildren(heroStringLines)
+const heroPosterTargetCount = countStaticClass(hero, 'poster')
+const heroBrandTargetCount = countStaticClass(hero, 'poster-brand')
+const heroDetailTargetCount = ['poster-tape', 'poster-local', 'poster-note']
+  .reduce((count, className) => count + countStaticClass(hero, className), 0)
+assert([heroCopyTargetCount, heroStringTargetCount, heroPosterTargetCount, heroBrandTargetCount, heroDetailTargetCount].every((count) => count > 0), 'Hero duration contract must resolve every tween target from template structure')
 assert(!/back\.out|elastic/i.test(hero), 'Hero motion must not use back or elastic overshoot')
 assert(heroCopyTweens.length === 1, 'Hero copy must rise in one clear entrance tween')
 assert(readNumericProperty(heroCopyTweens[0]?.options ?? '', 'y') >= 16 && readNumericProperty(heroCopyTweens[0]?.options ?? '', 'y') <= 22, 'Hero copy entrance must rise 16-22px')
@@ -828,11 +880,11 @@ assert(readStringProperty(heroBrandTweens[0]?.options ?? '', 'clipPath') === 'in
 assert(heroPosterTweens.length === 1 && readStringProperty(heroPosterTweens[0]?.options ?? '', 'ease') === 'power3.out', 'Hero poster must settle once with power3.out')
 assert(heroMotionTweens.every(Boolean) && heroMotionTweens.every((tween) => Number.isFinite(Number(tween.position))), 'Hero sequence must use explicit seek-safe start positions')
 assert(heroMotionTweens.every(Boolean) && Math.max(
-  tweenActiveEnd(heroCopyTweens[0], 4),
-  tweenActiveEnd(heroPosterTweens[0]),
-  tweenActiveEnd(heroStringTweens[0], 3),
-  tweenActiveEnd(heroBrandTweens[0]),
-  tweenActiveEnd(heroDetailTweens[0], 3),
+  tweenActiveEnd(heroCopyTweens[0], heroCopyTargetCount),
+  tweenActiveEnd(heroPosterTweens[0], heroPosterTargetCount),
+  tweenActiveEnd(heroStringTweens[0], heroStringTargetCount),
+  tweenActiveEnd(heroBrandTweens[0], heroBrandTargetCount),
+  tweenActiveEnd(heroDetailTweens[0], heroDetailTargetCount),
 ) < 1.2, 'Hero active sequence must total less than 1.2s')
 assert(!/\brepeat\s*:|\byoyo\s*:/.test(hero), 'Hero sequence must not loop')
 assert(hasStaticClass(home, 'pain-flyer'), 'Homepage pain section must use the pinned flyer scene class')
@@ -840,6 +892,11 @@ assert(home.includes('pin: true'), 'Homepage pain flyer animation must pin the s
 assert(home.includes("trigger: flyer"), 'Homepage pain flyer animation must be triggered by the flyer section')
 assert(home.includes('pinSpacing: true') && home.includes('invalidateOnRefresh: true'), 'Homepage pain flyer pin must preserve responsive layout and recalculate at 390px, 768px, and desktop widths')
 assert(/end:\s*\(\)\s*=>/.test(home), 'Homepage pain flyer pin distance must respond to the rendered viewport and section size')
+assert(/document\.fonts\??\.ready|document\.fonts\.ready/.test(home), 'Homepage pain flyer must refresh after document fonts are ready')
+assert(home.includes('new ResizeObserver'), 'Homepage pain flyer must observe relevant size changes')
+assert(home.includes('requestAnimationFrame') && home.includes('cancelAnimationFrame'), 'Homepage pain flyer refreshes must be frame-coalesced and cancellable')
+assert(/\.disconnect\(\)/.test(home), 'Homepage pain flyer cleanup must disconnect its ResizeObserver')
+assert(/return\s*\(\)\s*=>\s*\{/.test(home), 'Homepage pain flyer setup must return cleanup through runWhenMotionAllowed')
 const painTitleTween = readGsapTween(home, 'from', '#dolores-title')[0]
 const painNoteTween = readGsapTween(home, 'from', '.pain-flyer .note')[0]
 assert(!/back\.out|elastic/i.test(home), 'Homepage later motion must not use overshoot easing')

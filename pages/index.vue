@@ -80,6 +80,22 @@ onMounted(async () => {
         return;
       }
 
+      const flyerSheet = flyer.querySelector(".pain-flyer__sheet");
+      let refreshFrame: number | undefined;
+      let motionDisposed = false;
+      const scheduleRefresh = () => {
+        if (motionDisposed || refreshFrame !== undefined) {
+          return;
+        }
+
+        refreshFrame = window.requestAnimationFrame(() => {
+          refreshFrame = undefined;
+          if (!motionDisposed) {
+            ScrollTrigger.refresh();
+          }
+        });
+      };
+
       gsap
         .timeline({
           scrollTrigger: {
@@ -139,7 +155,23 @@ onMounted(async () => {
           "+=0.08",
         );
 
-      ScrollTrigger.refresh();
+      const resizeObserver = new ResizeObserver(scheduleRefresh);
+      resizeObserver.observe(flyer);
+      if (flyerSheet) {
+        resizeObserver.observe(flyerSheet);
+      }
+
+      void document.fonts.ready.then(scheduleRefresh);
+      scheduleRefresh();
+
+      return () => {
+        motionDisposed = true;
+        resizeObserver.disconnect();
+        if (refreshFrame !== undefined) {
+          window.cancelAnimationFrame(refreshFrame);
+          refreshFrame = undefined;
+        }
+      };
     },
   );
 });
