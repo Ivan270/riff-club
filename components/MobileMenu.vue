@@ -252,7 +252,7 @@ onBeforeUnmount(() => {
 }
 
 .mobile-menu__serial {
-  color: var(--acid);
+  color: var(--compact-accent-label-foreground);
   font-family: var(--font-ui);
   font-size: var(--type-label);
   font-weight: var(--weight-bold);

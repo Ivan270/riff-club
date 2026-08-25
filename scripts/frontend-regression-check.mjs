@@ -1,7 +1,9 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
 const readBuffer = (path) => readFileSync(new URL(`../${path}`, import.meta.url))
+const sha256 = (path) => createHash('sha256').update(readBuffer(path)).digest('hex')
 const stripCssComments = (source) => source.replace(/\/\*[\s\S]*?\*\//g, '')
 const stripVueComments = (source) => source.replace(/<!--[\s\S]*?-->/g, '')
 const readStyles = (source) => [...source.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/g)].map((match) => match[1]).join('\n')
@@ -17,7 +19,7 @@ const colorCustomProperties = new Set([
   '--muted', '--muted-on-dark', '--muted-ink', '--border', '--surface', '--surface-paper', '--page-bg', '--page-text',
   '--bg-start', '--bg-mid', '--bg-end', '--grid-line', '--grain-light', '--grain-dark', '--section-bg', '--section-bg-start',
   '--section-bg-end', '--section-text', '--section-muted', '--section-border', '--section-overlay', '--header-bg', '--shadow-hard',
-  '--service-accent', '--area-accent'
+  '--compact-accent-label-foreground', '--service-accent', '--area-accent'
 ])
 const hasDirectColorSyntax = (value) => /#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b|\b(?:rgb|rgba|hsl|hsla|oklch|lab|lch|hwb|color|color-mix|(?:repeating-)?(?:linear|radial|conic)-gradient)\s*\(/i.test(value)
 const isColorDeclaration = (property, value) => {
@@ -502,6 +504,14 @@ assert(hasAttribute(footerLogoImage, ':src', 'footerLogoSrc'), 'SiteFooter must 
 assert(hasExactFooterLogoMapping(footer), 'SiteFooter footerLogoSrc must map light theme to logo-full-light and dark theme to logo-full-dark')
 assert(readSvgFills(logoFullLight).size === 1 && readSvgFills(logoFullLight).has('#101010'), 'logo-full-light must be the Onyx horizontal logo for light surfaces')
 assert(readSvgFills(logoFullDark).size === 1 && readSvgFills(logoFullDark).has('#fff7e8'), 'logo-full-dark must be the Old Lace horizontal logo for dark surfaces')
+for (const [path, expectedHash] of [
+  ['public/logo-full-dark.svg', '28ca560110ed39c617b81e60b180de8e6e59c1d57a3cd5daa5bb7f42e3a47a79'],
+  ['public/logo-full-light.svg', 'd8e67bca77445ff8a07469ad1df1f9bca6307e67e95b9753bc27bfd123385e45'],
+  ['public/isotype-dark.svg', '767c9d2b049f231b169ba5911c76cfa232a4e7ea4e1bac84c938f7f55aa439d7'],
+  ['public/isotype-light.svg', '2920b6c9a4e30470ca353bd083c7da0cac8e57daccaede4752139e4c4c199061']
+]) {
+  assert(sha256(path) === expectedHash, `${path} must retain the immutable official responsive logo geometry`)
+}
 assert(hasDeclaration(footer, '.footer-logo', 'min-width', '180px'), 'SiteFooter horizontal logo must render at least 180px wide')
 assert(!/var\(--red\)|var\(--brand-cinnabar\)/.test(footer), 'SiteFooter must not use Cinnabar decoration')
 assert(footer.includes('var(--acid)') && footer.includes('var(--purple)'), 'SiteFooter accents must be Lime and Lavender only')
@@ -753,6 +763,7 @@ for (const [token, value] of [
   ['--section-border', 'var(--border)'],
   ['--section-overlay', 'color-mix(in srgb, var(--page-bg) 90%, transparent)'],
   ['--header-bg', 'color-mix(in srgb, var(--page-bg) 94%, transparent)'],
+  ['--compact-accent-label-foreground', 'var(--brand-lime)'],
   ['--purple-link-text', 'var(--brand-onyx)'],
   ['--shadow-hard', '7px 7px 0 var(--brand-onyx)']
 ]) {
@@ -784,6 +795,7 @@ for (const [token, value] of [
   ['--section-border', 'var(--border)'],
   ['--section-overlay', 'color-mix(in srgb, var(--surface-paper) 92%, transparent)'],
   ['--header-bg', 'color-mix(in srgb, var(--page-bg) 94%, transparent)'],
+  ['--compact-accent-label-foreground', 'var(--brand-onyx)'],
   ['--purple-link-text', 'var(--brand-onyx)'],
   ['--shadow-hard', '7px 7px 0 color-mix(in srgb, var(--brand-onyx) 82%, transparent)']
 ]) {
@@ -792,6 +804,12 @@ for (const [token, value] of [
 
 const cssWithoutPrimitiveBlock = normalizedCss.slice(primitiveBlock.length)
 assert(!/var\(--(?:black|tape)\)|--(?:black|tape)\s*:/.test(normalizedCss), 'Global CSS must remove the legacy --black and --tape aliases and consumers')
+assert(hasUniqueEffectiveDeclaration(darkThemeBlock, '--compact-accent-label-foreground', 'var(--brand-lime)'), '--compact-accent-label-foreground must map to brand Lime in the root/dark theme')
+assert(hasDeclaration(css, '.eyebrow', 'color', 'var(--compact-accent-label-foreground)'), 'Global .eyebrow must consume the compact accent-label foreground token')
+assert(hasDeclaration(mobileMenu, '.mobile-menu__serial', 'color', 'var(--compact-accent-label-foreground)'), 'Mobile menu serial must consume the compact accent-label foreground token')
+assert(contrastRatio('#d8ff00', '#101010') >= 4.5, 'Dark compact accent labels must keep Lime-on-Onyx WCAG AA contrast')
+assert(contrastRatio('#101010', '#fff7e8') >= 4.5, 'Light compact accent labels must keep Onyx-on-Old-Lace WCAG AA contrast')
+assert(contrastRatio('#d8ff00', '#fff7e8') < 4.5, 'Lime text on Old Lace must remain explicitly prohibited')
 
 for (const [path, source] of [
   ['assets/css/main.css runtime declarations', cssWithoutPrimitiveBlock],
